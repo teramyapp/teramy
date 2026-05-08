@@ -1,0 +1,5 @@
+ALTER TABLE psychologists
+  ADD COLUMN IF NOT EXISTS specialties TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS languages TEXT[] DEFAULT '{"Español"}',
+  ADD COLUMN IF NOT EXISTS years_experience INTEGER,
+  ADD COLUMN IF NOT EXISTS phone TEXT;

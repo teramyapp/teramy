@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-main: #f4f6f9;
+  --bg-white: #ffffff;
+  
+  --primary-light-blue: #e8f4fc;
+  --primary-blue: #0ea5e9;
+  --primary-dark-blue: #0369a1;
+  --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+  
+  --accent-soft-green: #ecfdf5;
+  --accent-green: #10b981;
+  
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border-light: #e2e8f0;
+  
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  
+  --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 10px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+  --shadow-glow: 0 10px 25px -5px rgba(14, 165, 233, 0.4);
+  
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Premium Primary Button */
+.btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Input Fields Premium */
+input, select, textarea {
+  font-family: inherit;
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-main);
+  transition: var(--transition);
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px var(--primary-light-blue);
+  background: var(--bg-white);
+}
+
+/* Premium Card Hover */
+.premium-card {
+  background-color: var(--bg-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  transition: var(--transition);
+}
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Slide in animation */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Trust Logos Hover */
+.trust-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6rem;
+  flex-wrap: wrap;
+  opacity: 1;
+  transition: all 0.5s ease;
+}
+
+.hover-scale {
+  transition: transform 0.3s ease !important;
+}
+
+.hover-scale:hover {
+  transform: scale(1.1);
+}
+
+/* Mockup UI Utilities */
+.mockup-window {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  height: 600px;
+  text-align: left;
+}
+
+.mockup-sidebar {
+  width: 240px;
+  background: #f8fafc;
+  border-right: 1px solid var(--border-light);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mockup-nav-item {
+  height: 40px;
+  width: 100%;
+  border-radius: 8px;
+  background: #e2e8f0;
+  opacity: 0.5;
+}
+
+.mockup-nav-item.active {
+  background: var(--primary-light-blue);
+  opacity: 1;
+}
+
+.mockup-content {
+  flex: 1;
+  padding: 2.5rem;
+  background: white;
+  overflow-y: hidden;
+}
+
+.mockup-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  padding: 1.25rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

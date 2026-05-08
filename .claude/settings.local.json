@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Read(//Users/agustingalleguillos/Documents/teramy prueba /supabase/**)",
+      "Bash(find \"/Users/agustingalleguillos/Documents/teramy prueba /src/app/api\" -type f | sort 2>/dev/null || echo \"no api dir\")",
+      "Bash(cat \"/Users/agustingalleguillos/Documents/teramy prueba /.env.local\")",
+      "Bash(find \"/Users/agustingalleguillos/Documents/teramy prueba /src\" -name \"supabase-server*\" -o -name \"supabase.ts\" | sort)",
+      "Bash(mkdir -p \"/Users/agustingalleguillos/Documents/teramy prueba /src/app/api/booking-data\")",
+      "Bash(node -e ' *)",
+      "Bash(npx supabase *)",
+      "Read(//Users/agustingalleguillos/Documents/teramy prueba /node_modules/**)",
+      "Read(//Users/agustingalleguillos/Documents/teramy prueba /node_modules/@supabase/supabase-js/**)",
+      "Bash(node)",
+      "Bash(mkdir -p \"/Users/agustingalleguillos/Documents/teramy prueba /src/app/api/save-availability\")",
+      "Bash(ls \"/Users/agustingalleguillos/Documents/\" && cat \"/Users/agustingalleguillos/Documents/teramy prueba/CLAUDE.md\")",
+      "Bash(./node_modules/.bin/tsc --noEmit)"
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+import { NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase-server';
+import { sendCancellationEmail, sendRescheduleEmail } from '@/lib/email';
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const supabase = createServerClient();
+  const { id } = params;
+
+  try {
+    const body = await request.json();
+    const { action, new_start_time, new_end_time } = body;
+
+    if (!action || !['cancel', 'reschedule'].includes(action)) {
+      return NextResponse.json({ error: 'Acción inválida' }, { status: 400 });
+    }
+
+    // Fetch current appointment with patient and psychologist data
+    const { data: appointment, error: fetchError } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        patients(name, email, phone),
+        psychologists(name, title, video_meeting_url, video_meeting_type),
+        event_types(title, mode, price)
+      `)
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !appointment) {
+      return NextResponse.json({ error: 'Cita no encontrada' }, { status: 404 });
+    }
+
+    const patient = appointment.patients as any;
+    const psychologist = appointment.psychologists as any;
+    const eventType = appointment.event_types as any;
+
+    if (action === 'cancel') {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'cancelled' })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      sendCancellationEmail({
+        to: patient.email,
+        patientName: patient.name,
+        psychologistName: psychologist.name,
+        startTime: appointment.start_time,
+      }).catch(console.error);
+
+      return NextResponse.json({ success: true, action: 'cancelled' });
+    }
+
+    if (action === 'reschedule') {
+      if (!new_start_time || !new_end_time) {
+        return NextResponse.json({ error: 'Faltan nueva fecha y hora' }, { status: 400 });
+      }
+
+      const { error } = await supabase
+        .from('appointments')
+        .update({ start_time: new_start_time, end_time: new_end_time })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      sendRescheduleEmail({
+        to: patient.email,
+        patientName: patient.name,
+        psychologistName: psychologist.name,
+        oldStartTime: appointment.start_time,
+        newStartTime: new_start_time,
+        newEndTime: new_end_time,
+        modality: eventType?.mode ?? 'online',
+        videoUrl: psychologist.video_meeting_url,
+        videoType: psychologist.video_meeting_type,
+      }).catch(console.error);
+
+      return NextResponse.json({ success: true, action: 'rescheduled' });
+    }
+  } catch (error: any) {
+    console.error('Appointment PATCH error:', error);
+    return NextResponse.json({ error: error?.message || 'Error interno' }, { status: 500 });
+  }
+}
