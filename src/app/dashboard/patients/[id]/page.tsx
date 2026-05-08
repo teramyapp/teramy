@@ -766,7 +766,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                     <div className="animate-slide-up">
                       <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '0.6rem' }}>Horas disponibles <span style={{ color: '#ef4444' }}>*</span></label>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.6rem' }}>
-                        {(availableDates.find(d => d.dateISO === selectedDateISO)?.slots || []).map(t => (
+                        {(availableDates.find(d => d.dateISO === selectedDateISO)?.slots || []).map((t: string) => (
                           <button key={t} onClick={() => setSchedTime(t)}
                             style={{ padding: '0.65rem', borderRadius: '10px', border: schedTime === t ? '2px solid #3b82f6' : '1.5px solid #e2e8f0', background: schedTime === t ? '#3b82f6' : 'white', color: schedTime === t ? 'white' : '#475569', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center' }}>
                             {t}

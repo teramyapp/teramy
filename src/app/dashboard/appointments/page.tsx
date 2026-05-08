@@ -149,9 +149,9 @@ export default function AppointmentsPage() {
   const [reminderOpen, setReminderOpen] = useState<number | null>(null);
   const [statusPickerId, setStatusPickerId] = useState<number | null>(null);
 
-  const [statusPos,   setStatusPos]   = useState<{ top: number; right: number } | null>(null);
-  const [reminderPos, setReminderPos] = useState<{ top: number; right: number } | null>(null);
-  const [menuPos,     setMenuPos]     = useState<{ top: number; right: number } | null>(null);
+  const [statusPos,   setStatusPos]   = useState<{ top: number; right?: number; left?: number } | null>(null);
+  const [reminderPos, setReminderPos] = useState<{ top: number; right?: number; left?: number } | null>(null);
+  const [menuPos,     setMenuPos]     = useState<{ top: number; right?: number; left?: number } | null>(null);
 
   const [statusConfirmFor, setStatusConfirmFor] = useState<Appointment | null>(null);
   const [statusConfirmNext, setStatusConfirmNext] = useState<AppStatus | null>(null);
@@ -658,7 +658,7 @@ export default function AppointmentsPage() {
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button onClick={() => { setStatusConfirmFor(null); setStatusConfirmNext(null); }} className="btn-secondary" style={{ flex: 1 }}>Volver</button>
-              <button onClick={() => applyStatusConfirm(true)} className="btn-primary" style={{ flex: 2, background: statusConfirmNext === 'Cancelada' ? '#ef4444' : undefined }}>
+              <button onClick={() => applyStatusConfirm()} className="btn-primary" style={{ flex: 2, background: statusConfirmNext === 'Cancelada' ? '#ef4444' : undefined }}>
                 {statusConfirmNext === 'Completada' ? 'Sí, completar sesión' : 'Confirmar cancelación'}
               </button>
             </div>

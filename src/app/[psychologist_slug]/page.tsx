@@ -31,8 +31,10 @@ interface Psychologist {
   description?: string;
   photo_url?: string;
   specialties?: string[];
+  therapies?: string[];
   languages?: string[];
   instagram_url?: string;
+  phone?: string;
   timezone: string;
   video_meeting_url?: string;
   video_meeting_type?: 'meet' | 'zoom';
@@ -739,7 +741,7 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
                   <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
                     <p style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>[ - ]</p>
                     <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Sin disponibilidad próxima</p>
-                    <p style={{ fontSize: '0.88rem' }}>Este psicólogo no tiene horarios disponibles en los próximos {bookingData.settings.booking_window_days || 60} días.</p>
+                    <p style={{ fontSize: '0.88rem' }}>Este psicólogo no tiene horarios disponibles en los próximos {bookingData?.settings?.booking_window_days || 60} días.</p>
                   </div>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.75rem' }}>

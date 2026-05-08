@@ -47,7 +47,7 @@ export default function AutomationsPage() {
       if (!user) { return; }
       const { data: psych } = await supabase
         .from('psychologists')
-        .select('id, video_meeting_type, video_meeting_url, session_type, whatsapp_reminder_template')
+        .select('id, video_meeting_type, video_meeting_url, session_type, whatsapp_reminder_template, whatsapp_reschedule_template, whatsapp_cancel_template')
         .eq('user_id', user.id)
         .single();
       if (psych) {

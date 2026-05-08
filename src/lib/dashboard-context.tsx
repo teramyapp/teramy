@@ -38,6 +38,8 @@ export interface PsychologistProfile {
   video_meeting_url:  string | null;
   session_type:       string | null;
   whatsapp_reminder_template: string | null;
+  whatsapp_reschedule_template: string | null;
+  whatsapp_cancel_template: string | null;
   subscription_status: 'trialing' | 'active' | 'paused' | 'cancelled' | null;
   trial_ends_at:       string | null;
 }
@@ -85,7 +87,7 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
 
     const { data: psych } = await supabase
       .from('psychologists')
-      .select('id, user_id, name, slug, title, photo_url, timezone, video_meeting_url, session_type, whatsapp_reminder_template, subscription_status, trial_ends_at')
+      .select('id, user_id, name, slug, title, photo_url, timezone, video_meeting_url, session_type, whatsapp_reminder_template, whatsapp_reschedule_template, whatsapp_cancel_template, subscription_status, trial_ends_at')
       .eq('user_id', user.id)
       .single();
 
