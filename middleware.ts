@@ -17,8 +17,8 @@ export async function middleware(request: NextRequest) {
   // "sb-<project-ref>-auth-token". We parse it to get user.id.
   let userId: string | null = null;
 
-  for (const [name, cookie] of request.cookies) {
-    if (name.includes('auth-token') && name.startsWith('sb-')) {
+  for (const cookie of request.cookies.getAll()) {
+    if (cookie.name.includes('auth-token') && cookie.name.startsWith('sb-')) {
       try {
         const parsed = JSON.parse(cookie.value);
         userId = parsed?.user?.id ?? null;
