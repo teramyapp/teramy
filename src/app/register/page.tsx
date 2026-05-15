@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, Camera, X, Plus, Mail } from 'lucide-react';
@@ -22,7 +22,7 @@ const THERAPIES_OPTIONS = [
   'Terapia infantil', 'Terapia adolescente', 'Terapia para adultos', 'Terapia grupal'
 ];
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParamsHook = useSearchParams();
   const initialStep = parseInt(searchParamsHook.get('step') || '1');
@@ -547,5 +547,13 @@ export default function RegisterPage() {
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>Cargando...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }
