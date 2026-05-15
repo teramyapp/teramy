@@ -249,9 +249,9 @@ export default function Home() {
               )}
             </div>
 
-            {/* Right: dual-device mockup (desktop) / phone mockup (mobile) */}
             {isMobile ? (
-              <div className="animate-slide-up" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '0', marginTop: '0.5rem', position: 'relative', paddingBottom: '1rem' }}>
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div className="animate-slide-up" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '0', marginTop: '0.5rem', position: 'relative', paddingBottom: '1rem' }}>
 
                 {/* Mini laptop card — peeking from left */}
                 <div style={{ width: '155px', flexShrink: 0, marginRight: '-18px', marginBottom: '20px', zIndex: 1 }}>
@@ -575,7 +575,7 @@ export default function Home() {
             </div>
 
             {/* 4 time-loss cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2.5rem' }}>
               {[
                 { icon: <MessageSquare size={22} />, hours: '3–4 hrs', label: 'Coordinando horarios por WhatsApp y llamadas telefónicas', color: '#0ea5e9', bg: 'rgba(14,165,233,0.1)', border: 'rgba(14,165,233,0.2)' },
                 { icon: <Clock size={22} />, hours: '2–3 hrs', label: 'Enviando recordatorios manualmente a cada paciente', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)' },
@@ -601,7 +601,7 @@ export default function Home() {
                   <Zap size={28} style={{ color: 'white' }} />
                 </div>
                 <div>
-                  <p style={{ fontSize: '2.4rem', fontWeight: 900, color: 'white', margin: 0, letterSpacing: '-0.03em' }}>+10 horas <span style={{ background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>recuperadas</span></p>
+                  <p style={{ fontSize: isMobile ? '1.8rem' : '2.4rem', fontWeight: 900, color: 'white', margin: 0, letterSpacing: '-0.03em' }}>+10 horas <span style={{ background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>recuperadas</span></p>
                   <p style={{ fontSize: '1rem', color: '#94a3b8', margin: 0 }}>por semana. Tiempo para más pacientes, más descanso, o simplemente para desconectar.</p>
                 </div>
               </div>
