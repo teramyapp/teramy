@@ -337,7 +337,7 @@ export default function AppointmentsPage() {
 
   const openNote = (app: Appointment) => {
     const noteId = app.supabaseId || `local-${app.id}`;
-    window.open(`/dashboard/nota?id=${noteId}`, `nota_${noteId}`, 'width=1000,height=800,menubar=no,toolbar=no,location=no,status=no');
+    router.push(`/dashboard/nota?id=${noteId}`);
   };
 
   const handleReschedule = async () => {
