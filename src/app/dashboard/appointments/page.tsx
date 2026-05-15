@@ -132,6 +132,19 @@ export default function AppointmentsPage() {
           email: r.patients?.email,
           patientNotes: r.patient_notes ?? undefined,
         };
+        
+        // --- LIMPIEZA JUST-IN-TIME ---
+        // Si la sesión es de hace más de 24 horas y sigue pendiente, la mostramos como completada
+        const limitDate = new Date();
+        limitDate.setHours(limitDate.getHours() - 24);
+        
+        if (processed.status === 'Pendiente' && start < limitDate) {
+          processed.status = 'Completada';
+          // Intentamos actualizar la DB en segundo plano para sincronizar
+          supabase.from('appointments').update({ status: 'completed' }).eq('id', r.id).then(() => {});
+        }
+
+        return processed;
       });
     },
   );
