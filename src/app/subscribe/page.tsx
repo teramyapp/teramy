@@ -223,10 +223,26 @@ export default function SubscribePage() {
               🔒 Pago seguro · Tus datos siguen guardados y seguros · Cancela cuando quieras
             </p>
 
-            <div style={{ marginTop: '1.5rem', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
-              <Link href="/dashboard/settings" style={{ fontSize: '0.8rem', color: '#94a3b8', textDecoration: 'none', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                ¿No quieres seguir? Gestionar o eliminar mi cuenta
-              </Link>
+            <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+                  ¿No deseas continuar usando Teramy?
+                </p>
+                <Link 
+                  href="/dashboard/settings" 
+                  style={{ 
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '0.75rem 1.5rem', borderRadius: '10px',
+                    background: '#f8fafc', border: '1px solid #e2e8f0',
+                    color: '#475569', fontSize: '0.85rem', fontWeight: 600,
+                    textDecoration: 'none', transition: 'all 0.2s', width: '100%', boxSizing: 'border-box'
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f1f5f9'; (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; }}
+                >
+                  Gestionar o eliminar mi cuenta
+                </Link>
+              </div>
             </div>
           </div>
 
