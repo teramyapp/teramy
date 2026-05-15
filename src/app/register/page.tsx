@@ -65,7 +65,7 @@ function RegisterForm() {
     setAuthError('');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/register?step=2` },
     });
     if (error) {
       setAuthError('No se pudo conectar con Google. Verifica la configuración en Supabase.');
