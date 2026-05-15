@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, Camera, X, Plus, Mail } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 
@@ -24,10 +24,15 @@ const THERAPIES_OPTIONS = [
 
 export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialStep = parseInt(searchParams.get('step') || '1');
-  
+  const searchParamsHook = useSearchParams();
+  const initialStep = parseInt(searchParamsHook.get('step') || '1');
   const [step, setStep] = useState(initialStep);
+
+  // Sync step if URL changes dynamically
+  React.useEffect(() => {
+    const s = parseInt(searchParamsHook.get('step') || '1');
+    if (s !== step) setStep(s);
+  }, [searchParamsHook]);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
 
