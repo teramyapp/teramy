@@ -2,15 +2,60 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Clock, CheckCircle, ArrowRight, Mail, Shield, Zap, Calendar, FileText, BarChart2, MessageSquare } from 'lucide-react';
+import { Clock, CheckCircle, ArrowRight, Mail, Shield, Zap, Calendar, FileText, BarChart2, MessageSquare, Loader2 } from 'lucide-react';
+import { supabase } from '@/utils/supabase';
+import { useRouter } from 'next/navigation';
 
 export default function SubscribePage() {
-  const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [psychologist, setPsychologist] = useState<any>(null);
+  const [subscribing, setSubscribing] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Could be passed via query param from middleware in future
-    // For now just show the blocking page
-  }, []);
+    async function checkUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+      
+      const { data: psych } = await supabase
+        .from('psychologists')
+        .select('id, name, email')
+        .eq('user_id', session.user.id)
+        .single();
+        
+      setPsychologist(psych);
+      setLoading(false);
+    }
+    checkUser();
+  }, [router]);
+
+  const handleSubscribe = async () => {
+    if (!psychologist) return;
+    setSubscribing(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          psychologistId: psychologist.id,
+          email: psychologist.email
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Error al generar link de pago');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un problema al conectar con Mercado Pago. Por favor intenta de nuevo.');
+      setSubscribing(false);
+    }
+  };
 
   const features = [
     { icon: <Calendar size={18} />, text: 'Agenda online 24/7 para tus pacientes' },
@@ -111,37 +156,35 @@ export default function SubscribePage() {
               ))}
             </div>
 
-            {/* CTA — Mercado Pago (URL will be configured) */}
-            <a
-              href={process.env.NEXT_PUBLIC_MP_CHECKOUT_URL || '#'}
-              id="mp-checkout-btn"
+            {/* CTA — Mercado Pago */}
+            <button
+              onClick={handleSubscribe}
+              disabled={subscribing || loading}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
                 width: '100%', padding: '1rem', borderRadius: '14px',
                 background: 'linear-gradient(135deg, #009ee3, #00bcf2)',
                 color: 'white', fontWeight: 800, fontSize: '1.05rem',
-                textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,158,227,0.35)',
+                border: 'none',
+                boxShadow: '0 8px 24px rgba(0,158,227,0.35)',
                 transition: 'all 0.2s', marginBottom: '0.75rem',
-                cursor: process.env.NEXT_PUBLIC_MP_CHECKOUT_URL ? 'pointer' : 'not-allowed',
-                opacity: process.env.NEXT_PUBLIC_MP_CHECKOUT_URL ? 1 : 0.7,
+                cursor: (subscribing || loading) ? 'not-allowed' : 'pointer',
+                opacity: (subscribing || loading) ? 0.7 : 1,
               }}
             >
-              {/* Mercado Pago logo */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="12" fill="white" fillOpacity="0.25"/>
-                <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">MP</text>
-              </svg>
-              Pagar con Mercado Pago
-              <ArrowRight size={18} />
-            </a>
-
-            {!process.env.NEXT_PUBLIC_MP_CHECKOUT_URL && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1rem', background: '#fef9ee', border: '1px solid #fde68a', borderRadius: '10px', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.8rem', color: '#92400e', fontWeight: 500 }}>
-                  ⚙️ El pago vía Mercado Pago está siendo configurado. Escríbenos para activar tu cuenta manualmente.
-                </span>
-              </div>
-            )}
+              {subscribing ? (
+                <Loader2 className="animate-spin" size={24} />
+              ) : (
+                <>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="12" fill="white" fillOpacity="0.25"/>
+                    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">MP</text>
+                  </svg>
+                  Pagar con Mercado Pago
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
 
             {/* Contact fallback */}
             <a
