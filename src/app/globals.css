@@ -233,7 +233,7 @@ input:focus, select:focus, textarea:focus {
   .hero-desc { margin-bottom: 0.5rem !important; }
   
   .banner-flex { flex-direction: column !important; align-items: flex-start !important; padding: 1.75rem 1.5rem !important; }
-  .profile-banner-grid { grid-template-columns: 1fr !important; gap: 2.5rem !important; padding: 1.75rem !important; }
+  .profile-banner-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 2.5rem !important; padding: 1.75rem !important; }
   .header-padding { padding: 1rem 1.5rem !important; }
   .result-text { font-size: 1.8rem !important; }
 }

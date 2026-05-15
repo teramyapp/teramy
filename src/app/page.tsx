@@ -524,7 +524,7 @@ export default function Home() {
 
 
         {/* ── Features Grid ───────────────────────────────── */}
-        <section id="features" style={{ padding: isMobile ? '4rem 1.5rem' : '7rem 5rem', background: 'var(--bg-main)' }}>
+        <section id="features" className="section-padding" style={{ background: 'var(--bg-main)' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '2.5rem' : '4.5rem' }}>
               <span style={{ display: 'inline-block', padding: '0.4rem 1rem', background: 'var(--primary-light-blue)', color: 'var(--primary-dark-blue)', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '1.25rem' }}>
@@ -554,7 +554,7 @@ export default function Home() {
         </section>
 
         {/* ── Time Savings ────────────────────────────────── */}
-        <section style={{ padding: isMobile ? '4rem 1.5rem' : '7rem 5rem', background: 'linear-gradient(160deg, #0f172a 0%, #0c1a2e 100%)', position: 'relative', overflow: 'hidden' }}>
+        <section className="section-padding" style={{ background: 'linear-gradient(160deg, #0f172a 0%, #0c1a2e 100%)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '10%', left: '5%', width: '400px', height: '400px', background: 'rgba(14,165,233,0.1)', filter: 'blur(120px)', borderRadius: '50%', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: '5%', right: '5%', width: '350px', height: '350px', background: 'rgba(16,185,129,0.08)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
           <div style={{ maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -612,7 +612,7 @@ export default function Home() {
         </section>
 
         {/* ── CRM Feature Spotlight ───────────────────────── */}
-        <section style={{ padding: isMobile ? '4rem 1.5rem' : '7rem 5rem', background: 'linear-gradient(160deg, #f0f7ff, #ffffff)' }}>
+        <section className="section-padding" style={{ background: 'linear-gradient(160deg, #f0f7ff, #ffffff)' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '3rem' : '6rem', alignItems: 'center' }}>
 
             {/* Left: visual */}
@@ -689,7 +689,7 @@ export default function Home() {
         </section>
 
         {/* ── Automations spotlight ───────────────────────── */}
-        <section style={{ padding: isMobile ? '4rem 1.5rem' : '7rem 5rem', background: 'var(--bg-main)' }}>
+        <section className="section-padding" style={{ background: 'var(--bg-main)' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '3rem' : '6rem', alignItems: 'center' }}>
             {/* Left: copy */}
             <div>
@@ -775,7 +775,7 @@ export default function Home() {
         </section>
 
         {/* ── Patient Booking Flow ─────────────────────────── */}
-        <section id="booking-flow" style={{ padding: isMobile ? '4rem 1.5rem' : '7rem 5rem', background: 'white', borderTop: '1px solid var(--border-light)' }}>
+        <section id="booking-flow" className="section-padding" style={{ background: 'white', borderTop: '1px solid var(--border-light)' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '2.5rem' : '5rem' }}>
               <span style={{ display: 'inline-block', padding: '0.4rem 1rem', background: '#f0fdf4', color: '#15803d', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '1.25rem' }}>
@@ -978,7 +978,7 @@ export default function Home() {
         </section>
 
         {/* ── Testimonials ────────────────────────────────── */}
-        <section style={{ padding: isMobile ? '4rem 1.5rem' : '7rem 5rem', background: 'white' }}>
+        <section className="section-padding" style={{ background: 'white' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '2rem' : '4rem' }}>
               <h2 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '0.75rem' }}>
@@ -1012,7 +1012,7 @@ export default function Home() {
         </section>
 
         {/* ── Pricing ─────────────────────────────────────── */}
-        <section id="pricing" style={{ padding: isMobile ? '4rem 1.5rem' : '5rem 5rem', background: 'var(--bg-main)' }}>
+        <section id="pricing" className="section-padding" style={{ background: 'var(--bg-main)' }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
               <span style={{ display: 'inline-block', padding: '0.4rem 1rem', background: 'var(--primary-light-blue)', color: 'var(--primary-dark-blue)', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '1rem' }}>
@@ -1078,7 +1078,7 @@ export default function Home() {
         </section>
 
         {/* ── FAQ + Contact ────────────────────────────────── */}
-        <section id="faq" style={{ padding: isMobile ? '4rem 1.5rem' : '6rem 5rem', background: 'white', borderTop: '1px solid var(--border-light)' }}>
+        <section id="faq" className="section-padding" style={{ background: 'white', borderTop: '1px solid var(--border-light)' }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '3rem' : '5rem', alignItems: 'start' }}>
 
             {/* Left: FAQ */}
