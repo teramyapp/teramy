@@ -902,38 +902,38 @@ export default function Home() {
                   {/* Profile content */}
                   <div style={{ display: 'flex', gap: '0', height: '340px' }}>
                     {/* Left sidebar: psychologist card */}
-                    <div style={{ width: '145px', flexShrink: 0, padding: '1rem 0.85rem', borderRight: '1px solid #f1f5f9', background: 'white', overflowY: 'hidden' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #0ea5e9, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.6rem' }}>LM</div>
-                      <p style={{ fontSize: '0.6rem', color: '#0ea5e9', fontWeight: 700, margin: '0 0 0.15rem' }}>teramy.cl/dra-laura</p>
-                      <p style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.1rem' }}>Dra. Laura Morales</p>
-                      <p style={{ fontSize: '0.6rem', color: '#94a3b8', margin: '0 0 0.6rem' }}>Psicóloga Clínica</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.6rem', color: '#94a3b8', marginBottom: '0.25rem' }}>
-                        <Star size={11} fill="currentColor" style={{ color: '#f59e0b' }} /> 10 años experiencia
+                    <div style={{ width: '120px', flexShrink: 0, padding: '0.85rem 0.5rem', borderRight: '1px solid #f1f5f9', background: 'white', overflowY: 'hidden' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #0ea5e9, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.5rem' }}>LM</div>
+                      <p style={{ fontSize: '0.55rem', color: '#0ea5e9', fontWeight: 700, margin: '0 0 0.15rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>teramy.cl/dra-laura</p>
+                      <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Dra. Laura Morales</p>
+                      <p style={{ fontSize: '0.55rem', color: '#94a3b8', margin: '0 0 0.5rem' }}>Psicóloga Clínica</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.55rem', color: '#94a3b8', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                        <Star size={10} fill="currentColor" style={{ color: '#f59e0b' }} /> 10 años exp.
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem', marginTop: '0.5rem' }}>
                         {['Ansiedad', 'TCC', 'Pareja'].map(sp => (
-                          <span key={sp} style={{ padding: '0.1rem 0.35rem', background: '#e8f4fc', color: '#0369a1', borderRadius: '2rem', fontSize: '0.52rem', fontWeight: 600 }}>{sp}</span>
+                          <span key={sp} style={{ padding: '0.1rem 0.3rem', background: '#e8f4fc', color: '#0369a1', borderRadius: '2rem', fontSize: '0.5rem', fontWeight: 600 }}>{sp}</span>
                         ))}
                       </div>
                     </div>
 
                     {/* Right: booking panel */}
-                    <div style={{ flex: 1, padding: '1rem', background: '#fafcff', overflowY: 'hidden' }}>
-                      <p style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0f172a', margin: '0 0 0.6rem' }}>¿Qué tipo de sesión necesitas?</p>
+                    <div style={{ flex: 1, padding: '0.85rem', background: '#fafcff', overflowY: 'hidden', minWidth: 0 }}>
+                      <p style={{ fontSize: '0.6rem', fontWeight: 700, color: '#0f172a', margin: '0 0 0.5rem' }}>¿Qué tipo de sesión necesitas?</p>
                       {[
                         { name: 'Evaluación Gratuita', tag: 'Online', tagColor: '#1d4ed8', tagBg: '#dbeafe', price: 'Gratis', priceColor: '#16a34a', min: '30 min' },
                         { name: 'Psicoterapia Individual', tag: 'Online', tagColor: '#1d4ed8', tagBg: '#dbeafe', price: '$45.000', priceColor: '#0f172a', min: '50 min' },
                         { name: 'Atención Presencial', tag: 'Presencial', tagColor: '#c2410c', tagBg: '#ffedd5', price: '$55.000', priceColor: '#0f172a', min: '50 min' },
                       ].map((svc, i) => (
-                        <div key={i} style={{ padding: '0.55rem 0.65rem', background: i === 0 ? '#eff6ff' : 'white', borderRadius: '8px', border: `1.5px solid ${i === 0 ? '#93c5fd' : '#e2e8f0'}`, marginBottom: '0.4rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
+                        <div key={i} style={{ padding: '0.5rem 0.5rem', background: i === 0 ? '#eff6ff' : 'white', borderRadius: '8px', border: `1.5px solid ${i === 0 ? '#93c5fd' : '#e2e8f0'}`, marginBottom: '0.4rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.25rem' }}>
+                          <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.15rem' }}>
-                              <span style={{ fontSize: '0.5rem', fontWeight: 700, padding: '0.1rem 0.35rem', borderRadius: '2rem', background: svc.tagBg, color: svc.tagColor }}>{svc.tag}</span>
+                              <span style={{ fontSize: '0.48rem', fontWeight: 700, padding: '0.1rem 0.3rem', borderRadius: '2rem', background: svc.tagBg, color: svc.tagColor }}>{svc.tag}</span>
                             </div>
-                            <p style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>{svc.name}</p>
-                            <p style={{ fontSize: '0.55rem', color: '#94a3b8', margin: 0 }}>{svc.min}</p>
+                            <p style={{ fontSize: '0.6rem', fontWeight: 700, color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.name}</p>
+                            <p style={{ fontSize: '0.5rem', color: '#94a3b8', margin: 0 }}>{svc.min}</p>
                           </div>
-                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: svc.priceColor }}>{svc.price}</span>
+                          <span style={{ fontSize: '0.6rem', fontWeight: 800, color: svc.priceColor, flexShrink: 0 }}>{svc.price}</span>
                         </div>
                       ))}
 
@@ -955,22 +955,22 @@ export default function Home() {
                 </div>
 
                 {/* Floating badge: confirmed */}
-                <div style={{ position: 'absolute', bottom: '-14px', right: '-16px', background: '#ecfdf5', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '0.6rem 1rem', boxShadow: '0 8px 24px rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Check size={14} style={{ color: '#15803d', strokeWidth: 3 }} />
+                <div className="animate-slide-up" style={{ position: 'absolute', bottom: '-10px', right: '-8px', background: '#ecfdf5', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '0.5rem 0.85rem', boxShadow: '0 8px 24px rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', gap: '0.4rem', zIndex: 10 }}>
+                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Check size={12} style={{ color: '#15803d', strokeWidth: 3 }} />
                   </div>
                   <div>
-                    <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#15803d', margin: 0 }}>¡Sesión confirmada!</p>
-                    <p style={{ fontSize: '0.6rem', color: '#64748b', margin: 0 }}>Jue 10 · 15:00 hrs</p>
+                    <p style={{ fontSize: '0.65rem', fontWeight: 700, color: '#15803d', margin: 0 }}>¡Sesión confirmada!</p>
+                    <p style={{ fontSize: '0.55rem', color: '#64748b', margin: 0 }}>Jue 10 · 15:00 hrs</p>
                   </div>
                 </div>
 
                 {/* Floating badge: link */}
-                <div style={{ position: 'absolute', top: '-14px', left: '-16px', background: 'var(--primary-gradient)', borderRadius: '12px', padding: '0.6rem 1rem', boxShadow: '0 8px 24px rgba(14,165,233,0.3)', color: 'white' }}>
-                  <p style={{ fontSize: '0.68rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <div className="animate-slide-up" style={{ position: 'absolute', top: '-10px', left: '-8px', background: 'var(--primary-gradient)', borderRadius: '12px', padding: '0.5rem 0.85rem', boxShadow: '0 8px 24px rgba(14,165,233,0.3)', color: 'white', zIndex: 10 }}>
+                  <p style={{ fontSize: '0.62rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
                     <Link2 size={12} /> teramy.cl/dra-laura
                   </p>
-                  <p style={{ fontSize: '0.6rem', opacity: 0.85, margin: 0 }}>Tu enlace personalizado</p>
+                  <p style={{ fontSize: '0.55rem', opacity: 0.85, margin: 0 }}>Tu enlace personalizado</p>
                 </div>
               </div>
             </div>
