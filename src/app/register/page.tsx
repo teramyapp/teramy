@@ -178,7 +178,7 @@ function RegisterForm() {
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
             {STEPS.map(s => (
-              <div key={s.num} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
+              <div key={s.num} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', minWidth: '65px' }}>
                 <div style={{
                   width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: s.num < step ? '#0ea5e9' : s.num === step ? 'linear-gradient(135deg, #0369a1, #0ea5e9)' : 'white',
@@ -188,7 +188,7 @@ function RegisterForm() {
                 }}>
                   {s.num < step ? <CheckCircle2 size={16} /> : s.num}
                 </div>
-                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: s.num === step ? '#0369a1' : '#94a3b8' }}>{s.label}</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: s.num === step ? '#0369a1' : '#94a3b8', textAlign: 'center' }}>{s.label}</span>
               </div>
             ))}
           </div>
