@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       const payment = await response.json();
 
       if (payment.status === 'approved') {
-        const psychologistId = payment.metadata?.psychologist_id;
+        const psychologistId = payment.metadata?.psychologist_id || payment.external_reference;
 
         if (psychologistId) {
           console.log('Pago aprobado para psicólogo:', psychologistId);

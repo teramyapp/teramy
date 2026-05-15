@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabase';
+import { MercadoPagoConfig, PreApproval } from 'mercadopago';
 
 export async function POST(request: Request) {
   try {
@@ -14,54 +14,37 @@ export async function POST(request: Request) {
 
     if (!accessToken) {
       console.error('MP_ACCESS_TOKEN no configurado');
-      return NextResponse.json({ error: 'Error de configuración en el servidor' }, { status: 500 });
+      return NextResponse.json({ error: 'El administrador aún no ha configurado Mercado Pago.' }, { status: 500 });
     }
 
-    // 1. Crear la preferencia en Mercado Pago
-    // Documentación: https://www.mercadopago.cl/developers/es/reference/preferences/_checkout_preferences/post
-    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        items: [
-          {
-            id: 'plan-pro-mensual',
-            title: 'Teramy Pro - Suscripción Mensual',
-            description: 'Acceso completo a todas las funciones de Teramy',
-            quantity: 1,
-            unit_price: 19990,
-            currency_id: 'CLP',
-          }
-        ],
-        payer: {
-          email: email || '',
+    // Inicializar SDK de Mercado Pago v2
+    const client = new MercadoPagoConfig({ accessToken });
+    const preApproval = new PreApproval(client);
+
+    // Crear la suscripción (PreApproval ad-hoc)
+    const response = await preApproval.create({
+      body: {
+        reason: 'Teramy Pro - Suscripción Mensual',
+        auto_recurring: {
+          frequency: 1,
+          frequency_type: 'months',
+          transaction_amount: 19990,
+          currency_id: 'CLP',
         },
-        // Metadata importante para identificar al usuario cuando nos llegue el Webhook
-        metadata: {
-          psychologist_id: psychologistId,
-        },
-        back_urls: {
-          success: `${appUrl}/dashboard/settings?payment=success`,
-          failure: `${appUrl}/dashboard/settings?payment=failure`,
-          pending: `${appUrl}/dashboard/settings?payment=pending`,
-        },
-        auto_return: 'approved',
-        notification_url: `${appUrl}/api/webhooks/mercadopago`, // Esta es la URL del Webhook
-      }),
+        payer_email: email || 'test_user_123@testuser.com', // MP requires an email
+        back_url: `${appUrl}/dashboard/settings?payment=success`,
+        external_reference: psychologistId,
+        status: 'pending',
+      }
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('Error MP:', data);
-      throw new Error(data.message || 'Error al crear la preferencia');
+    if (!response.init_point) {
+      console.error('Error MP:', response);
+      throw new Error('No se pudo generar el enlace de suscripción.');
     }
 
-    // Retornamos la URL de Mercado Pago (init_point)
-    return NextResponse.json({ url: data.init_point });
+    // Retornamos la URL de Mercado Pago (init_point) para suscripciones
+    return NextResponse.json({ url: response.init_point });
 
   } catch (error: any) {
     console.error('Checkout error:', error);
