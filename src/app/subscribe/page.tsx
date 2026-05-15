@@ -2,7 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Clock, CheckCircle, ArrowRight, Mail, Shield, Zap, Calendar, FileText, BarChart2, MessageSquare, Loader2, Lock, CreditCard } from 'lucide-react';
+import { 
+  Clock, CheckCircle, ArrowRight, Mail, Shield, Zap, Calendar, 
+  FileText, BarChart2, MessageSquare, Loader2, Lock, CreditCard,
+  LogOut, Trash2, Download, AlertTriangle, X, CheckCircle2
+} from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
 
@@ -10,6 +14,8 @@ export default function SubscribePage() {
   const [loading, setLoading] = useState(true);
   const [psychologist, setPsychologist] = useState<any>(null);
   const [subscribing, setSubscribing] = useState(false);
+  const [modal, setModal] = useState<null | 'delete_account' | 'logout'>(null);
+  const [downloading, setDownloading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,7 +37,7 @@ export default function SubscribePage() {
       }
 
       if (psych) {
-        setPsychologist({ ...psych, email: session.user.email });
+        setPsychologist({ ...psych, email: session.user.email, userId: session.user.id });
       }
       setLoading(false);
     }
@@ -60,6 +66,63 @@ export default function SubscribePage() {
       console.error(err);
       alert('Hubo un problema al conectar con Mercado Pago. Por favor intenta de nuevo.');
       setSubscribing(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!psychologist?.userId || !psychologist?.id) return;
+    
+    try {
+      const res = await fetch('/api/user/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ psychologistId: psychologist.id, userId: psychologist.userId }),
+      });
+      
+      if (res.ok) {
+        await supabase.auth.signOut();
+        router.push('/');
+      } else {
+        alert('Error al eliminar la cuenta. Por favor contacta a soporte.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un problema al procesar la solicitud.');
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!psychologist?.id) return;
+    setDownloading(true);
+
+    try {
+      const { data: patients } = await supabase.from('patients').select('*').eq('psychologist_id', psychologist.id);
+      
+      const headers = ['Nombre', 'Email', 'Teléfono', 'Creado en'];
+      const rows = (patients || []).map(p => [
+        p.name || '',
+        p.email || '',
+        p.phone || '',
+        p.created_at || ''
+      ].join(','));
+      
+      const csvContent = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const filename = `teramy-pacientes-${new Date().toISOString().split('T')[0]}.csv`;
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Error al descargar los datos.');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -224,24 +287,57 @@ export default function SubscribePage() {
             </p>
 
             <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
-                  ¿No deseas continuar usando Teramy?
-                </p>
-                <Link 
-                  href="/dashboard/settings" 
-                  style={{ 
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '0.75rem 1.5rem', borderRadius: '10px',
-                    background: '#f8fafc', border: '1px solid #e2e8f0',
-                    color: '#475569', fontSize: '0.85rem', fontWeight: 600,
-                    textDecoration: 'none', transition: 'all 0.2s', width: '100%', boxSizing: 'border-box'
+              <p style={{ fontSize: '0.85rem', color: '#64748b', textAlign: 'center', marginBottom: '1rem', fontWeight: 600 }}>
+                ¿Deseas gestionar tu salida o cerrar sesión?
+              </p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.6rem' }}>
+                {/* Download Data */}
+                <button
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                    padding: '0.75rem', borderRadius: '10px', background: 'white',
+                    border: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '0.85rem',
+                    cursor: 'pointer', transition: 'all 0.2s'
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f1f5f9'; (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
                 >
-                  Gestionar o eliminar mi cuenta
-                </Link>
+                  <Download size={16} style={{ color: '#0ea5e9' }} /> 
+                  {downloading ? 'Generando descarga...' : 'Descargar mis pacientes (CSV)'}
+                </button>
+
+                {/* Logout */}
+                <button
+                  onClick={() => setModal('logout')}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                    padding: '0.75rem', borderRadius: '10px', background: 'white',
+                    border: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '0.85rem',
+                    cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
+                >
+                  <LogOut size={16} style={{ color: '#64748b' }} /> Cerrar sesión
+                </button>
+
+                {/* Delete Account */}
+                <button
+                  onClick={() => setModal('delete_account')}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                    padding: '0.75rem', borderRadius: '10px', background: '#fff5f5',
+                    border: '1px solid #fecaca', color: '#ef4444', fontWeight: 600, fontSize: '0.85rem',
+                    cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff5f5'; }}
+                >
+                  <Trash2 size={16} /> Eliminar mi cuenta permanentemente
+                </button>
               </div>
             </div>
           </div>
@@ -260,6 +356,74 @@ export default function SubscribePage() {
         </div>
 
       </div>
+
+      {/* ── MODALS ── */}
+      {modal === 'logout' && (
+        <Modal
+          title="¿Cerrar sesión?"
+          description="Saldrás de tu cuenta. Podrás volver a entrar cuando quieras para activar tu suscripción."
+          confirmLabel="Sí, cerrar sesión"
+          onConfirm={handleLogout}
+          onCancel={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'delete_account' && (
+        <Modal
+          title="¿Eliminar tu cuenta?"
+          description="Esto eliminará permanentemente tu perfil y todos tus datos (pacientes, notas, sesiones). Esta acción es irreversible."
+          confirmLabel="Eliminar todo permanentemente"
+          confirmDanger
+          onConfirm={handleDeleteAccount}
+          onCancel={() => setModal(null)}
+        >
+          <div style={{ padding: '0.85rem 1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#7f1d1d' }}>
+            🔴 Te recomendamos <strong>descargar tus datos</strong> antes de proceder.
+          </div>
+        </Modal>
+      )}
     </div>
+  );
+}
+
+// ── Shared Components ────────────────────────────────────────────────────────
+
+function Modal({ title, description, confirmLabel, confirmDanger, onConfirm, onCancel, children }: any) {
+  return (
+    <>
+      <div onClick={onCancel} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)', zIndex: 1000 }} />
+      <div style={{
+        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+        background: 'white', borderRadius: '20px', padding: '2.5rem', maxWidth: '440px', width: '90%',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.14)', zIndex: 1001,
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: confirmDanger ? '#fef2f2' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {confirmDanger ? <AlertTriangle size={22} style={{ color: '#ef4444' }} /> : <CheckCircle2 size={22} style={{ color: '#0ea5e9' }} />}
+          </div>
+          <button onClick={onCancel} style={{ color: '#94a3b8', cursor: 'pointer', background: 'none', border: 'none', padding: '0.2rem' }}>
+            <X size={20} />
+          </button>
+        </div>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>{title}</h3>
+        <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6, marginBottom: '1.5rem' }}>{description}</p>
+        {children}
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: '0.8rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              flex: 1, padding: '0.8rem', borderRadius: '10px', border: 'none',
+              background: confirmDanger ? '#ef4444' : 'linear-gradient(135deg,#0369a1,#0ea5e9)',
+              color: 'white', fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
