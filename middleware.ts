@@ -67,9 +67,6 @@ export async function middleware(request: NextRequest) {
     (subscription_status === 'trialing' && trialExpired);
 
   if (isBlocked) {
-    const subscribeUrl = new URL('/subscribe', request.url);
-    return NextResponse.redirect(subscribeUrl);
-
     // Auto-update status to 'paused' if trial just expired
     if (subscription_status === 'trialing' && trialExpired) {
       await supabase
