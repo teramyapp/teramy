@@ -110,7 +110,7 @@ export default function AppointmentsPage() {
         const durationMin = Math.round((end.getTime() - start.getTime()) / 60000);
         const patient = r.patients?.name ?? 'Paciente';
         const initials = patient.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase();
-        return {
+        const processed = {
           id: i + 1,
           supabaseId: r.id,
           patient,
