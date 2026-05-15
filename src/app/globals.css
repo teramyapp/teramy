@@ -210,6 +210,7 @@ input:focus, select:focus, textarea:focus {
 .hero-desc { margin-bottom: 2.5rem; }
 .banner-flex { flex-direction: row; align-items: center; padding: 2.5rem 3rem; }
 .crm-grid { grid-template-columns: 1fr 1fr; gap: 6rem; }
+.profile-banner-grid { grid-template-columns: 1fr 1fr; gap: 4rem; padding: 3rem; }
 .header-padding { padding: 1.25rem 5rem; }
 .result-text { font-size: 2.4rem; }
 
@@ -232,6 +233,7 @@ input:focus, select:focus, textarea:focus {
   .hero-desc { margin-bottom: 0.5rem !important; }
   
   .banner-flex { flex-direction: column !important; align-items: flex-start !important; padding: 1.75rem 1.5rem !important; }
+  .profile-banner-grid { grid-template-columns: 1fr !important; gap: 2.5rem !important; padding: 1.75rem !important; }
   .header-padding { padding: 1rem 1.5rem !important; }
   .result-text { font-size: 1.8rem !important; }
 }

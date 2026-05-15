@@ -606,9 +606,6 @@ export default function Home() {
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                 <p style={{ fontSize: '1rem', color: '#cbd5e1', fontWeight: 600, marginBottom: '1rem' }}>Ese tiempo es tuyo.<br />Teramy te lo devuelve.</p>
-                <Link href="/register" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.9rem 2rem', fontSize: '0.97rem', fontWeight: 700 }}>
-                  Probar gratis <ArrowRight size={17} />
-                </Link>
               </div>
             </div>
           </div>
@@ -687,9 +684,6 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <Link href="/register" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.9rem 2rem', fontSize: '0.95rem' }}>
-                Ver demo <ArrowRight size={17} />
-              </Link>
             </div>
           </div>
         </section>
@@ -847,7 +841,7 @@ export default function Home() {
             </div>
 
             {/* Main visual: profile preview */}
-            <div style={{ background: 'linear-gradient(135deg, #f0f7ff 0%, #e8f4fc 100%)', borderRadius: '24px', padding: isMobile ? '1.75rem' : '3rem', border: '1px solid #dbeafe', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '2.5rem' : '4rem', alignItems: 'center' }}>
+            <div className="profile-banner-grid" style={{ background: 'linear-gradient(135deg, #f0f7ff 0%, #e8f4fc 100%)', borderRadius: '24px', border: '1px solid #dbeafe', display: 'grid', alignItems: 'center' }}>
 
               {/* Left: copy */}
               <div>
