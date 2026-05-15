@@ -20,13 +20,19 @@ export default function SubscribePage() {
         return;
       }
       
-      const { data: psych } = await supabase
+      const { data: psych, error } = await supabase
         .from('psychologists')
-        .select('id, name, email')
+        .select('id, name')
         .eq('user_id', session.user.id)
         .single();
         
-      setPsychologist(psych);
+      if (error) {
+        console.error('Error fetching psychologist:', error);
+      }
+
+      if (psych) {
+        setPsychologist({ ...psych, email: session.user.email });
+      }
       setLoading(false);
     }
     checkUser();
