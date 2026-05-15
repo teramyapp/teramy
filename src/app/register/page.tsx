@@ -281,9 +281,16 @@ export default function RegisterPage() {
         {/* STEP 2: Perfil */}
         {step === 2 && (
           <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
-            <button onClick={() => setStep(1)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#64748b', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: 'none', border: 'none', marginBottom: '1.5rem', padding: 0 }}>
-              <ArrowLeft size={16} /> Volver
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+              <button onClick={() => setStep(1)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#64748b', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
+                <ArrowLeft size={16} /> Volver
+              </button>
+              {typeof window !== 'undefined' && window.location.search.includes('step=2') && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#ecfdf5', color: '#10b981', padding: '0.4rem 0.8rem', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: 700 }}>
+                  <CheckCircle2 size={14} /> Correo verificado
+                </span>
+              )}
+            </div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.3rem' }}>Tu perfil público</h2>
             <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '2rem', lineHeight: 1.5 }}>
               Esto es lo que verán tus pacientes al visitar tu enlace de agendamiento. Puedes editarlo en cualquier momento.
