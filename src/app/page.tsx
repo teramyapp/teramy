@@ -349,6 +349,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+                </div>
 
                 {/* Mobile CTA and Badges (Moved here) */}
                 <div className="animate-slide-up" style={{ width: '100%', marginTop: '1.5rem' }}>
