@@ -131,6 +131,7 @@ export default function SettingsPage() {
   const [subscriptionStatus, setSubscriptionStatus] = useState<'trialing' | 'active' | 'paused' | 'cancelled' | string>('trialing');
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [psychologistId, setPsychologistId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -150,6 +151,7 @@ export default function SettingsPage() {
 
         if (psych) {
           setPsychologistId(psych.id);
+          setUserId(user.id);
           setSubscriptionStatus(psych.subscription_status);
           setTrialEndsAt(psych.trial_ends_at);
         }
@@ -178,9 +180,26 @@ export default function SettingsPage() {
     router.push('/login');
   };
 
-  const handleDeleteAccount = () => {
-    // TODO: supabase.rpc('delete_account')
-    router.push('/');
+  const handleDeleteAccount = async () => {
+    if (!psychologistId || !userId) return;
+    
+    try {
+      const res = await fetch('/api/user/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ psychologistId, userId }),
+      });
+      
+      if (res.ok) {
+        await supabase.auth.signOut();
+        router.push('/');
+      } else {
+        alert('Error al eliminar la cuenta. Por favor contacta a soporte.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un problema al procesar la solicitud.');
+    }
   };
 
   const handleCancelPlan = async () => {
