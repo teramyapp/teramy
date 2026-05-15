@@ -136,8 +136,7 @@ export default function Home() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'Outfit, sans-serif' }}>
 
       {/* ── Navbar ─────────────────────────────────────────── */}
-      <header style={{
-        padding: isMobile ? '1rem 1.5rem' : '1.25rem 5rem',
+      <header className="header-padding" style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)',
         position: 'sticky', top: 0, zIndex: 100,
@@ -152,37 +151,36 @@ export default function Home() {
           </div>
         </div>
 
-        {isMobile ? (
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            style={{ background: 'none', border: 'none', padding: '0.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '5px' }}
-            aria-label="Menú"
-          >
-            {menuOpen ? (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            ) : (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            )}
-          </button>
-        ) : (
-          <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            {[['#features', 'Características'], ['#booking-flow', 'Cómo se agenda'], ['#pricing', 'Precios'], ['#faq', 'Preguntas'], ['#contacto', 'Contacto']].map(([href, label]) => (
-              <a key={href} href={href} style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.95rem', transition: 'color 0.2s' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-dark)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
-                {label}
-              </a>
-            ))}
-            <div style={{ display: 'flex', gap: '0.75rem', marginLeft: '0.5rem', alignItems: 'center' }}>
-              <Link href="/login" style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.92rem', padding: '0.5rem 1rem' }}>
-                Ingresar
-              </Link>
-              <Link href="/register" className="btn-primary" style={{ padding: '0.6rem 1.4rem', fontSize: '0.92rem' }}>
-                Registrarme
-              </Link>
-            </div>
-          </nav>
-        )}
+        <button
+          className="mobile-only"
+          onClick={() => setMenuOpen(o => !o)}
+          style={{ background: 'none', border: 'none', padding: '0.5rem', cursor: 'pointer', flexDirection: 'column', gap: '5px' }}
+          aria-label="Menú"
+        >
+          {menuOpen ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          )}
+        </button>
+
+        <nav className="desktop-flex" style={{ gap: '2rem', alignItems: 'center' }}>
+          {[['#features', 'Características'], ['#booking-flow', 'Cómo se agenda'], ['#pricing', 'Precios'], ['#faq', 'Preguntas'], ['#contacto', 'Contacto']].map(([href, label]) => (
+            <a key={href} href={href} style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.95rem', transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-dark)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+              {label}
+            </a>
+          ))}
+          <div style={{ display: 'flex', gap: '0.75rem', marginLeft: '0.5rem', alignItems: 'center' }}>
+            <Link href="/login" style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.92rem', padding: '0.5rem 1rem' }}>
+              Ingresar
+            </Link>
+            <Link href="/register" className="btn-primary" style={{ padding: '0.6rem 1.4rem', fontSize: '0.92rem' }}>
+              Registrarme
+            </Link>
+          </div>
+        </nav>
 
         {isMobile && menuOpen && (
           <div style={{ width: '100%', borderTop: '1px solid var(--border-light)', paddingTop: '1rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0' }}>
@@ -207,7 +205,7 @@ export default function Home() {
       <main style={{ flex: 1 }}>
 
         {/* ── Hero ────────────────────────────────────────── */}
-        <section style={{ padding: isMobile ? '4rem 1.5rem 5rem' : '7rem 5rem 8rem', background: isMobile ? 'linear-gradient(180deg, #f0f7ff 0%, #fafcff 80%, #ffffff 100%)' : 'linear-gradient(160deg, #f0f7ff 0%, #fafcff 60%, #f0fdf4 100%)', position: 'relative', overflow: 'hidden' }}>
+        <section className="hero-padding hero-bg" style={{ position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '5%', left: '30%', width: '500px', height: '500px', background: 'rgba(14,165,233,0.12)', filter: 'blur(120px)', borderRadius: '50%', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: '0', right: '10%', width: '400px', height: '400px', background: 'rgba(16,185,129,0.1)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
 
@@ -219,14 +217,14 @@ export default function Home() {
                 <Zap size={14} style={{ color: 'var(--primary-blue)' }} /> Para terapeutas y profesionales de la salud
               </div>
 
-              <h1 style={{ fontSize: isMobile ? '2.5rem' : '4rem', fontWeight: 900, color: 'var(--text-dark)', lineHeight: 1.08, letterSpacing: '-0.03em', marginBottom: '1.5rem' }}>
+              <h1 className="hero-title" style={{ fontWeight: 900, color: 'var(--text-dark)', lineHeight: 1.08, letterSpacing: '-0.03em' }}>
                 Tu consulta,<br />
                 <span style={{ background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   organizada de verdad.
                 </span>
               </h1>
 
-              <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: '520px', marginBottom: isMobile ? '0.5rem' : '2.5rem' }}>
+              <p className="hero-desc" style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: '520px' }}>
                 Dedica tu energía a lo que importa: acompañar a tus pacientes. Teramy se encarga de la agenda, los recordatorios y el orden, para que ganes tiempo, tranquilidad y control de tu consulta.
               </p>
 
@@ -249,9 +247,8 @@ export default function Home() {
               )}
             </div>
 
-            {isMobile ? (
-              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div className="animate-slide-up" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '0', marginTop: '0.5rem', position: 'relative', paddingBottom: '1rem' }}>
+            <div className="mobile-only" style={{ width: '100%', flexDirection: 'column', alignItems: 'center' }}>
+              <div className="animate-slide-up" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '0', marginTop: '0.5rem', position: 'relative', paddingBottom: '1rem' }}>
 
                 {/* Mini laptop card — peeking from left */}
                 <div style={{ width: '155px', flexShrink: 0, marginRight: '-18px', marginBottom: '20px', zIndex: 1 }}>
@@ -368,7 +365,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            ) : <div className="animate-slide-up" style={{ flex: '1.2', minWidth: '500px', position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '0' }}>
+            </div>
+            
+            <div className="desktop-flex animate-slide-up" style={{ flex: '1.2', minWidth: '500px', position: 'relative', alignItems: 'flex-end', gap: '0' }}>
 
               {/* Glow backdrop */}
               <div style={{ position: 'absolute', inset: '-20px', background: 'var(--primary-gradient)', opacity: 0.04, borderRadius: '32px', transform: 'rotate(1.5deg)', pointerEvents: 'none' }} />
