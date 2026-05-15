@@ -365,7 +365,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
             
             <div className="desktop-flex animate-slide-up" style={{ flex: '1.2', minWidth: '500px', position: 'relative', alignItems: 'flex-end', gap: '0' }}>
 
@@ -519,7 +518,7 @@ export default function Home() {
                 </div>
               </div>
 
-            </div>}
+            </div>
           </div>
         </section>
 
