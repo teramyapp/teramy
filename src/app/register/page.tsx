@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, Camera, X, Plus } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, Camera, X, Plus, Mail } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 
 const STEPS = [
@@ -24,8 +24,12 @@ const THERAPIES_OPTIONS = [
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  const initialStep = parseInt(searchParams.get('step') || '1');
+  
+  const [step, setStep] = useState(initialStep);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
 
   // Step 1 data
   const [email, setEmail] = useState('');
@@ -71,14 +75,28 @@ export default function RegisterPage() {
     setPasswordError('');
     setAuthError('');
     setRegisterLoading(true);
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/register?step=2`
+      }
+    });
     setRegisterLoading(false);
+    
     if (error) {
       setPasswordError(error.message === 'User already registered' ? 'Este correo ya tiene una cuenta. Inicia sesión.' : error.message);
       return;
     }
-    if (data.user) setNewUserId(data.user.id);
-    setStep(2);
+    
+    if (data.user && !data.session) {
+      // Supabase requires email confirmation
+      setCheckEmail(true);
+    } else {
+      // Email confirmation is disabled, proceed normally
+      if (data.user) setNewUserId(data.user.id);
+      setStep(2);
+    }
   };
 
   const addTag = (tag: string) => {
@@ -175,7 +193,7 @@ export default function RegisterPage() {
         </div>
 
         {/* STEP 1: Cuenta */}
-        {step === 1 && (
+        {step === 1 && !checkEmail && (
           <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.3rem' }}>Crea tu cuenta</h1>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>Únete a la comunidad de profesionales que ya están organizando su consulta.</p>
@@ -239,6 +257,26 @@ export default function RegisterPage() {
             </form>
           </div>
         )}
+
+        {/* Check Email State */}
+        {checkEmail && (
+          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '3rem 2.5rem', border: '1px solid rgba(255,255,255,0.8)', textAlign: 'center' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #e0f2fe, #bae6fd)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+              <Mail size={40} style={{ color: '#0284c7' }} />
+            </div>
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+              Revisa tu correo
+            </h2>
+            <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+              Te hemos enviado un enlace mágico a <strong>{email}</strong>. 
+              Haz clic en él para confirmar tu cuenta y continuar configurando tu perfil.
+            </p>
+            <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '0.85rem', color: '#64748b' }}>
+              ¿No lo encuentras? Revisa tu carpeta de Spam o Correo no deseado.
+            </div>
+          </div>
+        )}
+
 
         {/* STEP 2: Perfil */}
         {step === 2 && (
@@ -487,7 +525,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {step === 1 && (
+        {step === 1 && !checkEmail && (
           <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#64748b' }}>
             ¿Ya tienes cuenta?{' '}
             <Link href="/login" style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'none' }}>Iniciar sesión</Link>
