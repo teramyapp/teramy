@@ -49,9 +49,11 @@ export async function middleware(request: NextRequest) {
     .eq('user_id', userId)
     .single();
 
-  // If no psychologist record yet (mid-registration), allow through
+  // If no psychologist record yet (e.g. they logged in with Google but haven't created a profile)
   if (error || !psych) {
-    return NextResponse.next();
+    const setupUrl = new URL('/register', request.url);
+    setupUrl.searchParams.set('step', '2');
+    return NextResponse.redirect(setupUrl);
   }
 
   const { subscription_status, trial_ends_at } = psych;
