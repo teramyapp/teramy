@@ -205,6 +205,12 @@ export default function SubscribePage() {
             <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', marginTop: '1.25rem', lineHeight: 1.5 }}>
               🔒 Pago seguro · Tus datos siguen guardados y seguros · Cancela cuando quieras
             </p>
+
+            <div style={{ marginTop: '1.5rem', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
+              <Link href="/dashboard/settings" style={{ fontSize: '0.8rem', color: '#94a3b8', textDecoration: 'none', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                ¿No quieres seguir? Gestionar o eliminar mi cuenta
+              </Link>
+            </div>
           </div>
 
           {/* Footer note */}

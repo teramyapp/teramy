@@ -65,6 +65,11 @@ export async function middleware(request: NextRequest) {
     (subscription_status === 'trialing' && trialExpired);
 
   if (isBlocked) {
+    // PASE ESPECIAL: Permitimos entrar a Configuración aunque esté bloqueado para que pueda borrar su cuenta
+    if (pathname === '/dashboard/settings') {
+      return NextResponse.next();
+    }
+
     // Auto-update status to 'paused' if trial just expired
     if (subscription_status === 'trialing' && trialExpired) {
       await supabase
