@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Clock, CheckCircle, ArrowRight, Mail, Shield, Zap, Calendar, FileText, BarChart2, MessageSquare, Loader2 } from 'lucide-react';
+import { Clock, CheckCircle, ArrowRight, Mail, Shield, Zap, Calendar, FileText, BarChart2, MessageSquare, Loader2, Lock, CreditCard } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
 
@@ -162,18 +162,18 @@ export default function SubscribePage() {
               ))}
             </div>
 
-            {/* CTA — Mercado Pago */}
+            {/* CTA — Secure Checkout */}
             <button
               onClick={handleSubscribe}
               disabled={subscribing || loading}
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                width: '100%', padding: '1rem', borderRadius: '14px',
-                background: 'linear-gradient(135deg, #009ee3, #00bcf2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                width: '100%', padding: '0.95rem', borderRadius: '14px',
+                background: '#0ea5e9',
                 color: 'white', fontWeight: 800, fontSize: '1.05rem',
                 border: 'none',
-                boxShadow: '0 8px 24px rgba(0,158,227,0.35)',
-                transition: 'all 0.2s', marginBottom: '0.75rem',
+                boxShadow: '0 8px 24px rgba(14,165,233,0.35)',
+                transition: 'all 0.2s', marginBottom: '0.5rem',
                 cursor: (subscribing || loading) ? 'not-allowed' : 'pointer',
                 opacity: (subscribing || loading) ? 0.7 : 1,
               }}
@@ -182,15 +182,26 @@ export default function SubscribePage() {
                 <Loader2 className="animate-spin" size={24} />
               ) : (
                 <>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="12" fill="white" fillOpacity="0.25"/>
-                    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">MP</text>
-                  </svg>
-                  Pagar con Mercado Pago
+                  <Lock size={18} />
+                  Ir al pago seguro
                   <ArrowRight size={18} />
                 </>
               )}
             </button>
+            
+            {/* Payment methods hint */}
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '0 0 0.4rem', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
+                <CreditCard size={14} /> Débito y Crédito aceptados
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem', background: '#f1f5f9', borderRadius: '4px', color: '#475569', fontWeight: 600 }}>Visa</span>
+                <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem', background: '#f1f5f9', borderRadius: '4px', color: '#475569', fontWeight: 600 }}>Mastercard</span>
+                <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem', background: '#f1f5f9', borderRadius: '4px', color: '#475569', fontWeight: 600 }}>Amex</span>
+                <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem', background: '#f1f5f9', borderRadius: '4px', color: '#475569', fontWeight: 600 }}>Mach</span>
+                <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem', background: '#f1f5f9', borderRadius: '4px', color: '#475569', fontWeight: 600 }}>Mercado Pago</span>
+              </div>
+            </div>
 
             {/* Contact fallback */}
             <a
