@@ -199,7 +199,7 @@ function RegisterForm() {
 
         {/* STEP 1: Cuenta */}
         {step === 1 && !checkEmail && (
-          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
+          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2rem 1.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.3rem' }}>Crea tu cuenta</h1>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>Únete a la comunidad de profesionales que ya están organizando su consulta.</p>
 
@@ -265,7 +265,7 @@ function RegisterForm() {
 
         {/* Check Email State */}
         {checkEmail && (
-          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '3rem 2.5rem', border: '1px solid rgba(255,255,255,0.8)', textAlign: 'center' }}>
+          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2rem 1.5rem', border: '1px solid rgba(255,255,255,0.8)', textAlign: 'center' }}>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #e0f2fe, #bae6fd)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
               <Mail size={40} style={{ color: '#0284c7' }} />
             </div>
@@ -285,7 +285,7 @@ function RegisterForm() {
 
         {/* STEP 2: Perfil */}
         {step === 2 && (
-          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
+          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2rem 1.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <button onClick={() => setStep(1)} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#64748b', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
                 <ArrowLeft size={16} /> Volver
@@ -498,7 +498,7 @@ function RegisterForm() {
 
         {/* STEP 3: Done */}
         {step === 3 && (
-          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '3rem 2.5rem', border: '1px solid rgba(255,255,255,0.8)', textAlign: 'center' }}>
+          <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2rem 1.5rem', border: '1px solid rgba(255,255,255,0.8)', textAlign: 'center' }}>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #ecfdf5, #dcfce7)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.75rem' }}>
               <CheckCircle2 size={44} style={{ color: '#10b981' }} />
             </div>

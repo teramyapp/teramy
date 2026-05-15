@@ -60,7 +60,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
+        <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', padding: '2rem 1.5rem', border: '1px solid rgba(255,255,255,0.8)' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.4rem', textAlign: 'center' }}>
             Bienvenido de vuelta
           </h1>
