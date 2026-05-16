@@ -375,7 +375,7 @@ export default function SettingsPage() {
                 Aprovecha al máximo tu periodo de prueba
               </p>
               <p style={{ fontSize: '0.85rem', color: '#0369a1', fontWeight: 500 }}>
-                Tu acceso de prueba gratuita finalizará el {new Date(trialEndsAt).toLocaleDateString('es-CL')}. ¡Suscríbete para asegurar tu lugar en Teramy!
+                Tu acceso de prueba gratuita finalizará el {new Date(trialEndsAt).toLocaleDateString('es-CL')}. ¡Suscríbete para asegurar tu lugar en Teramy Pro!
               </p>
             </div>
             <button 
@@ -386,15 +386,47 @@ export default function SettingsPage() {
                 boxShadow: '0 4px 12px rgba(2, 132, 199, 0.2)'
               }}
             >
-              Suscribirme
+              Suscribirme ahora
             </button>
           </div>
         )}
 
-        {/* ── 1. PLAN Y SUSCRIPCIÓN ── */}
-        <SectionCard title="Plan y suscripción" icon={<Zap size={20} />}>
+        {subscriptionStatus === 'active' && (
+          <div style={{ 
+            background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', 
+            border: '1px solid #bbf7d0', 
+            borderRadius: '16px', 
+            padding: '1.25rem 1.75rem', 
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.08)'
+          }}>
+            <div style={{ 
+              width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+            }}>
+              <CheckCircle2 size={20} style={{ color: '#16a34a' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: 800, color: '#14532d', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
+                ¡Eres Miembro Pro!
+              </p>
+              <p style={{ fontSize: '0.85rem', color: '#166534', fontWeight: 500 }}>
+                Gracias por ser parte de Teramy. Tienes acceso ilimitado a todas las funcionalidades profesionales.
+              </p>
+            </div>
+          </div>
+        )}
 
-                  {/* Plan badge */}
+        <SectionCard 
+          title="Plan y suscripción" 
+          icon={subscriptionStatus === 'active' ? <Star size={20} style={{ color: '#f59e0b' }} /> : <Zap size={20} />}
+        >
+
+          {/* Plan badge */}
           <div className="plan-badge-container">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
@@ -404,12 +436,13 @@ export default function SettingsPage() {
                 <span style={{ 
                   padding: '0.15rem 0.65rem', 
                   borderRadius: '2rem', 
-                  background: subscriptionStatus === 'active' || subscriptionStatus === 'trialing' ? '#dcfce7' : '#fee2e2', 
-                  color: subscriptionStatus === 'active' || subscriptionStatus === 'trialing' ? '#16a34a' : '#ef4444', 
+                  background: subscriptionStatus === 'active' ? 'linear-gradient(135deg, #dcfce7, #bbf7d0)' : subscriptionStatus === 'trialing' ? '#eff6ff' : '#fee2e2', 
+                  color: subscriptionStatus === 'active' ? '#15803d' : subscriptionStatus === 'trialing' ? '#0ea5e9' : '#ef4444', 
                   fontSize: '0.72rem', 
                   fontWeight: 800, 
                   textTransform: 'uppercase', 
-                  letterSpacing: '0.05em' 
+                  letterSpacing: '0.05em',
+                  border: subscriptionStatus === 'active' ? '1px solid #86efac' : 'none'
                 }}>
                   ● {
                     subscriptionStatus === 'active' ? 'Activo' : 
