@@ -27,8 +27,6 @@ export default function AutomationsPage() {
     `Hola {{nombre}}.\n\nLamento informarte que debo cancelar nuestra sesión del {{fecha}}.\n\nPronto te contactaré para buscar una nueva fecha. Saludos.`
   );
   const [whatsappTab, setWhatsappTab] = useState<'reminder' | 'reschedule' | 'cancel'>('reminder');
-  const [email24h, setEmail24h] = useState(true);
-  const [emailConfirm, setEmailConfirm] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -103,7 +101,7 @@ export default function AutomationsPage() {
     try {
       const { error } = await supabase.from('psychologists').update({
         video_meeting_type: videoPlatform === 'google_meet' ? 'meet' : 'zoom',
-        video_meeting_url: videoPlatform === 'zoom' ? zoomLink : null,
+        video_meeting_url: zoomLink,
         session_type: sessionType,
         whatsapp_reminder_template: whatsappTemplate,
         whatsapp_reschedule_template: whatsappRescheduleTemplate,
@@ -133,9 +131,7 @@ export default function AutomationsPage() {
     .replace('{{modalidad}}', sessionType === 'online' ? 'Online' : 'Presencial')
     .replace('{{detalle}}', sessionType === 'presencial'
       ? `📍 ${address || '[Dirección del consultorio]'}`
-      : videoPlatform === 'google_meet'
-        ? '💻 [Link de Google Meet]'
-        : `💻 ${zoomLink || '[Link de Zoom]'}`
+      : `💻 ${zoomLink || `[Link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}]`}`
     );
 
   const whatsappReschedulePreview = whatsappRescheduleTemplate
@@ -145,9 +141,7 @@ export default function AutomationsPage() {
     .replace('{{modalidad}}', sessionType === 'online' ? 'Online' : 'Presencial')
     .replace('{{detalle}}', sessionType === 'presencial'
       ? `📍 ${address || '[Dirección del consultorio]'}`
-      : videoPlatform === 'google_meet'
-        ? '💻 [Link de Google Meet]'
-        : `💻 ${zoomLink || '[Link de Zoom]'}`
+      : `💻 ${zoomLink || `[Link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}]`}`
     );
 
   const whatsappCancelPreview = whatsappCancelTemplate
@@ -297,95 +291,93 @@ export default function AutomationsPage() {
           </div>
 
           <div className="options-grid-2" style={{ marginBottom: videoPlatform === 'zoom' ? '1.25rem' : 0 }}>
-            {([
-              {
-                value: 'google_meet' as const,
-                label: 'Google Meet',
-                sub: 'Link automático por sesión — sin configuración',
-                badge: 'Recomendado',
-                badgeColor: '#0369a1',
-                badgeBg: '#e8f4fc',
-                activeColor: '#0369a1',
-                activeBg: '#e8f4fc',
-                activeBorder: '#bae6fd',
-                icon: (
-                  <div style={{ width: '60px', height: '60px', borderRadius: '14px', background: 'white', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '6px', flexShrink: 0 }}>
-                    <img src="/logos/logo-google-meet.jpg" alt="Google Meet" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  </div>
-                ),
-              },
-              {
-                value: 'zoom' as const,
-                label: 'Zoom',
-                sub: 'Ingresa tu link personal de Zoom',
-                badge: null,
-                activeColor: '#2563eb',
-                activeBg: '#eff6ff',
-                activeBorder: '#bfdbfe',
-                icon: (
-                  <div style={{ width: '60px', height: '60px', borderRadius: '14px', background: 'white', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '6px', flexShrink: 0 }}>
-                    <img src="/logos/unnamed.png" alt="Zoom" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  </div>
-                ),
-              },
-            ]).map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => setVideoPlatform(opt.value)}
-                style={{
-                  padding: '1.25rem',
-                  borderRadius: '14px',
-                  border: videoPlatform === opt.value ? `2px solid ${opt.activeBorder}` : '2px solid var(--border-light)',
-                  background: videoPlatform === opt.value ? opt.activeBg : 'var(--bg-main)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  gap: '1rem',
-                  alignItems: 'flex-start',
-                  position: 'relative',
-                }}
-              >
-                {videoPlatform === opt.value && (
-                  <div style={{ position: 'absolute', top: '0.85rem', right: '0.85rem', width: '20px', height: '20px', borderRadius: '50%', background: opt.activeColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Check size={12} color="white" />
-                  </div>
-                )}
-                {opt.icon}
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: '0.95rem', color: videoPlatform === opt.value ? opt.activeColor : 'var(--text-dark)', margin: '0 0 0.2rem' }}>
-                    {opt.label}
-                  </p>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{opt.sub}</p>
-                  {opt.badge && (
-                    <span style={{ display: 'inline-block', marginTop: '0.5rem', padding: '0.2rem 0.6rem', background: opt.badgeBg, color: opt.badgeColor, borderRadius: '2rem', fontSize: '0.72rem', fontWeight: 700 }}>
-                      {opt.badge}
-                    </span>
-                  )}
+          {([
+            {
+              value: 'google_meet' as const,
+              label: 'Google Meet',
+              sub: 'Ingresa tu link personal de Google Meet',
+              badge: 'Recomendado',
+              badgeColor: '#0369a1',
+              badgeBg: '#e8f4fc',
+              activeColor: '#0369a1',
+              activeBg: '#e8f4fc',
+              activeBorder: '#bae6fd',
+              icon: (
+                <div style={{ width: '60px', height: '60px', borderRadius: '14px', background: 'white', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '6px', flexShrink: 0 }}>
+                  <img src="/logos/logo-google-meet.jpg" alt="Google Meet" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
-              </button>
-            ))}
-          </div>
-
-          {videoPlatform === 'zoom' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.25rem' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <LinkIcon size={14} /> Tu link de sala Zoom
-              </label>
-              <input
-                type="url"
-                value={zoomLink}
-                onChange={e => setZoomLink(e.target.value)}
-                placeholder="https://zoom.us/j/123456789"
-                style={{ fontSize: '0.9rem' }}
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-                Este link se incluirá en todos los correos de confirmación y recordatorio de sesiones online.
-              </p>
-            </div>
-          )}
+              ),
+            },
+            {
+              value: 'zoom' as const,
+              label: 'Zoom',
+              sub: 'Ingresa tu link personal de Zoom',
+              badge: null,
+              activeColor: '#2563eb',
+              activeBg: '#eff6ff',
+              activeBorder: '#bfdbfe',
+              icon: (
+                <div style={{ width: '60px', height: '60px', borderRadius: '14px', background: 'white', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '6px', flexShrink: 0 }}>
+                  <img src="/logos/unnamed.png" alt="Zoom" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+              ),
+            },
+          ]).map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setVideoPlatform(opt.value)}
+              style={{
+                padding: '1.25rem',
+                borderRadius: '14px',
+                border: videoPlatform === opt.value ? `2px solid ${opt.activeBorder}` : '2px solid var(--border-light)',
+                background: videoPlatform === opt.value ? opt.activeBg : 'var(--bg-main)',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.2s',
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'flex-start',
+                position: 'relative',
+              }}
+            >
+              {videoPlatform === opt.value && (
+                <div style={{ position: 'absolute', top: '0.85rem', right: '0.85rem', width: '20px', height: '20px', borderRadius: '50%', background: opt.activeColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Check size={12} color="white" />
+                </div>
+              )}
+              {opt.icon}
+              <div>
+                <p style={{ fontWeight: 700, fontSize: '0.95rem', color: videoPlatform === opt.value ? opt.activeColor : 'var(--text-dark)', margin: '0 0 0.2rem' }}>
+                  {opt.label}
+                </p>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{opt.sub}</p>
+                {opt.badge && (
+                  <span style={{ display: 'inline-block', marginTop: '0.5rem', padding: '0.2rem 0.6rem', background: opt.badgeBg, color: opt.badgeColor, borderRadius: '2rem', fontSize: '0.72rem', fontWeight: 700 }}>
+                    {opt.badge}
+                  </span>
+                )}
+              </div>
+            </button>
+          ))}
         </div>
-      )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.25rem' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <LinkIcon size={14} /> Tu link de sala {videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}
+          </label>
+          <input
+            type="url"
+            value={zoomLink}
+            onChange={e => setZoomLink(e.target.value)}
+            placeholder={videoPlatform === 'google_meet' ? "https://meet.google.com/abc-defg-hij" : "https://zoom.us/j/123456789"}
+            style={{ fontSize: '0.9rem' }}
+          />
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+            Este link se incluirá en todos los correos de confirmación y recordatorio de sesiones online.
+          </p>
+        </div>
+      </div>
+    )}
 
       {showPresencial && (
         <div className="premium-card" style={{ padding: '2rem' }}>
@@ -585,52 +577,28 @@ export default function AutomationsPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-          {[
-            {
-              on: emailConfirm,
-              toggle: () => setEmailConfirm(v => !v),
-              title: 'Confirmación de sesión',
-              desc: sessionType === 'presencial'
-                ? 'Al agendar → el paciente recibe fecha, hora y dirección del consultorio'
-                : `Al agendar → el paciente recibe fecha, hora y el link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}`,
-              icon: <CheckCheck size={22} style={{ color: '#10b981' }} />,
-              iconBg: '#ecfdf5',
-            },
-            {
-              on: email24h,
-              toggle: () => setEmail24h(v => !v),
-              title: 'Recordatorio 24 horas antes',
-              desc: sessionType === 'presencial'
-                ? 'El día anterior → el paciente recibe un recordatorio con la dirección del consultorio'
-                : `El día anterior → recordatorio con el link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}`,
-              icon: <Bell size={22} style={{ color: '#0369a1' }} />,
-              iconBg: '#e8f4fc',
-            },
-          ].map((item, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: '1.25rem',
-              padding: '1.25rem',
-              borderRadius: '14px',
-              border: '1.5px solid var(--border-light)',
-              background: item.on ? 'var(--bg-white)' : 'var(--bg-main)',
-              transition: 'all 0.2s',
-              opacity: item.on ? 1 : 0.6,
-            }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: item.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.35rem', flexShrink: 0 }}>
-                {item.icon}
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', margin: '0 0 0.2rem' }}>{item.title}</p>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{item.desc}</p>
-              </div>
-              <div
-                onClick={item.toggle}
-                style={{ width: '48px', height: '26px', borderRadius: '13px', background: item.on ? 'var(--primary-blue)' : '#cbd5e1', display: 'flex', alignItems: 'center', padding: '2px', cursor: 'pointer', transition: 'all 0.3s', flexShrink: 0 }}
-              >
-                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'white', transform: item.on ? 'translateX(22px)' : 'none', transition: 'all 0.3s', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }} />
-              </div>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '1.25rem',
+            padding: '1.25rem',
+            borderRadius: '14px',
+            border: '1.5px solid var(--border-light)',
+            background: 'var(--bg-white)',
+          }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.35rem', flexShrink: 0 }}>
+              <CheckCheck size={22} style={{ color: '#10b981' }} />
             </div>
-          ))}
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', margin: '0 0 0.2rem' }}>Confirmación de sesión</p>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                {sessionType === 'presencial'
+                  ? 'Al agendar → el paciente recibe fecha, hora y dirección del consultorio'
+                  : `Al agendar → el paciente recibe fecha, hora y el link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}`}
+              </p>
+            </div>
+            <div style={{ padding: '0.25rem 0.7rem', borderRadius: '2rem', background: '#f0fdf4', color: '#15803d', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #bbf7d0' }}>
+              Siempre activo
+            </div>
+          </div>
         </div>
 
         <div style={{ marginTop: '1.25rem', padding: '0.9rem 1.1rem', background: 'var(--bg-main)', borderRadius: '12px', display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
