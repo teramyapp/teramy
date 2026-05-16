@@ -353,37 +353,37 @@ export default function SettingsPage() {
         
         {subscriptionStatus === 'trialing' && trialEndsAt && (
           <div style={{ 
-            background: 'linear-gradient(135deg, #fff9eb, #fff3d6)', 
-            border: '1px solid #fde68a', 
+            background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', 
+            border: '1px solid #bae6fd', 
             borderRadius: '16px', 
             padding: '1.25rem 1.75rem', 
             marginBottom: '1rem',
             display: 'flex',
             alignItems: 'center',
             gap: '1rem',
-            boxShadow: '0 4px 12px rgba(217, 119, 6, 0.05)'
+            boxShadow: '0 4px 12px rgba(2, 132, 199, 0.08)'
           }}>
             <div style={{ 
               width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
             }}>
-              <Zap size={20} style={{ color: '#d97706' }} />
+              <Zap size={20} style={{ color: '#0284c7' }} />
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 800, color: '#92400e', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
-                Tu periodo de prueba termina pronto
+              <p style={{ fontWeight: 800, color: '#0c4a6e', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
+                Aprovecha al máximo tu periodo de prueba
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#b45309', fontWeight: 500 }}>
-                Quedan pocos días para que tu trial finalice ({new Date(trialEndsAt).toLocaleDateString('es-CL')}). ¡Suscríbete ahora para no perder el acceso!
+              <p style={{ fontSize: '0.85rem', color: '#0369a1', fontWeight: 500 }}>
+                Tu acceso de prueba gratuita finalizará el {new Date(trialEndsAt).toLocaleDateString('es-CL')}. ¡Suscríbete para asegurar tu lugar en Teramy!
               </p>
             </div>
             <button 
               onClick={() => router.push('/subscribe')}
               style={{ 
-                padding: '0.6rem 1.25rem', borderRadius: '10px', background: '#d97706', color: 'white', 
+                padding: '0.6rem 1.25rem', borderRadius: '10px', background: '#0284c7', color: 'white', 
                 fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(217, 119, 6, 0.2)'
+                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.2)'
               }}
             >
               Suscribirme
@@ -419,10 +419,12 @@ export default function SettingsPage() {
                 </span>
               </div>
               <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                $19.990 CLP / mensual · Miembro desde {memberSince || '—'}
+                {subscriptionStatus === 'trialing' ? 'Sin cobros actuales (Periodo de prueba gratuito)' : '$19.990 CLP / mensual'} · Miembro desde {memberSince || '—'}
               </p>
             </div>
-            <div className="plan-badge-price" style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary-dark-blue)', lineHeight: 1 }}>$19.990</div>
+            <div className="plan-badge-price" style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary-dark-blue)', lineHeight: 1 }}>
+              {subscriptionStatus === 'trialing' ? 'Prueba' : '$19.990'}
+            </div>
           </div>
 
           <InfoRow 
@@ -436,9 +438,15 @@ export default function SettingsPage() {
           />
           <InfoRow label="Frecuencia de pago" value="Mensual" action={<button style={{ fontSize: '0.8rem', color: 'var(--primary-blue)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>Cambiar <ChevronRight size={14} /></button>} />
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem' }}>
-            <button onClick={() => setModal('cancel_plan')} style={{ padding: '0.7rem 1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <X size={15} /> Cancelar plan
-            </button>
+            {subscriptionStatus === 'trialing' ? (
+              <button onClick={() => router.push('/subscribe')} style={{ padding: '0.7rem 1.25rem', borderRadius: '10px', border: 'none', background: 'var(--primary-blue)', color: 'white', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Zap size={15} /> Suscribirme a Teramy Pro
+              </button>
+            ) : (
+              <button onClick={() => setModal('cancel_plan')} style={{ padding: '0.7rem 1.25rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <X size={15} /> Cancelar plan
+              </button>
+            )}
           </div>
         </SectionCard>
 
