@@ -147,12 +147,17 @@ export default function SubscribePage() {
     }}>
       <div style={{ width: '100%', maxWidth: '520px' }}>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        {/* Logo and Back Button */}
+        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: '2rem' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none' }}>
             <img src="/fondo%20blanco.png" alt="Teramy Logo" style={{ width: '48px', height: '48px', mixBlendMode: 'multiply', objectFit: 'contain' }} />
             <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.03em' }}>teramy</span>
           </Link>
+          {psychologist?.subscription_status === 'trialing' && (
+            <Link href="/dashboard" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textDecoration: 'none', background: 'white', padding: '0.5rem 1rem', borderRadius: '2rem', border: '1.5px solid #e2e8f0' }}>
+              Volver
+            </Link>
+          )}
         </div>
 
         {/* Main card */}
@@ -178,13 +183,19 @@ export default function SubscribePage() {
               margin: '0 auto 1.25rem',
               border: '2px solid rgba(255,255,255,0.3)',
             }}>
-              <Clock size={30} style={{ color: 'white' }} />
+              {psychologist?.subscription_status === 'trialing' 
+                ? <Zap size={30} style={{ color: 'white' }} />
+                : <Clock size={30} style={{ color: 'white' }} />}
             </div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 0.5rem', lineHeight: 1.2 }}>
-              Tu período de prueba terminó
+              {psychologist?.subscription_status === 'trialing' 
+                ? 'Asegura tu lugar en Teramy Pro' 
+                : 'Tu período de prueba terminó'}
             </h1>
             <p style={{ fontSize: '1rem', opacity: 0.9, margin: 0, lineHeight: 1.5 }}>
-              Para seguir usando Teramy, activa tu suscripción y continúa sin perder ningún dato.
+              {psychologist?.subscription_status === 'trialing'
+                ? 'Suscríbete ahora para seguir usando todas las herramientas sin interrupciones cuando finalice tu prueba.'
+                : 'Para seguir usando Teramy, activa tu suscripción y continúa sin perder ningún dato.'}
             </p>
           </div>
 
@@ -286,73 +297,78 @@ export default function SubscribePage() {
               🔒 Pago seguro · Tus datos siguen guardados y seguros · Cancela cuando quieras
             </p>
 
-            <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', textAlign: 'center', marginBottom: '1rem', fontWeight: 600 }}>
-                ¿Deseas gestionar tu salida o cerrar sesión?
+            {psychologist?.subscription_status !== 'trialing' && (
+              <>
+                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+                  <p style={{ fontSize: '0.85rem', color: '#64748b', textAlign: 'center', marginBottom: '1rem', fontWeight: 600 }}>
+                    ¿Deseas gestionar tu salida o cerrar sesión?
+                  </p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.6rem' }}>
+                    {/* Download Data */}
+                    <button
+                      onClick={handleDownload}
+                      disabled={downloading}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                        padding: '0.75rem', borderRadius: '10px', background: 'white',
+                        border: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '0.85rem',
+                        cursor: 'pointer', transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
+                    >
+                      <Download size={16} style={{ color: '#0ea5e9' }} /> 
+                      {downloading ? 'Generando descarga...' : 'Descargar mis pacientes (CSV)'}
+                    </button>
+
+                    {/* Logout */}
+                    <button
+                      onClick={() => setModal('logout')}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                        padding: '0.75rem', borderRadius: '10px', background: 'white',
+                        border: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '0.85rem',
+                        cursor: 'pointer', transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
+                    >
+                      <LogOut size={16} style={{ color: '#64748b' }} /> Cerrar sesión
+                    </button>
+
+                    {/* Delete Account */}
+                    <button
+                      onClick={() => setModal('delete_account')}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                        padding: '0.75rem', borderRadius: '10px', background: '#fff5f5',
+                        border: '1px solid #fecaca', color: '#ef4444', fontWeight: 600, fontSize: '0.85rem',
+                        cursor: 'pointer', transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff5f5'; }}
+                    >
+                      <Trash2 size={16} /> Eliminar mi cuenta permanentemente
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {psychologist?.subscription_status !== 'trialing' && (
+            <div style={{
+              background: '#f8fafc', borderTop: '1px solid #e2e8f0',
+              padding: '1rem 2.5rem',
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+            }}>
+              <CheckCircle size={15} style={{ color: '#10b981', flexShrink: 0 }} />
+              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>
+                Todos tus pacientes, sesiones y notas están intactos y te esperan.
               </p>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.6rem' }}>
-                {/* Download Data */}
-                <button
-                  onClick={handleDownload}
-                  disabled={downloading}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                    padding: '0.75rem', borderRadius: '10px', background: 'white',
-                    border: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '0.85rem',
-                    cursor: 'pointer', transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
-                >
-                  <Download size={16} style={{ color: '#0ea5e9' }} /> 
-                  {downloading ? 'Generando descarga...' : 'Descargar mis pacientes (CSV)'}
-                </button>
-
-                {/* Logout */}
-                <button
-                  onClick={() => setModal('logout')}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                    padding: '0.75rem', borderRadius: '10px', background: 'white',
-                    border: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '0.85rem',
-                    cursor: 'pointer', transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
-                >
-                  <LogOut size={16} style={{ color: '#64748b' }} /> Cerrar sesión
-                </button>
-
-                {/* Delete Account */}
-                <button
-                  onClick={() => setModal('delete_account')}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                    padding: '0.75rem', borderRadius: '10px', background: '#fff5f5',
-                    border: '1px solid #fecaca', color: '#ef4444', fontWeight: 600, fontSize: '0.85rem',
-                    cursor: 'pointer', transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff5f5'; }}
-                >
-                  <Trash2 size={16} /> Eliminar mi cuenta permanentemente
-                </button>
-              </div>
             </div>
-          </div>
-
-          {/* Footer note */}
-          <div style={{
-            background: '#f8fafc', borderTop: '1px solid #e2e8f0',
-            padding: '1rem 2.5rem',
-            display: 'flex', alignItems: 'center', gap: '0.5rem',
-          }}>
-            <CheckCircle size={15} style={{ color: '#10b981', flexShrink: 0 }} />
-            <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>
-              Todos tus pacientes, sesiones y notas están intactos y te esperan.
-            </p>
-          </div>
+          )}
         </div>
 
       </div>
