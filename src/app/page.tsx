@@ -214,18 +214,18 @@ export default function Home() {
             {/* Left: copy */}
             <div className="animate-slide-up" style={{ flex: 1, minWidth: isMobile ? '0' : '420px', width: '100%' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1.1rem', background: 'var(--primary-light-blue)', borderRadius: '2rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--primary-dark-blue)', letterSpacing: '0.04em', marginBottom: '1.75rem', textTransform: 'uppercase' }}>
-                <Zap size={14} style={{ color: 'var(--primary-blue)' }} /> Para terapeutas y profesionales de la salud
+                <Zap size={14} style={{ color: 'var(--primary-blue)' }} /> Software para psicólogos y terapeutas
               </div>
 
               <h1 className="hero-title" style={{ fontWeight: 900, color: 'var(--text-dark)', lineHeight: 1.08, letterSpacing: '-0.03em' }}>
-                Software para terapeutas,<br />
+                Tu consulta organizada,<br />
                 <span style={{ background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  organizado de verdad.
+                  de una vez por todas.
                 </span>
               </h1>
 
               <p className="hero-desc" style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: '520px' }}>
-                <strong>La herramienta todo-en-uno</strong> para gestionar tu agenda, notas de sesión y recordatorios automáticos. Gana tiempo, tranquilidad y el control total de tu consulta profesional.
+                Porque los mejores terapeutas no deberían gastar el día en planillas, agendas y mensajes de coordinación. <strong>Teramy se encarga de todo eso</strong>, para que tú solo pienses en tus pacientes.
               </p>
 
               {!isMobile && (
