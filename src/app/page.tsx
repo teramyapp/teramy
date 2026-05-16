@@ -218,9 +218,9 @@ export default function Home() {
               </div>
 
               <h1 className="hero-title" style={{ fontWeight: 900, color: 'var(--text-dark)', lineHeight: 1.08, letterSpacing: '-0.03em' }}>
-                Tu consulta organizada,<br />
+                Todo lo de tu consulta,<br />
                 <span style={{ background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  de una vez por todas.
+                  en un solo lugar.
                 </span>
               </h1>
 
