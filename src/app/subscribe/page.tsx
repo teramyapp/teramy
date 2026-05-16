@@ -28,7 +28,7 @@ export default function SubscribePage() {
       
       const { data: psych, error } = await supabase
         .from('psychologists')
-        .select('id, name')
+        .select('id, name, subscription_status, trial_ends_at')
         .eq('user_id', session.user.id)
         .single();
         
