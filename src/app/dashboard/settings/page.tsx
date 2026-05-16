@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   CreditCard, Shield, Download, Trash2, LogOut, CheckCircle2,
   AlertTriangle, ChevronRight, Calendar, Zap, Clock, RefreshCcw,
-  Lock, Eye, EyeOff, X, FileJson, FileSpreadsheet, Check,
+  Lock, Eye, EyeOff, X, FileJson, FileSpreadsheet, Check, Star,
 } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 
