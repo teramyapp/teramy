@@ -232,7 +232,7 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
   const [slotsLoading,     setSlotsLoading]     = useState(false);
   const [selectedDateIdx,  setSelectedDateIdx]  = useState<number | null>(null);
   const [selectedTime,     setSelectedTime]     = useState<string | null>(null);
-  const [form,             setForm]             = useState({ name: '', email: '', phone: '', notes: '' });
+  const [form,             setForm]             = useState({ name: '', email: '', phone: '+56 9 ', notes: '' });
   const [emailError,       setEmailError]       = useState<string | null>(null);
   const [submitting,       setSubmitting]       = useState(false);
   const [submitError,      setSubmitError]      = useState<string | null>(null);
@@ -844,8 +844,8 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
                     )}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Teléfono (opcional)</label>
-                    <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="+56 9 1234 5678" />
+                    <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Teléfono (WhatsApp) *</label>
+                    <input required type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="+56 9 1234 5678" />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                     <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>¿Algo que quieras comentarle? (opcional)</label>

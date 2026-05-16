@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { psychologist_id, event_type_id, patient, start_time, end_time, patient_notes } = body;
 
-    if (!psychologist_id || !patient?.email || !patient?.name || !start_time || !end_time) {
+    if (!psychologist_id || !patient?.email || !patient?.name || !patient?.phone || !start_time || !end_time) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
     }
 
