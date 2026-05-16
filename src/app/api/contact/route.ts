@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     await resend.emails.send({
       from: `Teramy Web <${process.env.FROM_EMAIL || 'onboarding@resend.dev'}>`,
-      to: 'contacto@teramy.cl',
+      to: process.env.CONTACT_EMAIL || 'contacto@teramy.cl',
       replyTo: email,
       subject: `Consulta de ${name} desde teramy.cl`,
       html: `
@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ error: 'Error al enviar el mensaje.' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Contact form email error:', error);
+    return NextResponse.json({ error: 'Error al enviar el mensaje.', details: error.message }, { status: 500 });
   }
 }
