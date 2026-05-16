@@ -403,6 +403,10 @@ export default function DashboardHome() {
   };
 
   const saveNewSession = async () => {
+    if (!nsPatientId || !nsDate || !nsTime) return;
+    const startDt = new Date(`${nsDate}T${nsTime}:00`);
+    const endDt   = new Date(startDt.getTime() + parseInt(nsDuration) * 60000);
+
     const selectedPatient = nsPatientsList.find(p => p.id === nsPatientId);
     if (!selectedPatient?.email) {
       alert("El paciente seleccionado no tiene correo electrónico. Por favor agrégalo en la sección de Pacientes.");
