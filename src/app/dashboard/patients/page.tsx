@@ -175,7 +175,7 @@ export default function PatientsPage() {
       .insert([{
         name: newName.trim(),
         email: newEmail.trim() || null,
-        phone: newPhone.trim() || null,
+        phone: newPhone.trim() ? `+56 9 ${newPhone.trim()}` : null,
         psychologist_id: psychologistId, // links patient to this psychologist (migration 002)
       }])
       .select('id, name, email, phone')
@@ -461,8 +461,23 @@ export default function PatientsPage() {
                   <input type="email" placeholder="ana@correo.com" value={newEmail} onChange={e => { setNewEmail(e.target.value); checkDuplicate(e.target.value, newPhone); }} style={{ padding: '0.85rem 1.1rem', borderRadius: '10px', fontSize: '0.95rem', fontFamily: 'inherit', background: '#fafcff', width: '100%', boxSizing: 'border-box', outline: 'none', border: duplicateWarning ? '1.5px solid #f59e0b' : '1.5px solid #e2e8f0' }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>Teléfono</label>
-                  <input type="tel" placeholder="+56 9..." value={newPhone} onChange={e => { setNewPhone(e.target.value); checkDuplicate(newEmail, e.target.value); }} style={{ padding: '0.85rem 1.1rem', borderRadius: '10px', fontSize: '0.95rem', fontFamily: 'inherit', background: '#fafcff', width: '100%', boxSizing: 'border-box', outline: 'none', border: duplicateWarning ? '1.5px solid #f59e0b' : '1.5px solid #e2e8f0' }} />
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>Teléfono *</label>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ padding: '0.85rem 0.75rem', background: '#f1f5f9', border: '1.5px solid #e2e8f0', borderRight: 'none', borderRadius: '10px 0 0 10px', fontSize: '0.95rem', color: '#64748b', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      +56 9
+                    </div>
+                    <input 
+                      type="tel" 
+                      placeholder="1234 5678" 
+                      value={newPhone} 
+                      onChange={e => { 
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 8);
+                        setNewPhone(val); 
+                        checkDuplicate(newEmail, `+56 9 ${val}`); 
+                      }} 
+                      style={{ padding: '0.85rem 1.1rem', borderRadius: '0 10px 10px 0', border: '1.5px solid #e2e8f0', fontSize: '0.95rem', fontFamily: 'inherit', background: '#fafcff', width: '100%', boxSizing: 'border-box', outline: 'none' }} 
+                    />
+                  </div>
                 </div>
               </div>
               {duplicateWarning && (

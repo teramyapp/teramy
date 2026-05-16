@@ -599,6 +599,48 @@ export default function AutomationsPage() {
               Siempre activo
             </div>
           </div>
+
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '1.25rem',
+            padding: '1.25rem',
+            borderRadius: '14px',
+            border: '1.5px solid var(--border-light)',
+            background: 'var(--bg-white)',
+          }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f0f9ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.35rem', flexShrink: 0 }}>
+              <RefreshCcw size={20} style={{ color: '#0ea5e9' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', margin: '0 0 0.2rem' }}>Aviso de Reagendamiento</p>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                Al cambiar fecha/hora → el paciente recibe un correo con los nuevos datos y enlace de sesión.
+              </p>
+            </div>
+            <div style={{ padding: '0.25rem 0.7rem', borderRadius: '2rem', background: '#f0fdf4', color: '#15803d', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #bbf7d0' }}>
+              Siempre activo
+            </div>
+          </div>
+
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '1.25rem',
+            padding: '1.25rem',
+            borderRadius: '14px',
+            border: '1.5px solid var(--border-light)',
+            background: 'var(--bg-white)',
+          }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.35rem', flexShrink: 0 }}>
+              <Ban size={20} style={{ color: '#ef4444' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', margin: '0 0 0.2rem' }}>Aviso de Cancelación</p>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                Al cancelar → el paciente recibe un correo profesional notificando la anulación de la cita.
+              </p>
+            </div>
+            <div style={{ padding: '0.25rem 0.7rem', borderRadius: '2rem', background: '#f0fdf4', color: '#15803d', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #bbf7d0' }}>
+              Siempre activo
+            </div>
+          </div>
         </div>
 
         <div style={{ marginTop: '1.25rem', padding: '0.9rem 1.1rem', background: 'var(--bg-main)', borderRadius: '12px', display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>

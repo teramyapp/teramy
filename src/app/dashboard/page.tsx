@@ -14,7 +14,7 @@ import { addMinutes, format, addDays, isBefore, startOfDay, parseISO } from 'dat
 import { es } from 'date-fns/locale';
 import { usePsychologist, useCachedQuery, useDashboardCache } from '@/lib/dashboard-context';
 
-type NsPatientOption  = { id: string; name: string };
+type NsPatientOption  = { id: string; name: string; email?: string; phone?: string };
 type NsServiceOption  = { id: string; title: string; mode: string; duration_minutes: number; price: number };
 
 type Session = {
@@ -118,8 +118,8 @@ export default function DashboardHome() {
           .order('start_time'),
         supabase.from('appointments').select('patient_id').eq('psychologist_id', psychId!).neq('status', 'cancelled'),
         supabase.from('appointments').select('start_time, end_time, event_types(price)').eq('psychologist_id', psychId!).eq('status', 'completed').gte('start_time', weekStart.toISOString()),
-        supabase.from('appointments').select('patients(id, name)').eq('psychologist_id', psychId!),
-        supabase.from('patients').select('id, name').eq('psychologist_id', psychId!),
+        supabase.from('appointments').select('patients(id, name, email, phone)').eq('psychologist_id', psychId!),
+        supabase.from('patients').select('id, name, email, phone').eq('psychologist_id', psychId!),
         supabase.from('event_types').select('id, title, mode, duration_minutes, price').eq('psychologist_id', psychId!).eq('is_active', true).order('title'),
         supabase.from('appointments').select('id, start_time, status, created_at, patients(name), event_types(title, mode)').eq('psychologist_id', psychId!).order('created_at', { ascending: false }).limit(8),
         supabase.from('availability').select('day_of_week, start_time, end_time').eq('psychologist_id', psychId!),
@@ -128,11 +128,11 @@ export default function DashboardHome() {
         supabase.from('appointments').select('start_time, end_time').eq('psychologist_id', psychId!).neq('status', 'cancelled'),
       ]);
 
-      const pMap = new Map<string, string>();
-      (apptPatientsData ?? []).forEach((r: any) => { if (r.patients) pMap.set(r.patients.id, r.patients.name); });
-      (directPatientsData ?? []).forEach((r: any) => pMap.set(r.id, r.name));
-      const nsPatientsList = Array.from(pMap.entries())
-        .map(([id, name]) => ({ id, name }))
+      const pMap = new Map<string, any>();
+      (apptPatientsData ?? []).forEach((r: any) => { if (r.patients) pMap.set(r.patients.id, r.patients); });
+      (directPatientsData ?? []).forEach((r: any) => pMap.set(r.id, r));
+      const nsPatientsList = Array.from(pMap.values())
+        .map(p => ({ id: p.id, name: p.name, email: p.email, phone: p.phone }))
         .sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
       const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#7c3aed', '#ec4899'];
@@ -403,43 +403,59 @@ export default function DashboardHome() {
   };
 
   const saveNewSession = async () => {
-    if (!nsPatientId || !nsDate || !nsTime) return;
-    const startDt = new Date(`${nsDate}T${nsTime}:00`);
-    const endDt   = new Date(startDt.getTime() + parseInt(nsDuration) * 60000);
-    if (psychId) {
-      await supabase.from('appointments').insert([{
-        patient_id: nsPatientId,
-        psychologist_id: psychId,
-        event_type_id: nsServiceId || null,
-        start_time: startDt.toISOString(),
-        end_time: endDt.toISOString(),
-        status: 'pending',
-      }]);
+    const selectedPatient = nsPatientsList.find(p => p.id === nsPatientId);
+    if (!selectedPatient?.email) {
+      alert("El paciente seleccionado no tiene correo electrónico. Por favor agrégalo en la sección de Pacientes.");
+      return;
     }
-    const formattedDate = startDt.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
-    
-    const defaultTemplate = `¡Hola {{nombre}}! 👋\n\nTu sesión ha sido confirmada:\nFecha: {{fecha}} a las {{hora}}\nModalidad: {{modalidad}}\n\n¡Nos vemos! 💙`;
-    const template = psychologist?.whatsapp_reminder_template || defaultTemplate;
-    
-    const detail = nsModality === 'online' 
-      ? `🔗 ${psychologist?.video_meeting_url || 'Google Meet'}`
-      : `📍 Presencial`;
 
-    const waMsg = template
-      .replace('{{nombre}}', nsPatient)
-      .replace('{{fecha}}', formattedDate)
-      .replace('{{hora}}', nsTime)
-      .replace('{{detalle}}', detail)
-      .replace('{{modalidad}}', nsModality === 'online' ? 'Online' : 'Presencial');
+    try {
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          psychologist_id: psychId,
+          event_type_id: nsServiceId || null,
+          patient: {
+            name: selectedPatient.name,
+            email: selectedPatient.email,
+            phone: selectedPatient.phone || ''
+          },
+          start_time: startDt.toISOString(),
+          end_time: endDt.toISOString(),
+          patient_notes: null
+        })
+      });
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const baseUrl = isMobile ? 'https://wa.me' : 'https://web.whatsapp.com/send';
-    const url = isMobile 
-      ? `${baseUrl}/?text=${encodeURIComponent(waMsg)}`
-      : `${baseUrl}?text=${encodeURIComponent(waMsg)}`;
-    window.open(url, '_blank');
-    setNsStep('success');
-    if (psychId) invalidate(`home:bundle:${psychId}`);
+      if (!res.ok) throw new Error('Error al crear la sesión en el servidor');
+
+      const formattedDate = startDt.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+      const defaultTemplate = `¡Hola {{nombre}}! 👋\n\nTu sesión ha sido confirmada:\nFecha: {{fecha}} a las {{hora}}\nModalidad: {{modalidad}}\n\n¡Nos vemos! 💙`;
+      const template = psychologist?.whatsapp_reminder_template || defaultTemplate;
+      const detail = nsModality === 'online' 
+        ? `🔗 ${psychologist?.video_meeting_url || 'Google Meet'}`
+        : `📍 Presencial`;
+
+      const waMsg = template
+        .replace('{{nombre}}', nsPatient)
+        .replace('{{fecha}}', formattedDate)
+        .replace('{{hora}}', nsTime)
+        .replace('{{detalle}}', detail)
+        .replace('{{modalidad}}', nsModality === 'online' ? 'Online' : 'Presencial');
+
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const baseUrl = isMobile ? 'https://wa.me' : 'https://web.whatsapp.com/send';
+      const phone = selectedPatient.phone ? selectedPatient.phone.replace(/\D/g, '') : '';
+      const url = isMobile 
+        ? `${baseUrl}/${phone}?text=${encodeURIComponent(waMsg)}`
+        : `${baseUrl}?phone=${phone}&text=${encodeURIComponent(waMsg)}`;
+      
+      window.open(url, '_blank');
+      setNsStep('success');
+      if (psychId) invalidate(`home:bundle:${psychId}`);
+    } catch (err: any) {
+      alert(err.message || 'Error al crear la sesión');
+    }
   };
 
   const today = new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });

@@ -360,13 +360,20 @@ export default function AppointmentsPage() {
       const durationMin = parseInt(rescheduleItem.duration) || 50;
       const newStart = new Date(`${newDate}T${newTime}:00`);
       const newEnd = addMinutes(newStart, durationMin);
+      
       if (rescheduleItem.supabaseId) {
-        await supabase.from('appointments').update({
-          start_time: newStart.toISOString(),
-          end_time: newEnd.toISOString(),
-          status: 'confirmed'
-        }).eq('id', rescheduleItem.supabaseId);
+        const res = await fetch(`/api/appointments/${rescheduleItem.supabaseId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'reschedule',
+            new_start_time: newStart.toISOString(),
+            new_end_time: newEnd.toISOString()
+          })
+        });
+        if (!res.ok) throw new Error('Error al reagendar en el servidor');
       }
+
       setAppointments(prev => prev.map(a => a.id === rescheduleItem.id ? {
         ...a,
         date: (() => {
@@ -381,10 +388,10 @@ export default function AppointmentsPage() {
       
       if (notifyMethod === 'whatsapp' && rescheduleItem.phone) {
         sendWhatsApp(rescheduleItem, true);
-      } else if (notifyMethod === 'email' && rescheduleItem.email) {
-        sendEmail(rescheduleItem);
       }
       setRescheduleItem(null);
+    } catch (err: any) {
+      alert(err.message || 'Error al reagendar');
     } finally {
       setUpdating(false);
     }
@@ -395,16 +402,21 @@ export default function AppointmentsPage() {
     setUpdating(true);
     try {
       if (cancelItem.supabaseId) {
-        await supabase.from('appointments').update({ status: 'cancelled' }).eq('id', cancelItem.supabaseId);
+        const res = await fetch(`/api/appointments/${cancelItem.supabaseId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'cancel' })
+        });
+        if (!res.ok) throw new Error('Error al cancelar en el servidor');
       }
       setAppointments(prev => prev.map(a => a.id === cancelItem.id ? { ...a, status: 'Cancelada' } : a));
       
       if (notifyMethod === 'whatsapp' && cancelItem.phone) {
         sendWhatsApp(cancelItem, false, true);
-      } else if (notifyMethod === 'email' && cancelItem.email) {
-        sendEmail(cancelItem);
       }
       setCancelItem(null);
+    } catch (err: any) {
+      alert(err.message || 'Error al cancelar');
     } finally {
       setUpdating(false);
     }
