@@ -218,14 +218,14 @@ export default function Home() {
               </div>
 
               <h1 className="hero-title" style={{ fontWeight: 900, color: 'var(--text-dark)', lineHeight: 1.08, letterSpacing: '-0.03em' }}>
-                Tu consulta,<br />
+                Software para terapeutas,<br />
                 <span style={{ background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  organizada de verdad.
+                  organizado de verdad.
                 </span>
               </h1>
 
               <p className="hero-desc" style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: '520px' }}>
-                Dedica tu energía a lo que importa: acompañar a tus pacientes. Teramy se encarga de la agenda, los recordatorios y el orden, para que ganes tiempo, tranquilidad y control de tu consulta.
+                <strong>La herramienta todo-en-uno</strong> para gestionar tu agenda, notas de sesión y recordatorios automáticos. Gana tiempo, tranquilidad y el control total de tu consulta profesional.
               </p>
 
               {!isMobile && (
