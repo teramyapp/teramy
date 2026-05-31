@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ArrowRight, Check, Star, Users, ChevronDown,
   Calendar, FileText, BarChart2, Zap, Video, MessageSquare,
   Clock, Shield, UserCheck, Smartphone, Eye, Link2, Laptop
 } from 'lucide-react';
+import { supabase } from '@/utils/supabase';
 
 const FEATURES = [
   {
@@ -99,11 +101,19 @@ const TESTIMONIALS = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Si el usuario ya tiene sesión iniciada, redirigir al dashboard automáticamente
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) router.replace('/dashboard');
+    });
+  }, [router]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
