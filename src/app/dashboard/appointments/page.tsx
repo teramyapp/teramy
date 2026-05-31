@@ -169,6 +169,7 @@ export default function AppointmentsPage() {
   const [statusConfirmFor, setStatusConfirmFor] = useState<Appointment | null>(null);
   const [statusConfirmNext, setStatusConfirmNext] = useState<AppStatus | null>(null);
   const [statusConfirmDone, setStatusConfirmDone] = useState(false);
+  const [reactivateConfirmFor, setReactivateConfirmFor] = useState<Appointment | null>(null);
 
   const [showNS, setShowNS]       = useState(false);
   const [nsStep, setNsStep]       = useState<'form' | 'success'>('form');
@@ -316,10 +317,26 @@ export default function AppointmentsPage() {
     return () => window.removeEventListener('click', handleGlobalClick);
   }, []);
 
+  // Transiciones válidas por estado — solo mostramos opciones con sentido lógico
+  const VALID_TRANSITIONS: Record<AppStatus, AppStatus[]> = {
+    Pendiente:  ['Confirmada', 'Cancelada'],
+    Confirmada: ['Pendiente', 'Completada', 'Cancelada'],
+    Completada: [], // solo se puede reactivar (vía botón dedicado)
+    Cancelada:  [], // solo se puede reactivar (vía botón dedicado)
+  };
+
   const changeAppStatus = (id: number, next: AppStatus) => {
     const app = appointments.find(a => a.id === id);
     if (!app) return;
+
+    // Bloquear transiciones inválidas
+    if (!VALID_TRANSITIONS[app.status].includes(next)) {
+      setStatusPickerId(null); setStatusPos(null);
+      return;
+    }
+
     if (next === 'Completada' || next === 'Cancelada') {
+      // Requiere confirmación antes de cerrar la sesión
       setStatusConfirmFor(app);
       setStatusConfirmNext(next);
       setStatusConfirmDone(false);
@@ -333,6 +350,18 @@ export default function AppointmentsPage() {
       }
     }
     setStatusPickerId(null); setStatusPos(null);
+  };
+
+  // Reactivar una sesión cerrada (completada o cancelada) → vuelve a Confirmada
+  const reactivateSession = async (app: Appointment) => {
+    setAppointments(prev => prev.map(a => a.id === app.id ? { ...a, status: 'Confirmada' } : a));
+    if (app.supabaseId) {
+      await supabase.from('appointments')
+        .update({ status: 'confirmed' })
+        .eq('id', app.supabaseId);
+    }
+    setReactivateConfirmFor(null);
+    setMenuOpen(null);
   };
 
   const applyStatusConfirm = async () => {
@@ -694,18 +723,37 @@ export default function AppointmentsPage() {
         </ModalWrapper>
       )}
 
+      {/* Status picker — solo muestra transiciones válidas para el estado actual */}
       {statusPickerId !== null && statusPos && createPortal(
         <div data-dropdown="true" className="dropdown-menu" style={{ position: 'fixed', top: statusPos.top, left: statusPos.left, zIndex: 9999, background: 'white', border: '1px solid #e2e8f0', borderRadius: '14px', boxShadow: '0 8px 32px rgba(0,0,0,0.13)', minWidth: '185px', overflow: 'hidden' }}>
           <div style={{ padding: '0.5rem 0.85rem', fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: '1px solid #f1f5f9' }}>Cambiar estado</div>
-          {(Object.keys(STATUS_CONFIG) as AppStatus[]).map(s => {
-            const cfg = STATUS_CONFIG[s];
-            return (
-              <button key={s} onClick={() => changeAppStatus(statusPickerId, s)} style={{ width: '100%', padding: '0.7rem 1rem', display: 'flex', alignItems: 'center', gap: '0.65rem', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 600, color: cfg.color, textAlign: 'left', transition: 'background 0.15s' }} onMouseEnter={e => (e.currentTarget.style.background = cfg.bg)} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
-                {s}
-              </button>
-            );
-          })}
+          {(() => {
+            const current = appointments.find(a => a.id === statusPickerId);
+            if (!current) return null;
+            const validNext = VALID_TRANSITIONS[current.status];
+            if (validNext.length === 0) {
+              // Sesión cerrada: solo opción de reactivar
+              return (
+                <button
+                  onClick={() => { setReactivateConfirmFor(current); setStatusPickerId(null); setStatusPos(null); }}
+                  style={{ width: '100%', padding: '0.7rem 1rem', display: 'flex', alignItems: 'center', gap: '0.65rem', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 600, color: '#0369a1', textAlign: 'left' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#eff6ff')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <RefreshCcw size={14} /> Reactivar sesión
+                </button>
+              );
+            }
+            return validNext.map(s => {
+              const cfg = STATUS_CONFIG[s];
+              return (
+                <button key={s} onClick={() => changeAppStatus(statusPickerId, s)} style={{ width: '100%', padding: '0.7rem 1rem', display: 'flex', alignItems: 'center', gap: '0.65rem', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 600, color: cfg.color, textAlign: 'left', transition: 'background 0.15s' }} onMouseEnter={e => (e.currentTarget.style.background = cfg.bg)} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
+                  {cfg.label}
+                </button>
+              );
+            });
+          })()}
         </div>
       , document.body)}
 
@@ -718,10 +766,9 @@ export default function AppointmentsPage() {
 
       {menuOpen !== null && menuPos && createPortal(
         <div data-dropdown="true" className="dropdown-menu" style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, zIndex: 9999, background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.13)', minWidth: '190px', overflow: 'hidden' }}>
-          {/* Sesión cerrada (completada o cancelada): solo mostrar reactivar */}
           {(filtered[menuOpen]?.status === 'Cancelada' || filtered[menuOpen]?.status === 'Completada') ? (
             <button
-              onClick={() => { changeAppStatus(filtered[menuOpen].id, 'Confirmada'); setMenuOpen(null); }}
+              onClick={() => { setReactivateConfirmFor(filtered[menuOpen]); setMenuOpen(null); }}
               style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 600, color: '#0369a1', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}
@@ -729,7 +776,6 @@ export default function AppointmentsPage() {
               <RefreshCcw size={14} /> Reactivar sesión
             </button>
           ) : (
-            /* Sesión activa: reagendar y cancelar */
             <>
               <button onClick={() => { setRescheduleItem(filtered[menuOpen]); setMenuOpen(null); }} style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 500, color: '#1d4ed8' }} onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>Reagendar sesión</button>
               <button onClick={() => { setCancelItem(filtered[menuOpen]); setMenuOpen(null); }} style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 500, color: '#ef4444' }} onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>Cancelar sesión</button>
@@ -737,6 +783,35 @@ export default function AppointmentsPage() {
           )}
         </div>
       , document.body)}
+
+      {/* Modal de confirmación para reactivar una sesión cerrada */}
+      {reactivateConfirmFor && (
+        <ModalWrapper onClose={() => setReactivateConfirmFor(null)}>
+          <div style={{ padding: '1.75rem 2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <RefreshCcw size={20} style={{ color: '#0369a1' }} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0 }}>Reactivar sesión</h3>
+            </div>
+            <p style={{ fontSize: '0.95rem', color: 'var(--text-dark)', fontWeight: 600, margin: '0 0 0.2rem' }}>{reactivateConfirmFor.patient}</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>{reactivateConfirmFor.date} · {reactivateConfirmFor.time}</p>
+            {reactivateConfirmFor.status === 'Completada' && (
+              <div style={{ padding: '0.9rem 1rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#92400e', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1rem' }}>⚠️</span>
+                <span>Esta sesión ya fue <strong>marcada como completada</strong>. Reactivarla significa que fue registrada por error y necesita reanudarse.</span>
+              </div>
+            )}
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+              La sesión volverá a estado <strong>Confirmada</strong> y podrás gestionarla nuevamente.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button onClick={() => setReactivateConfirmFor(null)} className="btn-secondary" style={{ flex: 1 }}>Cancelar</button>
+              <button onClick={() => reactivateSession(reactivateConfirmFor)} className="btn-primary" style={{ flex: 2 }}>Sí, reactivar</button>
+            </div>
+          </div>
+        </ModalWrapper>
+      )}
 
       {rescheduleItem && (
         <ModalWrapper onClose={() => setRescheduleItem(null)}>
