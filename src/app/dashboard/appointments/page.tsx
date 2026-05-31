@@ -593,14 +593,17 @@ export default function AppointmentsPage() {
                       setMenuOpen(null);
                     }} style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.82rem', fontWeight: 700, background: st.bg, color: st.color, cursor: 'pointer', border: 'none' }}>{app.status}</button>
                     <div className="appointment-actions" style={{ display: 'flex', gap: '0.4rem' }}>
-                      <button onClick={(e) => {
-                        e.stopPropagation();
-                        const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                        setReminderPos({ top: rect.bottom + 6, left: rect.left - 100 });
-                        setReminderOpen(idx);
-                        setStatusPickerId(null);
-                        setMenuOpen(null);
-                      }} style={{ padding: '0.45rem 0.85rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>Recordar</button>
+                      {/* Recordar: solo para sesiones activas (no cerradas) */}
+                      {app.status !== 'Cancelada' && app.status !== 'Completada' && (
+                        <button onClick={(e) => {
+                          e.stopPropagation();
+                          const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                          setReminderPos({ top: rect.bottom + 6, left: rect.left - 100 });
+                          setReminderOpen(idx);
+                          setStatusPickerId(null);
+                          setMenuOpen(null);
+                        }} style={{ padding: '0.45rem 0.85rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>Recordar</button>
+                      )}
                       <button onClick={() => openNote(app)} className="btn-primary" style={{ padding: '0.45rem 0.85rem' }}>Nota</button>
                       <button onClick={(e) => {
                         e.stopPropagation();
@@ -715,8 +718,23 @@ export default function AppointmentsPage() {
 
       {menuOpen !== null && menuPos && createPortal(
         <div data-dropdown="true" className="dropdown-menu" style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, zIndex: 9999, background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.13)', minWidth: '190px', overflow: 'hidden' }}>
-          <button onClick={() => { setRescheduleItem(filtered[menuOpen]); setMenuOpen(null); }} style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 500, color: '#1d4ed8' }} onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>Reagendar sesión</button>
-          <button onClick={() => { setCancelItem(filtered[menuOpen]); setMenuOpen(null); }} style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 500, color: '#ef4444' }} onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>Cancelar sesión</button>
+          {/* Sesión cerrada (completada o cancelada): solo mostrar reactivar */}
+          {(filtered[menuOpen]?.status === 'Cancelada' || filtered[menuOpen]?.status === 'Completada') ? (
+            <button
+              onClick={() => { changeAppStatus(filtered[menuOpen].id, 'Confirmada'); setMenuOpen(null); }}
+              style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 600, color: '#0369a1', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'}
+              onMouseLeave={e => e.currentTarget.style.background = 'none'}
+            >
+              <RefreshCcw size={14} /> Reactivar sesión
+            </button>
+          ) : (
+            /* Sesión activa: reagendar y cancelar */
+            <>
+              <button onClick={() => { setRescheduleItem(filtered[menuOpen]); setMenuOpen(null); }} style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 500, color: '#1d4ed8' }} onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>Reagendar sesión</button>
+              <button onClick={() => { setCancelItem(filtered[menuOpen]); setMenuOpen(null); }} style={{ width: '100%', padding: '0.8rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.88rem', fontWeight: 500, color: '#ef4444' }} onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>Cancelar sesión</button>
+            </>
+          )}
         </div>
       , document.body)}
 
