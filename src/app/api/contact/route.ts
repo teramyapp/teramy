@@ -35,10 +35,10 @@ export async function POST(req: NextRequest) {
 
   // ── 4. Send email ────────────────────────────────────────────────────────
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: `Teramy Web <${process.env.FROM_EMAIL || 'onboarding@resend.dev'}>`,
       to: process.env.CONTACT_EMAIL || 'contacto@teramy.cl',
-      replyTo: email,
+      reply_to: email,
       subject: `Consulta de ${name} desde teramy.cl`,
       // All values are already HTML-escaped by sanitizeContactForm
       html: `
@@ -64,7 +64,12 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    return NextResponse.json({ ok: true });
+    if (error) {
+      console.error('Resend API Error:', error);
+      return NextResponse.json({ error: 'Error al enviar el mensaje desde el servidor de correo.' }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true, data });
   } catch (error: any) {
     console.error('Contact form email error:', error);
     return NextResponse.json({ error: 'Error al enviar el mensaje.' }, { status: 500 });
