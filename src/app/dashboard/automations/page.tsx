@@ -16,7 +16,10 @@ export default function AutomationsPage() {
   const [sessionType, setSessionType] = useState<SessionType>('online');
   const [videoPlatform, setVideoPlatform] = useState<VideoPlatform>('google_meet');
   const [zoomLink, setZoomLink] = useState('');
-  const [address, setAddress] = useState('');
+  const [officeStreet, setOfficeStreet]   = useState('');
+  const [officeSuite,  setOfficeSuite]    = useState('');
+  const [officeCommune, setOfficeCommune] = useState('');
+  const [officeCity,   setOfficeCity]     = useState('Santiago');
   const [whatsappTemplate, setWhatsappTemplate] = useState(
     `Hola {{nombre}}.\n\nTe recuerdo que tienes sesión mañana:\n\nFecha: {{fecha}} a las {{hora}}\n{{detalle}}\n\nSaludos.`
   );
@@ -45,7 +48,7 @@ export default function AutomationsPage() {
       if (!user) { return; }
       const { data: psych } = await supabase
         .from('psychologists')
-        .select('id, video_meeting_type, video_meeting_url, session_type, whatsapp_reminder_template, whatsapp_reschedule_template, whatsapp_cancel_template')
+        .select('id, video_meeting_type, video_meeting_url, session_type, office_street, office_suite, office_commune, office_city, whatsapp_reminder_template, whatsapp_reschedule_template, whatsapp_cancel_template')
         .eq('user_id', user.id)
         .single();
       if (psych) {
@@ -58,6 +61,10 @@ export default function AutomationsPage() {
           setSessionType(psych.session_type as SessionType);
           setOriginalSessionType(psych.session_type as SessionType);
         }
+        if (psych.office_street)  setOfficeStreet(psych.office_street);
+        if (psych.office_suite)   setOfficeSuite(psych.office_suite);
+        if (psych.office_commune) setOfficeCommune(psych.office_commune);
+        if (psych.office_city)    setOfficeCity(psych.office_city || 'Santiago');
         if (psych.whatsapp_reminder_template !== null && psych.whatsapp_reminder_template !== undefined) {
           setWhatsappTemplate(psych.whatsapp_reminder_template);
         }
@@ -103,6 +110,10 @@ export default function AutomationsPage() {
         video_meeting_type: videoPlatform === 'google_meet' ? 'meet' : 'zoom',
         video_meeting_url: zoomLink,
         session_type: sessionType,
+        office_street:   officeStreet.trim() || null,
+        office_suite:    officeSuite.trim()  || null,
+        office_commune:  officeCommune.trim() || null,
+        office_city:     officeCity.trim()   || null,
         whatsapp_reminder_template: whatsappTemplate,
         whatsapp_reschedule_template: whatsappRescheduleTemplate,
         whatsapp_cancel_template: whatsappCancelTemplate,
@@ -124,13 +135,16 @@ export default function AutomationsPage() {
     }
   };
 
+  // Compose full address for preview
+  const composedAddress = [officeStreet, officeSuite, officeCommune, officeCity].filter(Boolean).join(', ');
+
   const whatsappPreview = whatsappTemplate
     .replace('{{nombre}}', '[Nombre del paciente]')
     .replace('{{fecha}}', '[Fecha de la sesión]')
     .replace('{{hora}}', '[Hora]')
     .replace('{{modalidad}}', sessionType === 'online' ? 'Online' : 'Presencial')
     .replace('{{detalle}}', sessionType === 'presencial'
-      ? `📍 ${address || '[Dirección del consultorio]'}`
+      ? `📍 ${composedAddress || '[Dirección del consultorio]'}`
       : `💻 ${zoomLink || `[Link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}]`}`
     );
 
@@ -140,7 +154,7 @@ export default function AutomationsPage() {
     .replace('{{hora}}', '[Nueva Hora]')
     .replace('{{modalidad}}', sessionType === 'online' ? 'Online' : 'Presencial')
     .replace('{{detalle}}', sessionType === 'presencial'
-      ? `📍 ${address || '[Dirección del consultorio]'}`
+      ? `📍 ${composedAddress || '[Dirección del consultorio]'}`
       : `💻 ${zoomLink || `[Link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}]`}`
     );
 
@@ -381,25 +395,71 @@ export default function AutomationsPage() {
 
       {showPresencial && (
         <div className="premium-card" style={{ padding: '2rem' }}>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-dark)', margin: '0 0 0.25rem' }}>
-              Dirección del consultorio
-            </h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-              Se enviará automáticamente al paciente al confirmar su sesión presencial
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border-light)' }}>
+            <MapPin size={18} style={{ color: '#c2410c' }} />
+            <div>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-dark)', margin: '0 0 0.1rem' }}>Dirección del consultorio</h2>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>Se enviará automáticamente al paciente al confirmar su sesión presencial</p>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <MapPin size={14} /> Dirección
-            </label>
-            <input
-              type="text"
-              value={address}
-              onChange={e => setAddress(e.target.value)}
-              placeholder="Av. Providencia 1234, Oficina 501, Providencia"
-              style={{ fontSize: '0.9rem' }}
-            />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Calle y número */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)' }}>Calle y número *</label>
+              <input
+                type="text"
+                value={officeStreet}
+                onChange={e => setOfficeStreet(e.target.value)}
+                placeholder="Ej. Av. Providencia 1234"
+              />
+            </div>
+
+            {/* Oficina/Piso + Comuna en grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)' }}>
+                  Oficina / Piso <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={officeSuite}
+                  onChange={e => setOfficeSuite(e.target.value)}
+                  placeholder="Ej. Piso 3, Of. 302"
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)' }}>Comuna *</label>
+                <input
+                  type="text"
+                  value={officeCommune}
+                  onChange={e => setOfficeCommune(e.target.value)}
+                  placeholder="Ej. Providencia"
+                />
+              </div>
+            </div>
+
+            {/* Ciudad */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)' }}>Ciudad *</label>
+              <input
+                type="text"
+                value={officeCity}
+                onChange={e => setOfficeCity(e.target.value)}
+                placeholder="Ej. Santiago"
+              />
+            </div>
+
+            {/* Preview de cómo se verá */}
+            {composedAddress && (
+              <div style={{ padding: '0.85rem 1rem', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+                <MapPin size={15} style={{ color: '#c2410c', flexShrink: 0, marginTop: '0.1rem' }} />
+                <div>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#c2410c', margin: '0 0 0.2rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Vista previa</p>
+                  <p style={{ fontSize: '0.88rem', color: '#7c2d12', margin: 0, lineHeight: 1.5 }}>{composedAddress}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

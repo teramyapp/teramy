@@ -39,6 +39,10 @@ export interface Psychologist {
   trial_ends_at: string;
   video_meeting_url?: string;
   video_meeting_type?: 'meet' | 'zoom';
+  office_street?: string;
+  office_suite?: string;
+  office_commune?: string;
+  office_city?: string;
   whatsapp_reminder_template?: string;
   whatsapp_reschedule_template?: string;
   whatsapp_cancel_template?: string;

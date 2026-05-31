@@ -468,7 +468,12 @@ export default function AppointmentsPage() {
         .replace('{{nombre}}', app.patient)
         .replace('{{fecha}}', formattedDate)
         .replace('{{hora}}', newTime || app.time)
-        .replace('{{detalle}}', app.modality === 'online' ? `🔗 ${psychologist?.video_meeting_url || 'Meet'}` : '📍 Presencial');
+        .replace('{{detalle}}', app.modality === 'online'
+          ? `🔗 ${psychologist?.video_meeting_url || 'Meet'}`
+          : `📍 ${
+              [psychologist?.office_street, psychologist?.office_suite, psychologist?.office_commune, psychologist?.office_city]
+                .filter(Boolean).join(', ') || 'Consultorio presencial'
+            }`);
     } else if (isCancel) {
       msg = (psychologist?.whatsapp_cancel_template || "Hola {{nombre}}.\n\nLamento informarte que debo cancelar nuestra sesión del {{fecha}}.\n\nPronto te contactaré para buscar una nueva fecha. Saludos.")
         .replace('{{nombre}}', app.patient)
@@ -478,7 +483,12 @@ export default function AppointmentsPage() {
         .replace('{{nombre}}', app.patient)
         .replace('{{fecha}}', app.date)
         .replace('{{hora}}', app.time)
-        .replace('{{detalle}}', app.modality === 'online' ? `🔗 ${psychologist?.video_meeting_url || 'Meet'}` : '📍 Presencial');
+        .replace('{{detalle}}', app.modality === 'online'
+          ? `🔗 ${psychologist?.video_meeting_url || 'Meet'}`
+          : `📍 ${
+              [psychologist?.office_street, psychologist?.office_suite, psychologist?.office_commune, psychologist?.office_city]
+                .filter(Boolean).join(', ') || 'Consultorio presencial'
+            }`);
     }
 
     const cleanPhone = app.phone.replace(/\D/g, '');

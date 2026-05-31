@@ -150,13 +150,19 @@ export async function POST(request: Request) {
     const [{ data: psychologist }, { data: eventType }] = await Promise.all([
       supabase
         .from('psychologists')
-        .select('name, title, video_meeting_url, video_meeting_type')
+        .select('name, title, video_meeting_url, video_meeting_type, office_street, office_suite, office_commune, office_city')
         .eq('id', psychologist_id)
         .single(),
       event_type_id
         ? supabase.from('event_types').select('title, mode, price').eq('id', event_type_id).single()
         : Promise.resolve({ data: null, error: null }),
     ]);
+
+    // Compose office address for presencial sessions
+    const officeAddress = psychologist
+      ? [psychologist.office_street, psychologist.office_suite, psychologist.office_commune, psychologist.office_city]
+          .filter(Boolean).join(', ') || null
+      : null;
 
     // ── 9. Send confirmation email (non-blocking) ─────────────────────────
     if (psychologist) {
@@ -170,6 +176,7 @@ export async function POST(request: Request) {
         modality:           (eventType as any)?.mode ?? 'online',
         videoUrl:           psychologist.video_meeting_url,
         videoType:          psychologist.video_meeting_type,
+        officeAddress:      officeAddress,
         serviceName:        (eventType as any)?.title ?? undefined,
         price:              (eventType as any)?.price ?? undefined,
       }).catch(console.error);

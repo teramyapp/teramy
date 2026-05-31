@@ -132,6 +132,7 @@ export interface BookingConfirmationData {
   modality: 'online' | 'presencial';
   videoUrl?: string | null;
   videoType?: 'meet' | 'zoom' | null;
+  officeAddress?: string | null;
   serviceName?: string;
   price?: number;
 }
@@ -146,13 +147,25 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
     description: data.videoUrl ? `Enlace de sesión: ${data.videoUrl}` : '',
   });
 
-  const videoSection = data.modality === 'online' && data.videoUrl
+  const locationSection = data.modality === 'online' && data.videoUrl
     ? `<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
         <span style="color:#64748b;font-size:14px;line-height:1.5;">
           ${ic.video}<strong style="color:#0f172a;">Enlace de sesión:</strong>
           <a href="${data.videoUrl}" style="color:#0ea5e9;">${data.videoUrl}</a>
         </span>
       </td></tr>`
+    : data.modality === 'presencial' && data.officeAddress
+    ? `<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
+        <span style="color:#64748b;font-size:14px;line-height:1.5;">
+          ${ic.mapPin}<strong style="color:#0f172a;">Dirección:</strong> ${data.officeAddress}
+        </span>
+      </td></tr>`
+    : '';
+
+  const actionButton = data.modality === 'online' && data.videoUrl
+    ? primaryButton(data.videoUrl, `${ic.externalLink}Unirse a la sesión`)
+    : data.modality === 'presencial' && data.officeAddress
+    ? primaryButton(`https://maps.google.com/?q=${encodeURIComponent(data.officeAddress)}`, `${ic.mapPin}Ver en Google Maps`)
     : '';
 
   const priceSection = data.price && data.price > 0
@@ -169,12 +182,12 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
       ${infoRow(ic.calendar, 'Fecha', dateStr.charAt(0).toUpperCase() + dateStr.slice(1))}
       ${infoRow(ic.clock, 'Hora', `${timeStr} hrs (hora de Santiago)`)}
       ${infoRow(ic.mapPin, 'Modalidad', data.modality === 'online' ? 'Online' : 'Presencial')}
-      ${videoSection}
+      ${locationSection}
       ${priceSection}
     </table>
 
     <div style="text-align:center;margin-top:8px;">
-      ${data.modality === 'online' && data.videoUrl ? primaryButton(data.videoUrl, `${ic.externalLink}Unirse a la sesión`) : ''}
+      ${actionButton}
       ${secondaryButton(calUrl, `${ic.calendarPlus}Agregar al calendario`)}
     </div>
 
@@ -248,6 +261,7 @@ export interface RescheduleEmailData {
   modality: 'online' | 'presencial';
   videoUrl?: string | null;
   videoType?: 'meet' | 'zoom' | null;
+  officeAddress?: string | null;
 }
 
 export async function sendRescheduleEmail(data: RescheduleEmailData) {
@@ -291,10 +305,15 @@ export async function sendRescheduleEmail(data: RescheduleEmailData) {
       ? `<table width="100%" cellpadding="0" cellspacing="0">
           ${infoRow(ic.video, 'Enlace de sesión', `<a href="${data.videoUrl}" style="color:#0ea5e9;">${data.videoUrl}</a>`)}
         </table>`
+      : data.modality === 'presencial' && data.officeAddress
+      ? `<table width="100%" cellpadding="0" cellspacing="0">
+          ${infoRow(ic.mapPin, 'Dirección', data.officeAddress)}
+        </table>`
       : ''}
 
     <div style="text-align:center;">
       ${data.modality === 'online' && data.videoUrl ? primaryButton(data.videoUrl, `${ic.externalLink}Unirse a la sesión`) : ''}
+      ${data.modality === 'presencial' && data.officeAddress ? primaryButton(`https://maps.google.com/?q=${encodeURIComponent(data.officeAddress)}`, `${ic.mapPin}Ver en Google Maps`) : ''}
       ${secondaryButton(calUrl, `${ic.calendarPlus}Agregar al calendario`)}
     </div>
   `);

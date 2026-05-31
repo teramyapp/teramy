@@ -23,7 +23,7 @@ export async function PATCH(
       .select(`
         *,
         patients(name, email, phone),
-        psychologists(name, title, video_meeting_url, video_meeting_type),
+        psychologists(name, title, video_meeting_url, video_meeting_type, office_street, office_suite, office_commune, office_city),
         event_types(title, mode, price)
       `)
       .eq('id', id)
@@ -67,6 +67,9 @@ export async function PATCH(
 
       if (error) throw error;
 
+      const officeAddress = [psychologist.office_street, psychologist.office_suite, psychologist.office_commune, psychologist.office_city]
+        .filter(Boolean).join(', ') || null;
+
       sendRescheduleEmail({
         to: patient.email,
         patientName: patient.name,
@@ -77,6 +80,7 @@ export async function PATCH(
         modality: eventType?.mode ?? 'online',
         videoUrl: psychologist.video_meeting_url,
         videoType: psychologist.video_meeting_type,
+        officeAddress,
       }).catch(console.error);
 
       return NextResponse.json({ success: true, action: 'rescheduled' });
