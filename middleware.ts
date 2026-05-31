@@ -13,19 +13,25 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── 1. Extract session from cookie ──────────────────────────────────────────
-  // Supabase stores the session as a JSON string in the cookie named
-  // "sb-<project-ref>-auth-token". We parse it to get user.id.
+  // Supabase stores the session as a JSON string in a cookie.
+  // We check both the default pattern (sb-<ref>-auth-token) and our custom
+  // storageKey (teramy-auth-session) to handle all cases.
   let userId: string | null = null;
 
   for (const cookie of request.cookies.getAll()) {
-    if (cookie.name.includes('auth-token') && cookie.name.startsWith('sb-')) {
+    const isDefaultToken = cookie.name.startsWith('sb-') && cookie.name.includes('auth-token');
+    const isCustomToken  = cookie.name === 'teramy-auth-session';
+
+    if (isDefaultToken || isCustomToken) {
       try {
         const parsed = JSON.parse(cookie.value);
-        userId = parsed?.user?.id ?? null;
+        // Session can be stored directly or wrapped in an array [session, expiry]
+        const session = Array.isArray(parsed) ? parsed[0] : parsed;
+        userId = session?.user?.id ?? null;
       } catch {
         // malformed cookie — treat as unauthenticated
       }
-      break;
+      if (userId) break;
     }
   }
 
