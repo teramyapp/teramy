@@ -61,6 +61,7 @@ type PatientData = {
   name: string;
   email: string | null;
   phone: string | null;
+  birth_date: string | null;
   created_at: string;
   status: PatientStatus | null;
 };
@@ -126,7 +127,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
 
     // Load patient
     const { data: pat, error: patErr } = await supabase
-      .from('patients').select('id, name, email, phone, created_at, status').eq('id', patientId).single();
+      .from('patients').select('id, name, email, phone, birth_date, created_at, status').eq('id', patientId).single();
     if (patErr || !pat) { setNotFound(true); setLoading(false); return; }
     setPatient(pat as PatientData);
     if ((pat as any).status) setPatientStatus((pat as any).status as PatientStatus);
@@ -490,10 +491,16 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-              {patient.email && <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Mail size={14} />{patient.email}</span>}
-              {patient.phone && <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Phone size={14} />{patient.phone}</span>}
-              {startDate && <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Calendar size={14} />Desde {startDate}</span>}
-            </div>
+                {patient.email && <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Mail size={14} />{patient.email}</span>}
+                {patient.phone && <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Phone size={14} />{patient.phone}</span>}
+                {patient.birth_date && (() => {
+                  const age = Math.floor((Date.now() - new Date(patient.birth_date!).getTime()) / (365.25 * 24 * 3600 * 1000));
+                  return age >= 0 && age < 120
+                    ? <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Calendar size={14} />{age} años</span>
+                    : null;
+                })()}
+                {startDate && <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}><Calendar size={14} />Desde {startDate}</span>}
+              </div>
           </div>
         </div>
 
@@ -699,6 +706,14 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                 { label: 'Nombre completo', value: patient.name },
                 { label: 'Correo electrónico', value: patient.email ?? '—' },
                 { label: 'Teléfono', value: patient.phone ?? '—' },
+                { label: 'Fecha de nacimiento', value: patient.birth_date
+                  ? (() => {
+                      const age = Math.floor((Date.now() - new Date(patient.birth_date!).getTime()) / (365.25 * 24 * 3600 * 1000));
+                      const formatted = new Date(patient.birth_date!).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+                      return `${formatted}  (${age} años)`;
+                    })()
+                  : '—'
+                },
                 { label: 'Registrado', value: new Date(patient.created_at).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' }) },
               ].map(f => (
                 <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
