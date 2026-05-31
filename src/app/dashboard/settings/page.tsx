@@ -203,17 +203,22 @@ export default function SettingsPage() {
   };
 
   const handleCancelPlan = async () => {
-    if (!psychologistId) return;
-    const { error } = await supabase
-      .from('psychologists')
-      .update({ subscription_status: 'cancelled' })
-      .eq('id', psychologistId);
-
-    if (!error) {
-      setSubscriptionStatus('cancelled');
-      setModal(null);
-    } else {
-      alert('Error al cancelar el plan. Por favor intenta de nuevo.');
+    if (!psychologistId || !userId) return;
+    try {
+      const res = await fetch('/api/user/cancel-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ psychologistId, userId }),
+      });
+      if (res.ok) {
+        setSubscriptionStatus('cancelled');
+        setModal(null);
+      } else {
+        alert('Error al cancelar el plan. Por favor intenta de nuevo.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un problema al procesar la solicitud.');
     }
   };
 
@@ -486,9 +491,17 @@ export default function SettingsPage() {
                 {/* Método de pago */}
         <SectionCard title="Método de pago" icon={<CreditCard size={20} />}>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '1rem' }}>
-            La gestión de métodos de pago e historial de facturas estará disponible próximamente desde el portal de clientes.
+            La gestión de métodos de pago e historial de facturas se realiza directamente desde Mercado Pago.
           </p>
-          <InfoRow label="Estado" value={<span style={{ color: '#16a34a', fontWeight: 700 }}>✓ Plan activo</span>}
+          <InfoRow label="Estado" value={
+            <span style={{ 
+              color: subscriptionStatus === 'active' ? '#16a34a' : subscriptionStatus === 'trialing' ? '#0284c7' : '#ef4444', 
+              fontWeight: 700 
+            }}>
+              {subscriptionStatus === 'active' ? '✓ Suscripción activa' 
+                : subscriptionStatus === 'trialing' ? '⏳ En período de prueba' 
+                : '✗ Sin suscripción activa'}
+            </span>}
             action={<button onClick={() => setModal('change_card')} style={{ fontSize: '0.82rem', color: 'var(--primary-blue)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>Gestionar <ChevronRight size={14} /></button>}
           />
         </SectionCard>
@@ -723,13 +736,12 @@ export default function SettingsPage() {
         </>
       )}
 
-      {/* Cambiar tarjeta */}
       {modal === 'change_card' && (
         <Modal
-          title="Cambiar método de pago"
-          description="Serás redirigido al portal de pagos seguro para actualizar tu tarjeta. Tu suscripción continuará sin interrupciones."
-          confirmLabel="Ir al portal de pagos"
-          onConfirm={() => { setModal(null); }}
+          title="Gestionar método de pago"
+          description="Serás redirigido a Mercado Pago para administrar tu suscripción, tarjetas guardadas e historial de pagos."
+          confirmLabel="Ir a Mercado Pago"
+          onConfirm={() => { setModal(null); window.open('https://www.mercadopago.cl/subscriptions', '_blank'); }}
           onCancel={() => setModal(null)}
         />
       )}
