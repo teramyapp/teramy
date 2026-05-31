@@ -92,31 +92,54 @@ export function isValidUuid(value: string): boolean {
 // ── 4. Composite sanitizer for booking / contact forms ───────────────────────
 
 export interface PatientInput {
-  name: string;
-  email: string;
-  phone: string;
+  firstName: string;
+  lastName:  string;
+  email:     string;
+  phone:     string;
+  birthDate?: string | null;
 }
 
 export interface SanitizedPatientInput {
-  name: string;
-  email: string;
-  phone: string;
+  /** Full name composed from firstName + lastName — kept for backward compatibility */
+  name:      string;
+  firstName: string;
+  lastName:  string;
+  email:     string;
+  phone:     string;
+  birthDate: string | null;
 }
 
 /**
  * Validate and sanitize the patient object from a booking request.
  * Returns the cleaned object or throws an error describing the first problem.
+ *
+ * The `name` field is always composed as `firstName + ' ' + lastName` so that
+ * all existing code that reads `patients.name` continues to work unchanged.
  */
 export function sanitizePatient(raw: Partial<PatientInput>): SanitizedPatientInput {
-  const name = sanitizeText(raw.name, { maxLength: 120, singleLine: true });
-  const email = sanitizeText(raw.email, { maxLength: 254, singleLine: true }).toLowerCase();
-  const phone = sanitizeText(raw.phone, { maxLength: 20, singleLine: true });
+  const firstName = sanitizeText(raw.firstName, { maxLength: 80, singleLine: true });
+  const lastName  = sanitizeText(raw.lastName,  { maxLength: 80, singleLine: true });
+  const email     = sanitizeText(raw.email,      { maxLength: 254, singleLine: true }).toLowerCase();
+  const phone     = sanitizeText(raw.phone,      { maxLength: 20, singleLine: true });
 
-  if (!name || name.length < 2) throw new Error('Nombre inválido');
-  if (!isValidEmail(email))      throw new Error('Email inválido');
-  if (phone && !isValidPhone(phone)) throw new Error('Teléfono inválido');
+  if (!firstName || firstName.length < 2) throw new Error('Nombre inválido');
+  if (!lastName  || lastName.length  < 2) throw new Error('Apellido inválido');
+  if (!isValidEmail(email))               throw new Error('Email inválido');
+  if (phone && !isValidPhone(phone))      throw new Error('Teléfono inválido');
 
-  return { name, email, phone };
+  // Validate birth date: must be YYYY-MM-DD and not in the future
+  let birthDate: string | null = null;
+  if (raw.birthDate) {
+    const bd = sanitizeText(raw.birthDate as string, { maxLength: 10, singleLine: true });
+    if (/^\d{4}-\d{2}-\d{2}$/.test(bd)) {
+      const parsed = new Date(bd);
+      if (!isNaN(parsed.getTime()) && parsed < new Date()) {
+        birthDate = bd;
+      }
+    }
+  }
+
+  return { name: `${firstName} ${lastName}`, firstName, lastName, email, phone, birthDate };
 }
 
 /**

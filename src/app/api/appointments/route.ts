@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     // ── 4. Sanitize patient inputs ────────────────────────────────────────
-    let sanitizedPatient: { name: string; email: string; phone: string };
+    let sanitizedPatient: import('@/lib/sanitize').SanitizedPatientInput;
     try {
       sanitizedPatient = sanitizePatient(patient);
     } catch (err: any) {
@@ -82,13 +82,24 @@ export async function POST(request: Request) {
 
     if (existing) {
       patientId = existing.id;
+      // Update first/last name and birth_date if they changed
+      await supabase.from('patients').update({
+        name:       sanitizedPatient.name,
+        first_name: sanitizedPatient.firstName,
+        last_name:  sanitizedPatient.lastName,
+        phone:      sanitizedPatient.phone,
+        ...(sanitizedPatient.birthDate ? { birth_date: sanitizedPatient.birthDate } : {}),
+      }).eq('id', existing.id);
     } else {
       const { data: newPatient, error: insertError } = await supabase
         .from('patients')
         .insert([{
-          name:  sanitizedPatient.name,
-          email: sanitizedPatient.email,
-          phone: sanitizedPatient.phone,
+          name:       sanitizedPatient.name,
+          first_name: sanitizedPatient.firstName,
+          last_name:  sanitizedPatient.lastName,
+          email:      sanitizedPatient.email,
+          phone:      sanitizedPatient.phone,
+          birth_date: sanitizedPatient.birthDate,
         }])
         .select('id')
         .single();
