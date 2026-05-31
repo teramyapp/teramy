@@ -22,9 +22,9 @@ const store = new Map<string, Bucket>();
 // Clean up expired buckets every 5 minutes to avoid memory leaks
 setInterval(() => {
   const now = Date.now();
-  for (const [key, bucket] of store.entries()) {
+  store.forEach((bucket, key) => {
     if (bucket.resetAt < now) store.delete(key);
-  }
+  });
 }, 5 * 60 * 1000);
 
 export interface RateLimitOptions {
