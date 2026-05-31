@@ -155,7 +155,7 @@ export default function AppointmentsPage() {
     if (cachedAppointments) setAppointments(cachedAppointments);
   }, [cachedAppointments]);
   const [view, setView] = useState<'list' | 'week'>('list');
-  const [activeFilter, setActiveFilter] = useState<FilterKey>('Todas');
+  const [activeFilter, setActiveFilter] = useState<FilterKey>('Próximas');
   const [sortAsc, setSortAsc] = useState(true);
 
   const [menuOpen, setMenuOpen] = useState<number | null>(null);
