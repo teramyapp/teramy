@@ -518,7 +518,6 @@ export default function AutomationsPage() {
                   </div>
                 )}
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Escribe y selecciona — se autocompletarán los otros campos.</p>
             </div>
 
             {/* Oficina/Piso + Comuna en grid */}
