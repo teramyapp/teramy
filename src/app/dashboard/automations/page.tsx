@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Video, MapPin, MessageSquare, Mail, Check,
   Save, CheckCircle2, Link as LinkIcon, Info, Loader2, AlertTriangle,
@@ -20,6 +20,12 @@ export default function AutomationsPage() {
   const [officeSuite,  setOfficeSuite]    = useState('');
   const [officeCommune, setOfficeCommune] = useState('');
   const [officeCity,   setOfficeCity]     = useState('Santiago');
+  // Address autocomplete
+  const [streetSuggestions, setStreetSuggestions] = useState<any[]>([]);
+  const [showSuggestions,   setShowSuggestions]   = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const streetDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const streetWrapperRef  = useRef<HTMLDivElement>(null);
   const [whatsappTemplate, setWhatsappTemplate] = useState(
     `Hola {{nombre}}.\n\nTe recuerdo que tienes sesión mañana:\n\nFecha: {{fecha}} a las {{hora}}\n{{detalle}}\n\nSaludos.`
   );
@@ -134,6 +140,50 @@ export default function AutomationsPage() {
       alert(`Error al guardar: ${err.message || 'Intenta de nuevo'}`);
     }
   };
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (streetWrapperRef.current && !streetWrapperRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleStreetInput = useCallback((value: string) => {
+    setOfficeStreet(value);
+    if (streetDebounceRef.current) clearTimeout(streetDebounceRef.current);
+    if (value.length < 3) { setStreetSuggestions([]); setShowSuggestions(false); return; }
+    streetDebounceRef.current = setTimeout(async () => {
+      setLoadingSuggestions(true);
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&countrycodes=cl&limit=6&addressdetails=1`,
+          { headers: { 'Accept-Language': 'es' } }
+        );
+        const data = await res.json();
+        setStreetSuggestions(Array.isArray(data) ? data : []);
+        setShowSuggestions(Array.isArray(data) && data.length > 0);
+      } catch { setStreetSuggestions([]); }
+      finally { setLoadingSuggestions(false); }
+    }, 420);
+  }, []);
+
+  const selectStreetSuggestion = useCallback((s: any) => {
+    const addr = s.address ?? {};
+    const road = addr.road ?? addr.pedestrian ?? addr.footway ?? '';
+    const houseNum = addr.house_number ?? '';
+    const street = [road, houseNum].filter(Boolean).join(' ') || s.display_name.split(',')[0].trim();
+    const commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? addr.county ?? addr.state_district ?? '';
+    const city = addr.city ?? addr.town ?? addr.village ?? 'Santiago';
+    setOfficeStreet(street);
+    if (commune) setOfficeCommune(commune);
+    setOfficeCity(city || 'Santiago');
+    setShowSuggestions(false);
+    setStreetSuggestions([]);
+  }, []);
 
   // Compose full address for preview
   const composedAddress = [officeStreet, officeSuite, officeCommune, officeCity].filter(Boolean).join(', ');
@@ -404,15 +454,71 @@ export default function AutomationsPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* Calle y número */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            {/* Calle y número — con autocomplete Nominatim */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }} ref={streetWrapperRef}>
               <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dark)' }}>Calle y número *</label>
-              <input
-                type="text"
-                value={officeStreet}
-                onChange={e => setOfficeStreet(e.target.value)}
-                placeholder="Ej. Av. Providencia 1234"
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={officeStreet}
+                  onChange={e => handleStreetInput(e.target.value)}
+                  onFocus={() => streetSuggestions.length > 0 && setShowSuggestions(true)}
+                  placeholder="Ej. Av. Providencia 1234"
+                  autoComplete="off"
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                {loadingSuggestions && (
+                  <Loader2 size={15} style={{ position: 'absolute', right: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', animation: 'spin 1s linear infinite' }} />
+                )}
+
+                {showSuggestions && streetSuggestions.length > 0 && (
+                  <div style={{
+                    position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
+                    zIndex: 200, background: 'white',
+                    border: '1px solid #e2e8f0', borderRadius: '14px',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.13)',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{ padding: '0.45rem 1rem', fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', background: '#f8fafc', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <MapPin size={10} /> Resultados
+                    </div>
+                    {streetSuggestions.map((s, i) => {
+                      const addr = s.address ?? {};
+                      const road = addr.road ?? addr.pedestrian ?? addr.footway ?? '';
+                      const houseNum = addr.house_number ?? '';
+                      const mainLine = [road, houseNum].filter(Boolean).join(' ') || s.display_name.split(',')[0].trim();
+                      const commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? '';
+                      const city = addr.city ?? addr.town ?? addr.village ?? '';
+                      const subLine = [commune, city].filter(Boolean).join(', ');
+                      return (
+                        <button
+                          key={i}
+                          onMouseDown={() => selectStreetSuggestion(s)}
+                          style={{
+                            width: '100%', padding: '0.7rem 1rem',
+                            display: 'flex', alignItems: 'center', gap: '0.75rem',
+                            background: 'transparent', border: 'none', cursor: 'pointer',
+                            textAlign: 'left',
+                            borderBottom: i < streetSuggestions.length - 1 ? '1px solid #f8fafc' : 'none',
+                            transition: 'background 0.12s',
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.background = '#f0f9ff')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        >
+                          <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <MapPin size={13} style={{ color: '#c2410c' }} />
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontSize: '0.88rem', fontWeight: 600, color: '#0f172a', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mainLine}</p>
+                            {subLine && <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.1rem 0 0' }}>{subLine}</p>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Escribe y selecciona — se autocompletarán los otros campos.</p>
             </div>
 
             {/* Oficina/Piso + Comuna en grid */}
