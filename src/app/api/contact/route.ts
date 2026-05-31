@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: `Teramy Web <${process.env.FROM_EMAIL || 'onboarding@resend.dev'}>`,
       to: process.env.CONTACT_EMAIL || 'contacto@teramy.cl',
-      reply_to: email,
+      replyTo: email,
       subject: `Consulta de ${name} desde teramy.cl`,
       // All values are already HTML-escaped by sanitizeContactForm
       html: `
