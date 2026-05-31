@@ -33,8 +33,8 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com",
       // Images: self + data URIs (used by Next.js Image) + supabase storage
       "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://http2.mlstatic.com",
-      // API calls: self + Supabase + Resend + MercadoPago
-      "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://api.resend.com https://api.mercadopago.com",
+      // API calls: self + Supabase + Resend + MercadoPago + Nominatim (address autocomplete)
+      "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://api.resend.com https://api.mercadopago.com https://nominatim.openstreetmap.org",
       // Iframes: only MercadoPago checkout
       "frame-src https://*.mercadopago.com https://*.mercadopago.cl https://*.mercadolibre.com",
       // Everything else is blocked

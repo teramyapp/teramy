@@ -24,7 +24,7 @@ export default function AutomationsPage() {
   const [streetSuggestions, setStreetSuggestions] = useState<any[]>([]);
   const [showSuggestions,   setShowSuggestions]   = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  const streetDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const streetDebounceRef = useRef<number | null>(null);
   const streetWrapperRef  = useRef<HTMLDivElement>(null);
   const [whatsappTemplate, setWhatsappTemplate] = useState(
     `Hola {{nombre}}.\n\nTe recuerdo que tienes sesión mañana:\n\nFecha: {{fecha}} a las {{hora}}\n{{detalle}}\n\nSaludos.`
@@ -154,9 +154,9 @@ export default function AutomationsPage() {
 
   const handleStreetInput = useCallback((value: string) => {
     setOfficeStreet(value);
-    if (streetDebounceRef.current) clearTimeout(streetDebounceRef.current);
+    if (streetDebounceRef.current !== null) clearTimeout(streetDebounceRef.current);
     if (value.length < 3) { setStreetSuggestions([]); setShowSuggestions(false); return; }
-    streetDebounceRef.current = setTimeout(async () => {
+    streetDebounceRef.current = window.setTimeout(async () => {
       setLoadingSuggestions(true);
       try {
         const res = await fetch(
