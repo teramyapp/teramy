@@ -8,26 +8,31 @@ const supabaseAdmin = createClient(
 );
 
 export async function GET(request: Request) {
-  try {
-    // 1. Verificar seguridad básica (Vercel envía un header especial en Cron Jobs)
-    // Opcional: puedes agregar una API_KEY secreta si quieres más seguridad
-    const authHeader = request.headers.get('authorization');
-    if (process.env.VERCEL_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      // return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-      // Nota: Durante las pruebas podrías querer desactivar esto o usar una simple API KEY
-    }
+  // ── Autenticación del cron job ──────────────────────────────────────────
+  // Vercel envía automáticamente el CRON_SECRET como Bearer token.
+  // También lo verificamos en desarrollo con la variable de entorno.
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
 
-    // 2. Calcular la fecha límite (hace 24 horas desde ahora)
+  if (!cronSecret) {
+    console.error('CRON_SECRET no está configurado en las variables de entorno');
+    return NextResponse.json({ error: 'Configuración incorrecta del servidor' }, { status: 500 });
+  }
+
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    console.warn('Intento no autorizado de ejecutar el cron job');
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
+
+  try {
+    // Calcular la fecha límite (hace 24 horas desde ahora)
     const limitDate = new Date();
     limitDate.setHours(limitDate.getHours() - 24);
     const limitISO = limitDate.toISOString();
 
     console.log('Ejecutando limpieza de sesiones. Límite:', limitISO);
 
-    // 3. Buscar y actualizar sesiones:
-    // Estado: 'pending' (o el que uses en la DB, usualmente 'pending')
-    // Start_time < limitISO
-    const { data, error, count } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('appointments')
       .update({ status: 'completed' })
       .eq('status', 'pending')
@@ -38,16 +43,16 @@ export async function GET(request: Request) {
       throw error;
     }
 
-    console.log(`Se actualizaron ${data?.length || 0} sesiones a 'completada'.`);
+    const updatedCount = data?.length ?? 0;
+    console.log(`Se actualizaron ${updatedCount} sesiones a 'completada'.`);
 
-    return NextResponse.json({ 
-      success: true, 
-      updatedCount: data?.length || 0,
-      message: 'Limpieza completada con éxito' 
+    return NextResponse.json({
+      success: true,
+      updatedCount,
+      message: 'Limpieza completada con éxito',
     });
-
   } catch (error: any) {
     console.error('Cron job error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }
 }
