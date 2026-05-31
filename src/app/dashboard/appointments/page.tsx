@@ -785,33 +785,55 @@ export default function AppointmentsPage() {
       , document.body)}
 
       {/* Modal de confirmación para reactivar una sesión cerrada */}
-      {reactivateConfirmFor && (
-        <ModalWrapper onClose={() => setReactivateConfirmFor(null)}>
-          <div style={{ padding: '1.75rem 2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <RefreshCcw size={20} style={{ color: '#0369a1' }} />
+      {reactivateConfirmFor && (() => {
+        const sessionDate = new Date(`${reactivateConfirmFor.dateSort}T${reactivateConfirmFor.time}`);
+        const isPast = sessionDate < new Date();
+        const isCompleted = reactivateConfirmFor.status === 'Completada';
+        return (
+          <ModalWrapper onClose={() => setReactivateConfirmFor(null)}>
+            <div style={{ padding: '1.75rem 2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <RefreshCcw size={20} style={{ color: '#0369a1' }} />
+                </div>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0 }}>Reactivar sesión</h3>
               </div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0 }}>Reactivar sesión</h3>
-            </div>
-            <p style={{ fontSize: '0.95rem', color: 'var(--text-dark)', fontWeight: 600, margin: '0 0 0.2rem' }}>{reactivateConfirmFor.patient}</p>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>{reactivateConfirmFor.date} · {reactivateConfirmFor.time}</p>
-            {reactivateConfirmFor.status === 'Completada' && (
-              <div style={{ padding: '0.9rem 1rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#92400e', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '1rem' }}>⚠️</span>
-                <span>Esta sesión ya fue <strong>marcada como completada</strong>. Reactivarla significa que fue registrada por error y necesita reanudarse.</span>
+
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-dark)', fontWeight: 600, margin: '0 0 0.2rem' }}>{reactivateConfirmFor.patient}</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>{reactivateConfirmFor.date} · {reactivateConfirmFor.time}</p>
+
+              {/* Aviso: sesión completada por error */}
+              {isCompleted && (
+                <div style={{ padding: '0.9rem 1rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', marginBottom: '0.75rem', fontSize: '0.85rem', color: '#92400e', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+                  <span>⚠️</span>
+                  <span>Esta sesión ya fue <strong>marcada como completada</strong>. Reactivarla indica que fue registrada por error.</span>
+                </div>
+              )}
+
+              {/* Aviso: fecha en el pasado */}
+              {isPast && (
+                <div style={{ padding: '0.9rem 1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', marginBottom: '0.75rem', fontSize: '0.85rem', color: '#7f1d1d', display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+                  <span>📅</span>
+                  <span>La fecha de esta sesión <strong>ya pasó</strong>. Al reactivarla, te recomendamos <strong>reagendarla</strong> a una fecha futura desde el menú <strong>···</strong>.</span>
+                </div>
+              )}
+
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+                {isPast
+                  ? 'La sesión volverá a estado Confirmada. Recuerda reagendarla para evitar confusiones.'
+                  : 'La sesión volverá a estado Confirmada y podrás gestionarla normalmente.'}
+              </p>
+
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button onClick={() => setReactivateConfirmFor(null)} className="btn-secondary" style={{ flex: 1 }}>Cancelar</button>
+                <button onClick={() => reactivateSession(reactivateConfirmFor)} className="btn-primary" style={{ flex: 2 }}>
+                  {isPast ? 'Reactivar y reagendar después' : 'Sí, reactivar'}
+                </button>
               </div>
-            )}
-            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1.75rem' }}>
-              La sesión volverá a estado <strong>Confirmada</strong> y podrás gestionarla nuevamente.
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button onClick={() => setReactivateConfirmFor(null)} className="btn-secondary" style={{ flex: 1 }}>Cancelar</button>
-              <button onClick={() => reactivateSession(reactivateConfirmFor)} className="btn-primary" style={{ flex: 2 }}>Sí, reactivar</button>
             </div>
-          </div>
-        </ModalWrapper>
-      )}
+          </ModalWrapper>
+        );
+      })()}
 
       {rescheduleItem && (
         <ModalWrapper onClose={() => setRescheduleItem(null)}>
