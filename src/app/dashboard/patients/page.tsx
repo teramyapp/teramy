@@ -14,6 +14,7 @@ type Patient = {
   name: string;
   email: string;
   phone: string;
+  birthDate: string | null;
   lastService: string;
   lastModality: 'online' | 'presencial';
   lastDate: string;
@@ -78,11 +79,11 @@ export default function PatientsPage() {
     async () => {
       const [{ data: apptRows }, { data: directRows }] = await Promise.all([
         supabase.from('appointments')
-          .select('id, start_time, status, patient_id, patients(id, name, email, phone, status), event_types(title, mode)')
+          .select('id, start_time, status, patient_id, patients(id, name, email, phone, status, birth_date), event_types(title, mode)')
           .eq('psychologist_id', psychId!)
           .order('start_time', { ascending: false }),
         supabase.from('patients')
-          .select('id, name, email, phone, status')
+          .select('id, name, email, phone, status, birth_date')
           .eq('psychologist_id', psychId!),
       ]);
 
@@ -109,6 +110,7 @@ export default function PatientsPage() {
           name: p.name,
           email: p.email ?? '',
           phone: p.phone ?? '',
+          birthDate: p.birth_date ?? null,
           lastService: last?.event_types?.title ?? '—',
           lastModality: last?.event_types?.mode === 'presencial' ? 'presencial' : 'online',
           lastDate: last ? formatRelativeDate(last.start_time) : 'Sin sesiones',
@@ -377,7 +379,15 @@ export default function PatientsPage() {
               <div className="patient-info-main" style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: `${p.color}18`, color: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, flexShrink: 0 }}>{p.initials}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '0.95rem' }}>{p.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '0.95rem' }}>{p.name}</span>
+                    {p.birthDate && (() => {
+                      const age = Math.floor((Date.now() - new Date(p.birthDate).getTime()) / (365.25 * 24 * 3600 * 1000));
+                      return age >= 0 && age < 120
+                        ? <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', background: 'var(--bg-main)', padding: '0.1rem 0.45rem', borderRadius: '2rem', flexShrink: 0 }}>{age} años</span>
+                        : null;
+                    })()}
+                  </div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>{p.lastService}</div>
                 </div>
               </div>
