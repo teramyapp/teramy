@@ -1193,6 +1193,19 @@ export default function AppointmentsPage() {
                       <div style={{ border: '1px solid #e2e8f0', background: 'white', color: '#334155', fontWeight: 700, padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}>Agregar al calendario</div>
                     </div>
 
+                    {/* Confirm / Cancel Section */}
+                    <div style={{ marginTop: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem', textAlign: 'center' }}>
+                      <p style={{ margin: '0 0 0.75rem', color: '#0f172a', fontSize: '0.75rem', fontWeight: 700 }}>¿Confirmas tu asistencia a esta sesión?</p>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                        <div style={{ flex: 1, backgroundColor: '#16a34a', color: 'white', textAlign: 'center', padding: '0.5rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.75rem' }}>
+                          Sí, asistiré
+                        </div>
+                        <div style={{ flex: 1, backgroundColor: '#ef4444', color: 'white', textAlign: 'center', padding: '0.5rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.75rem' }}>
+                          No podré asistir
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Footer */}
                     <p style={{ textAlign: 'center', fontSize: '0.65rem', color: '#94a3b8', margin: 0, borderTop: '1px solid #e2e8f0', paddingTop: '0.75rem', marginTop: '0.75rem' }}>
                       Este es un correo automático enviado a nombre de tu terapeuta.<br />Tecnología de agendamiento provista por <strong>Teramy</strong>

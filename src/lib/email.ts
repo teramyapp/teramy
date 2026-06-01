@@ -363,6 +363,8 @@ export interface ReminderEmailData {
   videoType?: 'meet' | 'zoom' | null;
   officeAddress?: string | null;
   serviceName?: string;
+  confirmUrl?: string;
+  cancelUrl?: string;
 }
 
 export async function sendReminderEmail(data: ReminderEmailData) {
@@ -396,6 +398,31 @@ export async function sendReminderEmail(data: ReminderEmailData) {
     ? primaryButton(`https://maps.google.com/?q=${encodeURIComponent(data.officeAddress)}`, `${ic.mapPin}Ver en Google Maps`)
     : '';
 
+  const confirmCancelSection = data.confirmUrl && data.cancelUrl
+    ? `<div style="margin-top:28px;border-top:1px solid #e2e8f0;padding-top:24px;text-align:center;">
+        <p style="margin:0 0 16px;color:#0f172a;font-size:14px;font-weight:700;">¿Confirmas tu asistencia a esta sesión?</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 auto;max-width:360px;">
+          <tr>
+            <td width="48%">
+              <a href="${data.confirmUrl}" style="display:block;background-color:#16a34a;color:white;text-align:center;padding:12px 14px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
+                Sí, asistiré
+              </a>
+            </td>
+            <td width="4%"></td>
+            <td width="48%">
+              <a href="${data.cancelUrl}" style="display:block;background-color:#ef4444;color:white;text-align:center;padding:12px 14px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 4px 12px rgba(239,68,68,0.15);">
+                No podré asistir
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>`
+    : `<div style="margin-top:28px;padding:16px;background:#f0f9ff;border-radius:10px;border-left:3px solid #0ea5e9;">
+        <p style="margin:0;color:#0369a1;font-size:13px;line-height:1.4;">
+          ¿Necesitas cancelar o reagendar? Contacta a tu psicólogo/a con anticipación.
+        </p>
+      </div>`;
+
   const html = layout(`
     <h2 style="margin:0 0 6px;color:#0f172a;font-size:20px;font-weight:700;">Recordatorio de sesión</h2>
     <p style="margin:0 0 24px;color:#64748b;font-size:15px;">Hola <strong>${data.patientName}</strong>, te escribimos para recordarte tu próxima sesión:</p>
@@ -413,11 +440,7 @@ export async function sendReminderEmail(data: ReminderEmailData) {
       ${secondaryButton(calUrl, `${ic.calendarPlus}Agregar al calendario`)}
     </div>
 
-    <div style="margin-top:28px;padding:16px;background:#f0f9ff;border-radius:10px;border-left:3px solid #0ea5e9;">
-      <p style="margin:0;color:#0369a1;font-size:13px;line-height:1.4;">
-        ¿Necesitas cancelar o reagendar? Contacta a tu psicólogo/a con anticipación.
-      </p>
-    </div>
+    ${confirmCancelSection}
   `, { name: data.psychologistName, title: data.psychologistTitle, photoUrl: data.psychologistPhotoUrl });
 
   return resend.emails.send({

@@ -94,6 +94,12 @@ export async function PATCH(
       const officeAddress = [psychologist.office_street, psychologist.office_commune, psychologist.office_city, psychologist.office_suite]
         .filter(Boolean).join(', ') || null;
 
+      const host = request.headers.get('host') || 'teramy.cl';
+      const protocol = host.includes('localhost') ? 'http' : 'https';
+      const baseUrl = `${protocol}://${host}`;
+      const confirmUrl = `${baseUrl}/appointments/${id}/confirm`;
+      const cancelUrl = `${baseUrl}/appointments/${id}/cancel`;
+
       sendReminderEmail({
         to: patient.email,
         patientName: patient.name,
@@ -107,6 +113,8 @@ export async function PATCH(
         videoType: psychologist.video_meeting_type,
         officeAddress,
         serviceName: eventType?.title ?? undefined,
+        confirmUrl,
+        cancelUrl,
       }).catch(console.error);
 
       return NextResponse.json({ success: true, action: 'reminded' });
