@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import {
   Calendar, Clock, FileText, Video, MapPin, ChevronLeft, ChevronRight,
   X, Save, CheckCircle2, MessageSquare, Mail, ChevronDown,
-  Filter, ArrowUpDown, MoreVertical, RefreshCcw, Ban, CalendarPlus, Plus, CheckCheck, Loader2
+  Filter, ArrowUpDown, MoreVertical, RefreshCcw, Ban, CalendarPlus, Plus, CheckCheck, Loader2, AlertTriangle
 } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 import { addMinutes, format, addDays, isBefore, startOfDay } from 'date-fns';
@@ -164,6 +164,32 @@ export default function AppointmentsPage() {
 
   const [statusPos,   setStatusPos]   = useState<{ top: number; right?: number; left?: number } | null>(null);
   const [reminderPos, setReminderPos] = useState<{ top: number; right?: number; left?: number } | null>(null);
+  const [reminderPreviewApp, setReminderPreviewApp] = useState<Appointment | null>(null);
+  const [reminderSendState, setReminderSendState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [reminderError, setReminderError] = useState('');
+  const [rateLimited, setRateLimited] = useState(false);
+  const [minutesLeft, setMinutesLeft] = useState(0);
+
+  const handleSendReminder = async () => {
+    if (!reminderPreviewApp || !reminderPreviewApp.supabaseId) return;
+    setReminderSendState('sending');
+    setReminderError('');
+    try {
+      const res = await fetch(`/api/appointments/${reminderPreviewApp.supabaseId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'remind' })
+      });
+      if (!res.ok) throw new Error('Error al enviar el recordatorio');
+      
+      // Update rate limit in localStorage
+      localStorage.setItem('reminder_sent_' + reminderPreviewApp.supabaseId, Date.now().toString());
+      setReminderSendState('success');
+    } catch (err: any) {
+      setReminderError(err.message || 'Error al enviar el recordatorio');
+      setReminderSendState('error');
+    }
+  };
   const [menuPos,     setMenuPos]     = useState<{ top: number; right?: number; left?: number } | null>(null);
 
   const [statusConfirmFor, setStatusConfirmFor] = useState<Appointment | null>(null);
@@ -501,26 +527,28 @@ export default function AppointmentsPage() {
     window.open(finalUrl, '_blank');
   };
 
-  const sendEmail = async (app: Appointment) => {
+  const sendEmail = (app: Appointment) => {
     if (!app.email) return;
-    if (!app.supabaseId) {
-      const subject = encodeURIComponent(`Recordatorio de sesión: ${app.date}`);
-      const body = encodeURIComponent(`Hola ${app.patient},\n\nTe recordamos tu sesión para el día ${app.date} a las ${app.time}.\n\nSaludos,\n${psychologist?.name || 'Teramy'}`);
-      window.location.href = `mailto:${app.email}?subject=${subject}&body=${body}`;
-      return;
-    }
     
-    try {
-      const res = await fetch(`/api/appointments/${app.supabaseId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'remind' })
-      });
-      if (!res.ok) throw new Error('Error al enviar el correo');
-      alert('Correo de recordatorio enviado exitosamente a ' + app.email);
-    } catch (err: any) {
-      alert(err.message || 'Error al enviar el correo de recordatorio');
+    // Check rate limit
+    if (app.supabaseId) {
+      const lastSent = localStorage.getItem('reminder_sent_' + app.supabaseId);
+      if (lastSent) {
+        const elapsed = Date.now() - parseInt(lastSent);
+        const limitMs = 60 * 60 * 1000; // 1 hour
+        if (elapsed < limitMs) {
+          const minutesElapsed = Math.floor(elapsed / (60 * 1000));
+          setRateLimited(true);
+          setMinutesLeft(60 - minutesElapsed);
+          setReminderPreviewApp(app);
+          setReminderSendState('idle');
+          return;
+        }
+      }
     }
+    setRateLimited(false);
+    setReminderPreviewApp(app);
+    setReminderSendState('idle');
   };
 
   const counts = {
@@ -1035,6 +1063,161 @@ export default function AppointmentsPage() {
           </div>
         </ModalWrapper>
       )}
+
+      {/* Modal — Recordatorio Vista Previa */}
+      {reminderPreviewApp && createPortal(
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setReminderPreviewApp(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '520px', background: 'white', borderRadius: '20px', boxShadow: '0 24px 64px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', maxHeight: '92vh', overflow: 'hidden' }}>
+            
+            <div style={{ padding: '1.5rem 1.75rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Mail size={19} style={{ color: '#3b82f6' }} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', margin: 0 }}>Enviar Recordatorio</h3>
+                  <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: '0.1rem 0 0' }}>Vista previa del correo para el paciente</p>
+                </div>
+              </div>
+              <button onClick={() => setReminderPreviewApp(null)} style={{ padding: '0.4rem', borderRadius: '8px', color: '#9ca3af', cursor: 'pointer', background: 'transparent', border: 'none', display: 'flex' }}><X size={18} /></button>
+            </div>
+
+            <div style={{ padding: '1.75rem 2rem', display: 'flex', flexDirection: 'column', gap: '1.2rem', overflowY: 'auto' }}>
+              
+              {reminderSendState === 'success' ? (
+                <div style={{ padding: '2rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1.2rem' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle2 size={32} style={{ color: '#16a34a' }} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.4rem' }}>¡Correo Enviado!</h3>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                      El recordatorio se ha enviado exitosamente a <strong>{reminderPreviewApp.email}</strong>.
+                    </p>
+                  </div>
+                  <button onClick={() => setReminderPreviewApp(null)} style={{ width: '100%', padding: '0.85rem', borderRadius: '12px', background: '#3b82f6', color: 'white', fontWeight: 700, fontSize: '0.92rem', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(59,130,246,0.2)' }}>
+                    Listo, cerrar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {rateLimited ? (
+                    <div style={{ padding: '1rem', background: '#fffbeb', borderRadius: '12px', border: '1px solid #fef3c7', color: '#b45309', fontSize: '0.85rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                      <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+                      <div>
+                        <strong style={{ display: 'block', marginBottom: '2px' }}>Límite de recordatorios</strong>
+                        Ya enviaste un recordatorio para esta sesión hace {60 - minutesLeft} minutos. Por favor, espera {minutesLeft} minutos más antes de enviar otro para evitar spam.
+                      </div>
+                    </div>
+                  ) : reminderSendState === 'error' ? (
+                    <div style={{ padding: '1rem', background: '#fef2f2', borderRadius: '12px', border: '1px solid #fee2e2', color: '#b91c1c', fontSize: '0.85rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                      <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+                      <div>
+                        <strong style={{ display: 'block', marginBottom: '2px' }}>Error al enviar</strong>
+                        {reminderError}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/* Faux Email Preview */}
+                  <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', overflowY: 'auto', maxHeight: '350px', fontSize: '0.8rem', color: '#64748b' }}>
+                    {/* Therapist Header */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #e2e8f0', marginBottom: '0.75rem' }}>
+                      {psychologist?.photo_url ? (
+                        <img src={psychologist.photo_url} alt={psychologist.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#eff6ff', color: '#2563eb', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>
+                          {(psychologist?.name || 'T').split(' ').map((n: string) => n[0]).slice(0, 2).join('')}
+                        </div>
+                      )}
+                      <div>
+                        <h4 style={{ margin: 0, color: '#0f172a', fontSize: '0.85rem', fontWeight: 700 }}>{psychologist?.name}</h4>
+                        <p style={{ margin: 0, color: '#64748b', fontSize: '0.7rem' }}>{psychologist?.title || 'Terapeuta'}</p>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <h3 style={{ color: '#0f172a', fontSize: '1.05rem', margin: '0 0 0.25rem', fontWeight: 700 }}>Recordatorio de sesión</h3>
+                    <p style={{ margin: '0 0 1rem', fontSize: '0.82rem', color: '#475569' }}>Hola <strong>{reminderPreviewApp.patient}</strong>, te escribimos para recordarte tu próxima sesión:</p>
+
+                    <table width="100%" style={{ borderCollapse: 'collapse', marginBottom: '1rem', fontSize: '0.8rem' }}>
+                      <tbody>
+                        {reminderPreviewApp.type && (
+                          <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '6px 0', color: '#64748b', fontWeight: 600 }}>Tipo de sesión:</td>
+                            <td style={{ padding: '6px 0', color: '#0f172a', textAlign: 'right' }}>{reminderPreviewApp.type}</td>
+                          </tr>
+                        )}
+                        <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '6px 0', color: '#64748b', fontWeight: 600 }}>Fecha:</td>
+                          <td style={{ padding: '6px 0', color: '#0f172a', textAlign: 'right' }}>{reminderPreviewApp.date}</td>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '6px 0', color: '#64748b', fontWeight: 600 }}>Hora:</td>
+                          <td style={{ padding: '6px 0', color: '#0f172a', textAlign: 'right' }}>{reminderPreviewApp.time} hrs</td>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '6px 0', color: '#64748b', fontWeight: 600 }}>Modalidad:</td>
+                          <td style={{ padding: '6px 0', color: '#0f172a', textAlign: 'right' }}>{reminderPreviewApp.modality === 'online' ? 'Online' : 'Presencial'}</td>
+                        </tr>
+                        {reminderPreviewApp.modality === 'online' && psychologist?.video_meeting_url ? (
+                          <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '6px 0', color: '#64748b', fontWeight: 600 }}>Enlace:</td>
+                            <td style={{ padding: '6px 0', color: '#2563eb', textAlign: 'right', wordBreak: 'break-all' }}>
+                              <a href={psychologist.video_meeting_url} target="_blank" rel="noreferrer" style={{ color: '#2563eb', textDecoration: 'none' }}>{psychologist.video_meeting_url}</a>
+                            </td>
+                          </tr>
+                        ) : reminderPreviewApp.modality === 'presencial' && (
+                          [psychologist?.office_street, psychologist?.office_commune, psychologist?.office_city, psychologist?.office_suite].filter(Boolean).join(', ')
+                        ) ? (
+                          <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '6px 0', color: '#64748b', fontWeight: 600 }}>Dirección:</td>
+                            <td style={{ padding: '6px 0', color: '#0f172a', textAlign: 'right' }}>
+                              {[psychologist?.office_street, psychologist?.office_commune, psychologist?.office_city, psychologist?.office_suite].filter(Boolean).join(', ')}
+                            </td>
+                          </tr>
+                        ) : null}
+                      </tbody>
+                    </table>
+
+                    {/* Buttons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', margin: '1rem 0' }}>
+                      {reminderPreviewApp.modality === 'online' && psychologist?.video_meeting_url && (
+                        <div style={{ background: '#2563eb', color: 'white', fontWeight: 700, padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}>Unirse a la sesión</div>
+                      )}
+                      {reminderPreviewApp.modality === 'presencial' && (
+                        [psychologist?.office_street, psychologist?.office_commune, psychologist?.office_city, psychologist?.office_suite].filter(Boolean).join(', ')
+                      ) && (
+                        <div style={{ background: '#2563eb', color: 'white', fontWeight: 700, padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}>Ver en Google Maps</div>
+                      )}
+                      <div style={{ border: '1px solid #e2e8f0', background: 'white', color: '#334155', fontWeight: 700, padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%', textAlign: 'center', boxSizing: 'border-box' }}>Agregar al calendario</div>
+                    </div>
+
+                    {/* Footer */}
+                    <p style={{ textAlign: 'center', fontSize: '0.65rem', color: '#94a3b8', margin: 0, borderTop: '1px solid #e2e8f0', paddingTop: '0.75rem', marginTop: '0.75rem' }}>
+                      Este es un correo automático enviado a nombre de tu terapeuta.<br />Tecnología de agendamiento provista por <strong>Teramy</strong>
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                    <button onClick={() => setReminderPreviewApp(null)} style={{ flex: 1, padding: '0.85rem', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', color: '#64748b', fontWeight: 700, fontSize: '0.92rem', cursor: 'pointer' }}>
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleSendReminder}
+                      disabled={rateLimited || reminderSendState === 'sending'}
+                      style={{ flex: 1, padding: '0.85rem', borderRadius: '12px', background: rateLimited ? '#94a3b8' : '#2563eb', color: 'white', fontWeight: 700, fontSize: '0.92rem', border: 'none', cursor: rateLimited ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: rateLimited ? 'none' : '0 4px 12px rgba(37,99,235,0.2)' }}
+                    >
+                      {reminderSendState === 'sending' ? 'Enviando...' : 'Confirmar y Enviar'}
+                    </button>
+                  </div>
+                </>
+              )}
+
+            </div>
+          </div>
+        </div>
+      , document.body)}
     </div>
   );
 }
