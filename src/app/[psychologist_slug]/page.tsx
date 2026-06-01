@@ -821,45 +821,30 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
                 <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '0.25rem' }}>
                   Confirma tus datos
                 </h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                  Completa tu información para confirmar la sesión.
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center' }}>
+                  <span>Completa tu información para confirmar la sesión.</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsReturning(!isReturning);
+                      setSubmitError(null);
+                    }}
+                    style={{
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: 'var(--primary-blue)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      textDecoration: 'underline',
+                      marginLeft: '0.25rem'
+                    }}
+                  >
+                    {isReturning ? '¿Ingresar todos mis datos?' : '¿Ya te has atendido aquí antes?'}
+                  </button>
                 </p>
                 <form onSubmit={handleBook} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                  {/* Toggle returning patient */}
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(14,165,233,0.04)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(14,165,233,0.1)',
-                    marginBottom: '0.5rem'
-                  }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-dark)' }}>
-                      {isReturning ? '¿Primera vez agendando?' : '¿Ya te has atendido aquí antes?'}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsReturning(!isReturning);
-                        setSubmitError(null);
-                      }}
-                      style={{
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        color: 'var(--primary-blue)',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: 0,
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      {isReturning ? 'Ingresar mis datos manualmente' : 'Ingresar solo mi correo electrónico'}
-                    </button>
-                  </div>
 
                   {/* Nombre + Apellido en grid */}
                   {!isReturning && (
