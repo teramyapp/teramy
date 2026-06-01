@@ -231,34 +231,7 @@ export default function ProfilePage() {
       `}</style>
       <div className="animate-slide-up">
       
-      {profile.subscription_status === 'trialing' && profile.trial_ends_at && (
-        <div style={{ 
-          background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', 
-          border: '1px solid #bae6fd', 
-          borderRadius: '16px', 
-          padding: '1rem 1.5rem', 
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1rem',
-          boxShadow: '0 4px 12px rgba(2, 132, 199, 0.08)'
-        }}>
-          <Zap size={20} style={{ color: '#0284c7' }} />
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '0.88rem', color: '#0c4a6e', fontWeight: 700 }}>
-              Tu periodo de prueba termina el {new Date(profile.trial_ends_at).toLocaleDateString('es-CL')}. 
-              <span style={{ fontWeight: 500, marginLeft: '0.5rem', color: '#0369a1' }}>Suscríbete ahora para mantener todas las funciones Pro.</span>
-            </p>
-          </div>
-          <Link href="/dashboard/settings" style={{ 
-            padding: '0.5rem 1rem', borderRadius: '8px', background: '#0284c7', color: 'white', 
-            fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none',
-            boxShadow: '0 4px 12px rgba(2, 132, 199, 0.2)'
-          }}>
-            Ver planes
-          </Link>
-        </div>
-      )}
+
 
       <div className="profile-header">
         <div>
