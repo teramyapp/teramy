@@ -176,8 +176,11 @@ export default function AutomationsPage() {
     const road = addr.road ?? addr.pedestrian ?? addr.footway ?? '';
     const houseNum = addr.house_number ?? '';
     const street = [road, houseNum].filter(Boolean).join(' ') || s.display_name.split(',')[0].trim();
-    const commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? addr.county ?? addr.state_district ?? '';
-    const city = addr.city ?? addr.town ?? addr.village ?? 'Santiago';
+    let commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? addr.county ?? addr.state_district ?? '';
+    let city = addr.city ?? addr.town ?? addr.village ?? 'Santiago';
+    if (commune === city && addr.state && addr.state.toLowerCase().includes('metropolitana')) {
+      city = 'Santiago';
+    }
     setOfficeStreet(street);
     if (commune) setOfficeCommune(commune);
     setOfficeCity(city || 'Santiago');
@@ -488,8 +491,12 @@ export default function AutomationsPage() {
                       const houseNum = addr.house_number ?? '';
                       const mainLine = [road, houseNum].filter(Boolean).join(' ') || s.display_name.split(',')[0].trim();
                       const commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? '';
-                      const city = addr.city ?? addr.town ?? addr.village ?? '';
-                      const subLine = [commune, city].filter(Boolean).join(', ');
+                      let city = addr.city ?? addr.town ?? addr.village ?? '';
+                      if (commune === city && addr.state?.toLowerCase().includes('metropolitana')) {
+                        city = 'Santiago';
+                      }
+                      // Deduplicate values using a Set/filter pattern so "Quinta Normal, Quinta Normal" becomes just "Quinta Normal"
+                      const subLine = [commune, city].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(', ');
                       return (
                         <button
                           key={i}
