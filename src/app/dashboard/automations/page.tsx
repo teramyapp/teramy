@@ -452,7 +452,7 @@ export default function AutomationsPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border-light)' }}>
             <MapPin size={18} style={{ color: '#c2410c' }} />
             <div>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-dark)', margin: '0 0 0.1rem' }}>Dirección del consultorio</h2>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-dark)', margin: '0 0 0.1rem' }}>Ubicación de Atención</h2>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>Se enviará automáticamente al paciente al confirmar su sesión presencial</p>
             </div>
           </div>
@@ -574,6 +574,18 @@ export default function AutomationsPage() {
                 </div>
               </div>
             )}
+
+            {/* Guardar Button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <button
+                onClick={handleSaveClick}
+                disabled={saving}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.5rem', borderRadius: '10px', border: 'none', background: 'var(--primary-blue)', color: 'white', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', opacity: saving ? 0.7 : 1 }}
+              >
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} 
+                {saved ? '¡Guardado!' : 'Guardar ubicación'}
+              </button>
+            </div>
           </div>
         </div>
       )}
