@@ -60,32 +60,51 @@ const ic = {
 
 // ─── Shared layout ───────────────────────────────────────────────────────────
 
-function layout(content: string): string {
+function layout(
+  content: string,
+  psych?: { name: string; title?: string | null; photoUrl?: string | null }
+): string {
+  const profileHeader = psych
+    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #f1f5f9;">
+        <tr>
+          <td width="56" valign="top" style="padding-right:16px;">
+            ${psych.photoUrl 
+              ? `<img src="${psych.photoUrl}" width="56" height="56" style="border-radius:50%;object-fit:cover;display:block;border:1px solid #e2e8f0;" alt="${psych.name}" />`
+              : `<div style="width:56px;height:56px;border-radius:50%;background:#eff6ff;color:#2563eb;font-size:18px;font-weight:700;line-height:56px;text-align:center;text-transform:uppercase;border:1px solid #bfdbfe;">
+                  ${psych.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                 </div>`
+            }
+          </td>
+          <td valign="middle">
+            <h3 style="margin:0;color:#0f172a;font-size:18px;font-weight:700;line-height:1.2;">${psych.name}</h3>
+            ${psych.title ? `<p style="margin:4px 0 0;color:#64748b;font-size:13px;line-height:1.2;">${psych.title}</p>` : ''}
+          </td>
+        </tr>
+      </table>`
+    : '';
+
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teramy</title>
+  <title>Notificación de Cita</title>
 </head>
-<body style="margin:0;padding:0;background:#f0f9ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f9ff;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" style="max-width:560px;background:#ffffff;border-radius:16px;box-shadow:0 2px 12px rgba(14,165,233,0.10);overflow:hidden;">
-          <tr>
-            <td style="background:linear-gradient(135deg,#0ea5e9 0%,#3b82f6 100%);padding:28px 32px;text-align:center;">
-              <span style="color:#fff;font-size:24px;font-weight:800;letter-spacing:-0.5px;">Teramy</span>
-            </td>
-          </tr>
+        <table width="100%" style="max-width:560px;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 4px 12px rgba(15,23,42,0.03);overflow:hidden;">
           <tr>
             <td style="padding:32px;">
+              ${profileHeader}
               ${content}
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 32px;border-top:1px solid #e0f2fe;background:#f8fbff;text-align:center;">
-              <p style="margin:0;color:#94a3b8;font-size:12px;">© Teramy · Este email fue enviado automáticamente, no respondas a este mensaje.</p>
+            <td style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+              <p style="margin:0 0 6px;color:#94a3b8;font-size:11px;line-height:1.4;">Este es un correo automático enviado a nombre de tu terapeuta.</p>
+              <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.4;">Tecnología de agendamiento provista por <a href="https://teramy.com" target="_blank" style="color:#2563eb;text-decoration:none;font-weight:600;">Teramy</a></p>
             </td>
           </tr>
         </table>
@@ -99,23 +118,23 @@ function layout(content: string): string {
 function infoRow(icon: string, label: string, value: string): string {
   return `<tr>
     <td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
-      <span style="color:#64748b;font-size:14px;line-height:1.5;">${icon}<strong style="color:#0f172a;">${label}:</strong> ${value}</span>
+      <span style="color:#64748b;font-size:14px;line-height:1.5;">${icon}<strong style="color:#0f172a;"> ${label}:</strong> ${value}</span>
     </td>
   </tr>`;
 }
 
 function primaryButton(href: string, text: string): string {
   return `<a href="${href}" target="_blank"
-    style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#3b82f6);color:#fff;text-decoration:none;
-    padding:13px 30px;border-radius:8px;font-size:15px;font-weight:600;margin-top:24px;box-shadow:0 2px 8px rgba(14,165,233,0.35);">
+    style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;
+    padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;margin-top:20px;box-shadow:0 4px 12px rgba(37,99,235,0.18);">
     ${text}
   </a>`;
 }
 
 function secondaryButton(href: string, text: string): string {
   return `<a href="${href}" target="_blank"
-    style="display:inline-block;border:1px solid #bae6fd;color:#0369a1;text-decoration:none;
-    padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;margin-top:12px;background:#f0f9ff;">
+    style="display:inline-block;border:1px solid #e2e8f0;color:#334155;text-decoration:none;
+    padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;margin-top:10px;background:#ffffff;">
     ${text}
   </a>`;
 }
@@ -127,6 +146,7 @@ export interface BookingConfirmationData {
   patientName: string;
   psychologistName: string;
   psychologistTitle?: string;
+  psychologistPhotoUrl?: string;
   startTime: string;
   endTime: string;
   modality: 'online' | 'presencial';
@@ -150,14 +170,14 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
   const locationSection = data.modality === 'online' && data.videoUrl
     ? `<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
         <span style="color:#64748b;font-size:14px;line-height:1.5;">
-          ${ic.video}<strong style="color:#0f172a;">Enlace de sesión:</strong>
-          <a href="${data.videoUrl}" style="color:#0ea5e9;">${data.videoUrl}</a>
+          ${ic.video}<strong style="color:#0f172a;"> Enlace de sesión:</strong>
+          <a href="${data.videoUrl}" style="color:#2563eb;">${data.videoUrl}</a>
         </span>
       </td></tr>`
     : data.modality === 'presencial' && data.officeAddress
     ? `<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
         <span style="color:#64748b;font-size:14px;line-height:1.5;">
-          ${ic.mapPin}<strong style="color:#0f172a;">Dirección:</strong> ${data.officeAddress}
+          ${ic.mapPin}<strong style="color:#0f172a;"> Dirección:</strong> ${data.officeAddress}
         </span>
       </td></tr>`
     : '';
@@ -173,11 +193,10 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
     : '';
 
   const html = layout(`
-    <h2 style="margin:0 0 6px;color:#0f172a;font-size:20px;font-weight:700;">${ic.check}Sesión confirmada</h2>
+    <h2 style="margin:0 0 6px;color:#0f172a;font-size:20px;font-weight:700;">Sesión confirmada</h2>
     <p style="margin:0 0 24px;color:#64748b;font-size:15px;">Hola <strong>${data.patientName}</strong>, aquí están los detalles de tu sesión:</p>
 
     <table width="100%" cellpadding="0" cellspacing="0">
-      ${infoRow(ic.user, 'Psicólogo/a', `${data.psychologistName}${data.psychologistTitle ? ` · ${data.psychologistTitle}` : ''}`)}
       ${data.serviceName ? infoRow(ic.file, 'Tipo de sesión', data.serviceName) : ''}
       ${infoRow(ic.calendar, 'Fecha', dateStr.charAt(0).toUpperCase() + dateStr.slice(1))}
       ${infoRow(ic.clock, 'Hora', `${timeStr} hrs (hora de Santiago)`)}
@@ -192,11 +211,11 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
     </div>
 
     <div style="margin-top:28px;padding:16px;background:#f0f9ff;border-radius:10px;border-left:3px solid #0ea5e9;">
-      <p style="margin:0;color:#0369a1;font-size:13px;">
+      <p style="margin:0;color:#0369a1;font-size:13px;line-height:1.4;">
         ¿Necesitas cancelar o reagendar? Contacta a tu psicólogo/a con anticipación.
       </p>
     </div>
-  `);
+  `, { name: data.psychologistName, title: data.psychologistTitle, photoUrl: data.psychologistPhotoUrl });
 
   return resend.emails.send({
     from: FROM,
@@ -212,6 +231,8 @@ export interface CancellationEmailData {
   to: string;
   patientName: string;
   psychologistName: string;
+  psychologistTitle?: string;
+  psychologistPhotoUrl?: string;
   startTime: string;
   bookingUrl?: string;
 }
@@ -227,19 +248,18 @@ export async function sendCancellationEmail(data: CancellationEmailData) {
     </p>
 
     <table width="100%" cellpadding="0" cellspacing="0">
-      ${infoRow(ic.user, 'Psicólogo/a', data.psychologistName)}
       ${infoRow(ic.calendar, 'Fecha cancelada', dateStr.charAt(0).toUpperCase() + dateStr.slice(1))}
       ${infoRow(ic.clock, 'Hora', `${timeStr} hrs`)}
     </table>
 
     <div style="margin-top:24px;padding:16px;background:#fffbeb;border-radius:10px;border-left:3px solid #f59e0b;">
-      <p style="margin:0;color:#92400e;font-size:14px;">
+      <p style="margin:0;color:#92400e;font-size:14px;line-height:1.4;">
         Puedes reagendar cuando lo necesites. Tu psicólogo/a estará disponible para una nueva sesión.
       </p>
     </div>
 
-    ${data.bookingUrl ? `<div style="text-align:center;">${primaryButton(data.bookingUrl, `${ic.calendarPlus}Reagendar sesión`)}</div>` : ''}
-  `);
+    ${data.bookingUrl ? `<div style="text-align:center;margin-top:8px;">${primaryButton(data.bookingUrl, `${ic.calendarPlus}Reagendar sesión`)}</div>` : ''}
+  `, { name: data.psychologistName, title: data.psychologistTitle, photoUrl: data.psychologistPhotoUrl });
 
   return resend.emails.send({
     from: FROM,
@@ -255,6 +275,8 @@ export interface RescheduleEmailData {
   to: string;
   patientName: string;
   psychologistName: string;
+  psychologistTitle?: string;
+  psychologistPhotoUrl?: string;
   oldStartTime: string;
   newStartTime: string;
   newEndTime: string;
@@ -279,7 +301,7 @@ export async function sendRescheduleEmail(data: RescheduleEmailData) {
   const html = layout(`
     <h2 style="margin:0 0 8px;color:#0f172a;font-size:20px;font-weight:700;">Sesión reagendada</h2>
     <p style="margin:0 0 24px;color:#64748b;font-size:15px;">
-      Hola <strong>${data.patientName}</strong>, tu sesión con <strong>${data.psychologistName}</strong> ha sido reagendada.
+      Hola <strong>${data.patientName}</strong>, tu sesión ha sido reagendada.
     </p>
 
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
@@ -303,7 +325,7 @@ export async function sendRescheduleEmail(data: RescheduleEmailData) {
 
     ${data.modality === 'online' && data.videoUrl
       ? `<table width="100%" cellpadding="0" cellspacing="0">
-          ${infoRow(ic.video, 'Enlace de sesión', `<a href="${data.videoUrl}" style="color:#0ea5e9;">${data.videoUrl}</a>`)}
+          ${infoRow(ic.video, 'Enlace de sesión', `<a href="${data.videoUrl}" style="color:#2563eb;">${data.videoUrl}</a>`)}
         </table>`
       : data.modality === 'presencial' && data.officeAddress
       ? `<table width="100%" cellpadding="0" cellspacing="0">
@@ -311,12 +333,12 @@ export async function sendRescheduleEmail(data: RescheduleEmailData) {
         </table>`
       : ''}
 
-    <div style="text-align:center;">
+    <div style="text-align:center;margin-top:8px;">
       ${data.modality === 'online' && data.videoUrl ? primaryButton(data.videoUrl, `${ic.externalLink}Unirse a la sesión`) : ''}
       ${data.modality === 'presencial' && data.officeAddress ? primaryButton(`https://maps.google.com/?q=${encodeURIComponent(data.officeAddress)}`, `${ic.mapPin}Ver en Google Maps`) : ''}
       ${secondaryButton(calUrl, `${ic.calendarPlus}Agregar al calendario`)}
     </div>
-  `);
+  `, { name: data.psychologistName, title: data.psychologistTitle, photoUrl: data.psychologistPhotoUrl });
 
   return resend.emails.send({
     from: FROM,

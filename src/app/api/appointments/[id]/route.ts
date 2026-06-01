@@ -23,7 +23,7 @@ export async function PATCH(
       .select(`
         *,
         patients(name, email, phone),
-        psychologists(name, title, video_meeting_url, video_meeting_type, office_street, office_suite, office_commune, office_city),
+        psychologists(name, title, photo_url, video_meeting_url, video_meeting_type, office_street, office_suite, office_commune, office_city),
         event_types(title, mode, price)
       `)
       .eq('id', id)
@@ -49,6 +49,8 @@ export async function PATCH(
         to: patient.email,
         patientName: patient.name,
         psychologistName: psychologist.name,
+        psychologistTitle: psychologist.title ?? undefined,
+        psychologistPhotoUrl: psychologist.photo_url ?? undefined,
         startTime: appointment.start_time,
       }).catch(console.error);
 
@@ -74,6 +76,8 @@ export async function PATCH(
         to: patient.email,
         patientName: patient.name,
         psychologistName: psychologist.name,
+        psychologistTitle: psychologist.title ?? undefined,
+        psychologistPhotoUrl: psychologist.photo_url ?? undefined,
         oldStartTime: appointment.start_time,
         newStartTime: new_start_time,
         newEndTime: new_end_time,

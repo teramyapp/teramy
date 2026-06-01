@@ -150,7 +150,7 @@ export async function POST(request: Request) {
     const [{ data: psychologist }, { data: eventType }] = await Promise.all([
       supabase
         .from('psychologists')
-        .select('name, title, video_meeting_url, video_meeting_type, office_street, office_suite, office_commune, office_city')
+        .select('name, title, photo_url, video_meeting_url, video_meeting_type, office_street, office_suite, office_commune, office_city')
         .eq('id', psychologist_id)
         .single(),
       event_type_id
@@ -171,6 +171,7 @@ export async function POST(request: Request) {
         patientName:        sanitizedPatient.name,
         psychologistName:   psychologist.name,
         psychologistTitle:  psychologist.title ?? undefined,
+        psychologistPhotoUrl: psychologist.photo_url ?? undefined,
         startTime:          start_time,
         endTime:            end_time,
         modality:           (eventType as any)?.mode ?? 'online',
