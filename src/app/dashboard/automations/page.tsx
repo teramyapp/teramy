@@ -174,7 +174,8 @@ export default function AutomationsPage() {
   const selectStreetSuggestion = useCallback((s: any) => {
     const addr = s.address ?? {};
     const road = addr.road ?? addr.pedestrian ?? addr.footway ?? '';
-    const houseNum = addr.house_number ?? '';
+    const typedNumber = officeStreet.match(/\d+/)?.[0] || '';
+    const houseNum = addr.house_number || typedNumber;
     const street = [road, houseNum].filter(Boolean).join(' ') || s.display_name.split(',')[0].trim();
     let commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? addr.county ?? addr.state_district ?? '';
     let city = addr.city ?? addr.town ?? addr.village ?? 'Santiago';
@@ -186,7 +187,7 @@ export default function AutomationsPage() {
     setOfficeCity(city || 'Santiago');
     setShowSuggestions(false);
     setStreetSuggestions([]);
-  }, []);
+  }, [officeStreet]);
 
   // Compose full address for preview
   const composedAddress = [officeStreet, officeSuite, officeCommune, officeCity].filter(Boolean).join(', ');
@@ -488,7 +489,8 @@ export default function AutomationsPage() {
                     {streetSuggestions.map((s, i) => {
                       const addr = s.address ?? {};
                       const road = addr.road ?? addr.pedestrian ?? addr.footway ?? '';
-                      const houseNum = addr.house_number ?? '';
+                      const typedNumber = officeStreet.match(/\d+/)?.[0] || '';
+                      const houseNum = addr.house_number || typedNumber;
                       const mainLine = [road, houseNum].filter(Boolean).join(' ') || s.display_name.split(',')[0].trim();
                       const commune = addr.city_district ?? addr.suburb ?? addr.municipality ?? '';
                       let city = addr.city ?? addr.town ?? addr.village ?? '';
