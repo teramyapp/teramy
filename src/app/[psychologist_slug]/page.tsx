@@ -233,6 +233,7 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
   const [selectedDateIdx,  setSelectedDateIdx]  = useState<number | null>(null);
   const [selectedTime,     setSelectedTime]     = useState<string | null>(null);
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', birthDate: '', notes: '' });
+  const [isReturning, setIsReturning] = useState(false);
   const [emailError,       setEmailError]       = useState<string | null>(null);
   const [submitting,       setSubmitting]       = useState(false);
   const [submitError,      setSubmitError]      = useState<string | null>(null);
@@ -330,19 +331,23 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
     const startDate = new Date(`${selectedDate.dateISO}T${selectedTime}:00`);
     const endDate   = addMinutes(startDate, selectedService.duration_minutes);
 
+    const patientPayload = isReturning
+      ? { email: form.email, isReturning: true }
+      : {
+          firstName: form.firstName,
+          lastName:  form.lastName,
+          email:     form.email,
+          phone:     `+569${form.phone}`,
+          birthDate: form.birthDate || null,
+        };
+
     const res = await fetch('/api/appointments', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         psychologist_id:  psychologist.id,
         event_type_id:    selectedService.id,
-        patient: {
-          firstName: form.firstName,
-          lastName:  form.lastName,
-          email:     form.email,
-          phone:     `+569${form.phone}`,
-          birthDate: form.birthDate || null,
-        },
+        patient:          patientPayload,
         start_time:       startDate.toISOString(),
         end_time:         endDate.toISOString(),
         patient_notes:    form.notes || null,
@@ -350,7 +355,10 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
     });
     const json = await res.json();
     if (!res.ok) {
-      if (json.error?.includes('primera')) {
+      if (json.error === 'PATIENT_NOT_FOUND') {
+        setSubmitError('No encontramos ningún paciente con este correo electrónico registrado con este terapeuta. Por favor, ingresa tus datos en el formulario de abajo para registrarte.');
+        setIsReturning(false);
+      } else if (json.error?.includes('primera')) {
         setEmailError(json.error);
       } else {
         setSubmitError(json.error || 'Error al confirmar la sesión.');
@@ -818,29 +826,66 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
                 </p>
                 <form onSubmit={handleBook} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-                  {/* Nombre + Apellido en grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Nombre *</label>
-                      <input
-                        required
-                        type="text"
-                        value={form.firstName}
-                        onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
-                        placeholder="Ej. Ana"
-                      />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Apellido *</label>
-                      <input
-                        required
-                        type="text"
-                        value={form.lastName}
-                        onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
-                        placeholder="Ej. García"
-                      />
-                    </div>
+                  {/* Toggle returning patient */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(14,165,233,0.04)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(14,165,233,0.1)',
+                    marginBottom: '0.5rem'
+                  }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-dark)' }}>
+                      {isReturning ? '¿Primera vez agendando?' : '¿Ya te has atendido aquí antes?'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsReturning(!isReturning);
+                        setSubmitError(null);
+                      }}
+                      style={{
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        color: 'var(--primary-blue)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {isReturning ? 'Ingresar mis datos manualmente' : 'Ingresar solo mi correo electrónico'}
+                    </button>
                   </div>
+
+                  {/* Nombre + Apellido en grid */}
+                  {!isReturning && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Nombre *</label>
+                        <input
+                          required={!isReturning}
+                          type="text"
+                          value={form.firstName}
+                          onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
+                          placeholder="Ej. Ana"
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Apellido *</label>
+                        <input
+                          required={!isReturning}
+                          type="text"
+                          value={form.lastName}
+                          onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
+                          placeholder="Ej. García"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Email */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -873,42 +918,46 @@ export default function PublicBookingPage({ params }: { params: { psychologist_s
                   </div>
 
                   {/* Teléfono */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Teléfono (WhatsApp) *</label>
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid var(--border-light)', borderRadius: 'var(--radius-sm)', background: 'white', overflow: 'hidden' }}>
-                      <span style={{ padding: '0.85rem 0.5rem 0.85rem 0.85rem', background: '#f8fafc', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.9rem', borderRight: '1.5px solid var(--border-light)' }}>+56 9</span>
-                      <input
-                        required
-                        type="tel"
-                        value={form.phone}
-                        onChange={e => setForm(p => ({ ...p, phone: e.target.value.replace(/[^0-9]/g, '') }))}
-                        placeholder="1234 5678"
-                        maxLength={8}
-                        style={{ border: 'none', boxShadow: 'none', flex: 1, padding: '0.85rem', fontSize: '0.9rem', outline: 'none' }}
-                      />
+                  {!isReturning && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>Teléfono (WhatsApp) *</label>
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid var(--border-light)', borderRadius: 'var(--radius-sm)', background: 'white', overflow: 'hidden' }}>
+                        <span style={{ padding: '0.85rem 0.5rem 0.85rem 0.85rem', background: '#f8fafc', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.9rem', borderRight: '1.5px solid var(--border-light)' }}>+56 9</span>
+                        <input
+                          required={!isReturning}
+                          type="tel"
+                          value={form.phone}
+                          onChange={e => setForm(p => ({ ...p, phone: e.target.value.replace(/[^0-9]/g, '') }))}
+                          placeholder="1234 5678"
+                          maxLength={8}
+                          style={{ border: 'none', boxShadow: 'none', flex: 1, padding: '0.85rem', fontSize: '0.9rem', outline: 'none' }}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Fecha de nacimiento */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>
-                      Fecha de nacimiento *
-                      {form.birthDate && (() => {
-                        const age = Math.floor((Date.now() - new Date(form.birthDate).getTime()) / (365.25 * 24 * 3600 * 1000));
-                        return age >= 0 && age < 120
-                          ? <span style={{ marginLeft: '0.5rem', fontWeight: 400, color: 'var(--primary-blue)', fontSize: '0.82rem' }}>{age} años</span>
-                          : null;
-                      })()}
-                    </label>
-                    <input
-                      required
-                      type="date"
-                      value={form.birthDate}
-                      max={new Date().toISOString().split('T')[0]}
-                      onChange={e => setForm(p => ({ ...p, birthDate: e.target.value }))}
-                      style={{ colorScheme: 'light' }}
-                    />
-                  </div>
+                  {!isReturning && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-dark)' }}>
+                        Fecha de nacimiento *
+                        {form.birthDate && (() => {
+                          const age = Math.floor((Date.now() - new Date(form.birthDate).getTime()) / (365.25 * 24 * 3600 * 1000));
+                          return age >= 0 && age < 120
+                            ? <span style={{ marginLeft: '0.5rem', fontWeight: 400, color: 'var(--primary-blue)', fontSize: '0.82rem' }}>{age} años</span>
+                            : null;
+                        })()}
+                      </label>
+                      <input
+                        required={!isReturning}
+                        type="date"
+                        value={form.birthDate}
+                        max={new Date().toISOString().split('T')[0]}
+                        onChange={e => setForm(p => ({ ...p, birthDate: e.target.value }))}
+                        style={{ colorScheme: 'light' }}
+                      />
+                    </div>
+                  )}
 
                   {/* Motivo de consulta */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
