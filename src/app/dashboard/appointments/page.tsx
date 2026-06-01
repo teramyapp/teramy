@@ -471,7 +471,7 @@ export default function AppointmentsPage() {
         .replace('{{detalle}}', app.modality === 'online'
           ? `🔗 ${psychologist?.video_meeting_url || 'Meet'}`
           : `📍 ${
-              [psychologist?.office_street, psychologist?.office_suite, psychologist?.office_commune, psychologist?.office_city]
+              [psychologist?.office_street, psychologist?.office_commune, psychologist?.office_city, psychologist?.office_suite]
                 .filter(Boolean).join(', ') || 'Consultorio presencial'
             }`);
     } else if (isCancel) {
@@ -486,7 +486,7 @@ export default function AppointmentsPage() {
         .replace('{{detalle}}', app.modality === 'online'
           ? `🔗 ${psychologist?.video_meeting_url || 'Meet'}`
           : `📍 ${
-              [psychologist?.office_street, psychologist?.office_suite, psychologist?.office_commune, psychologist?.office_city]
+              [psychologist?.office_street, psychologist?.office_commune, psychologist?.office_city, psychologist?.office_suite]
                 .filter(Boolean).join(', ') || 'Consultorio presencial'
             }`);
     }

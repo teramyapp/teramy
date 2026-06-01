@@ -67,7 +67,7 @@ export async function PATCH(
 
       if (error) throw error;
 
-      const officeAddress = [psychologist.office_street, psychologist.office_suite, psychologist.office_commune, psychologist.office_city]
+      const officeAddress = [psychologist.office_street, psychologist.office_commune, psychologist.office_city, psychologist.office_suite]
         .filter(Boolean).join(', ') || null;
 
       sendRescheduleEmail({

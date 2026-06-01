@@ -160,7 +160,7 @@ export async function POST(request: Request) {
 
     // Compose office address for presencial sessions
     const officeAddress = psychologist
-      ? [psychologist.office_street, psychologist.office_suite, psychologist.office_commune, psychologist.office_city]
+      ? [psychologist.office_street, psychologist.office_commune, psychologist.office_city, psychologist.office_suite]
           .filter(Boolean).join(', ') || null
       : null;
 

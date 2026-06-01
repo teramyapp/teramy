@@ -190,7 +190,7 @@ export default function AutomationsPage() {
   }, [officeStreet]);
 
   // Compose full address for preview
-  const composedAddress = [officeStreet, officeSuite, officeCommune, officeCity].filter(Boolean).join(', ');
+  const composedAddress = [officeStreet, officeCommune, officeCity, officeSuite].filter(Boolean).join(', ');
 
   const whatsappPreview = whatsappTemplate
     .replace('{{nombre}}', '[Nombre del paciente]')
