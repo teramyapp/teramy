@@ -440,16 +440,21 @@ export default function AutomationsPage() {
             placeholder={videoPlatform === 'google_meet' ? "https://meet.google.com/abc-defg-hij" : "https://zoom.us/j/123456789"}
             style={{ fontSize: '0.9rem' }}
           />
-          <div style={{ marginTop: '0.2rem' }}>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 0.3rem' }}>
-              Este link se incluirá en todos los correos y recordatorios de sesiones online.
-            </p>
-            <p style={{ fontSize: '0.73rem', color: 'var(--text-muted)', margin: 0, fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#f8fafc', padding: '0.5rem 0.6rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-              <Info size={13} style={{ color: 'var(--primary-blue)', flexShrink: 0 }} />
-              {videoPlatform === 'google_meet' 
-                ? "Tip: En meet.google.com presiona 'Nueva reunión' > 'Crear una reunión para más tarde' y copia el enlace."
-                : "Tip: En la app de Zoom ve a 'Reuniones' > 'Mi sala personal (PMI)' y copia el enlace de invitación."}
-            </p>
+          <div style={{ marginTop: '0.4rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', background: '#f8fafc', padding: '0.75rem 0.85rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-dark)', margin: 0, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Info size={14} style={{ color: 'var(--primary-blue)' }} />
+                ¿Cómo funciona este link?
+              </p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                Teramy usa el modelo de <strong>Sala de Espera Permanente</strong>. No necesitas crear un link nuevo por sesión; solo pega tu enlace aquí una vez y se enviará automáticamente a todos los pacientes que agenden online.
+              </p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-dark)', margin: '0.2rem 0 0', lineHeight: 1.5, fontWeight: 500 }}>
+                {videoPlatform === 'google_meet' 
+                  ? "👉 En meet.google.com presiona 'Nueva reunión' > 'Crear una reunión para más tarde' y pega ese mismo link arriba."
+                  : "👉 En la app de Zoom ve a 'Reuniones' > 'Mi sala personal (PMI)' y copia el link de invitación."}
+              </p>
+            </div>
           </div>
         </div>
       </div>
