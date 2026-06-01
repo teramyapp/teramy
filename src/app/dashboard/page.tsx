@@ -18,6 +18,7 @@ type NsPatientOption  = { id: string; name: string; email?: string; phone?: stri
 type NsServiceOption  = { id: string; title: string; mode: string; duration_minutes: number; price: number };
 
 type Session = {
+  id?: string;
   time: string;
   name: string;
   type: string;
@@ -139,6 +140,7 @@ export default function DashboardHome() {
       const sessions: Session[] = (todayRows ?? []).map((r: any, i: number) => {
         const name = r.patients?.name ?? 'Paciente';
         return {
+          id:       r.id,
           time:     new Date(r.start_time).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }),
           name,
           type:     r.event_types?.title ?? 'Sesión',
@@ -255,12 +257,30 @@ export default function DashboardHome() {
     setReminderOpen(null); setReminderPos(null);
   };
 
-  const sendEmail = (s: Session) => {
+  const sendEmail = async (s: Session) => {
     if (!s.email) return;
-    const subj = encodeURIComponent(`Recordatorio: Tu sesión hoy a las ${s.time}`);
-    const body = encodeURIComponent(`Hola ${s.name},\n\nTe recuerdo que tienes sesión hoy a las ${s.time}.\nModalidad: ${s.modality === 'online' ? 'Online' : 'Presencial'}\n\n¡Nos vemos!`);
-    window.open(`mailto:${s.email}?subject=${subj}&body=${body}`, '_blank');
+    if (!s.id) {
+      const subj = encodeURIComponent(`Recordatorio: Tu sesión hoy a las ${s.time}`);
+      const body = encodeURIComponent(`Hola ${s.name},\n\nTe recuerdo que tienes sesión hoy a las ${s.time}.\nModalidad: ${s.modality === 'online' ? 'Online' : 'Presencial'}\n\n¡Nos vemos!`);
+      window.open(`mailto:${s.email}?subject=${subj}&body=${body}`, '_blank');
+      setReminderOpen(null);
+      setReminderPos(null);
+      return;
+    }
+    
     setReminderOpen(null);
+    setReminderPos(null);
+    try {
+      const res = await fetch(`/api/appointments/${s.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'remind' })
+      });
+      if (!res.ok) throw new Error('Error al enviar el correo');
+      alert('Correo de recordatorio enviado exitosamente a ' + s.email);
+    } catch (err: any) {
+      alert(err.message || 'Error al enviar el correo de recordatorio');
+    }
   };
 
   // Nueva sesión modal

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase-server';
-import { sendCancellationEmail, sendRescheduleEmail } from '@/lib/email';
+import { sendCancellationEmail, sendRescheduleEmail, sendReminderEmail } from '@/lib/email';
 
 export async function PATCH(
   request: Request,
@@ -13,7 +13,7 @@ export async function PATCH(
     const body = await request.json();
     const { action, new_start_time, new_end_time } = body;
 
-    if (!action || !['cancel', 'reschedule'].includes(action)) {
+    if (!action || !['cancel', 'reschedule', 'remind'].includes(action)) {
       return NextResponse.json({ error: 'Acción inválida' }, { status: 400 });
     }
 
@@ -89,8 +89,30 @@ export async function PATCH(
 
       return NextResponse.json({ success: true, action: 'rescheduled' });
     }
+
+    if (action === 'remind') {
+      const officeAddress = [psychologist.office_street, psychologist.office_commune, psychologist.office_city, psychologist.office_suite]
+        .filter(Boolean).join(', ') || null;
+
+      sendReminderEmail({
+        to: patient.email,
+        patientName: patient.name,
+        psychologistName: psychologist.name,
+        psychologistTitle: psychologist.title ?? undefined,
+        psychologistPhotoUrl: psychologist.photo_url ?? undefined,
+        startTime: appointment.start_time,
+        endTime: appointment.end_time,
+        modality: eventType?.mode ?? 'online',
+        videoUrl: psychologist.video_meeting_url,
+        videoType: psychologist.video_meeting_type,
+        officeAddress,
+        serviceName: eventType?.title ?? undefined,
+      }).catch(console.error);
+
+      return NextResponse.json({ success: true, action: 'reminded' });
+    }
   } catch (error: any) {
     console.error('Appointment PATCH error:', error);
-    return NextResponse.json({ error: error?.message || 'Error interno' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Error del servidor' }, { status: 500 });
   }
 }

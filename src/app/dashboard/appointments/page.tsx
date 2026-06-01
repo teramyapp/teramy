@@ -501,10 +501,26 @@ export default function AppointmentsPage() {
     window.open(finalUrl, '_blank');
   };
 
-  const sendEmail = (app: Appointment) => {
-    const subject = encodeURIComponent(`Recordatorio de sesión: ${app.date}`);
-    const body = encodeURIComponent(`Hola ${app.patient},\n\nTe recordamos tu sesión para el día ${app.date} a las ${app.time}.\n\nSaludos,\n${psychologist?.name || 'Teramy'}`);
-    window.location.href = `mailto:${app.email}?subject=${subject}&body=${body}`;
+  const sendEmail = async (app: Appointment) => {
+    if (!app.email) return;
+    if (!app.supabaseId) {
+      const subject = encodeURIComponent(`Recordatorio de sesión: ${app.date}`);
+      const body = encodeURIComponent(`Hola ${app.patient},\n\nTe recordamos tu sesión para el día ${app.date} a las ${app.time}.\n\nSaludos,\n${psychologist?.name || 'Teramy'}`);
+      window.location.href = `mailto:${app.email}?subject=${subject}&body=${body}`;
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/appointments/${app.supabaseId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'remind' })
+      });
+      if (!res.ok) throw new Error('Error al enviar el correo');
+      alert('Correo de recordatorio enviado exitosamente a ' + app.email);
+    } catch (err: any) {
+      alert(err.message || 'Error al enviar el correo de recordatorio');
+    }
   };
 
   const counts = {
