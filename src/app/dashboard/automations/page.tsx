@@ -198,7 +198,7 @@ export default function AutomationsPage() {
     .replace('{{hora}}', '[Hora]')
     .replace('{{modalidad}}', sessionType === 'online' ? 'Online' : 'Presencial')
     .replace('{{detalle}}', sessionType === 'presencial'
-      ? `📍 ${composedAddress || '[Dirección del consultorio]'}`
+      ? `📍 ${composedAddress || '[Ubicación de atención]'}`
       : `💻 ${zoomLink || `[Link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}]`}`
     );
 
@@ -208,7 +208,7 @@ export default function AutomationsPage() {
     .replace('{{hora}}', '[Nueva Hora]')
     .replace('{{modalidad}}', sessionType === 'online' ? 'Online' : 'Presencial')
     .replace('{{detalle}}', sessionType === 'presencial'
-      ? `📍 ${composedAddress || '[Dirección del consultorio]'}`
+      ? `📍 ${composedAddress || '[Ubicación de atención]'}`
       : `💻 ${zoomLink || `[Link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}]`}`
     );
 
@@ -313,7 +313,7 @@ export default function AutomationsPage() {
         <div className="options-grid-3">
           {([
             { value: 'online',    label: 'Online',           sub: 'Videollamada',           icon: <Video size={22} />,  color: '#0369a1', bg: '#e8f4fc', border: '#bae6fd' },
-            { value: 'presencial',label: 'Presencial',        sub: 'En consultorio',          icon: <MapPin size={22} />, color: '#c2410c', bg: '#ffedd5', border: '#fed7aa' },
+            { value: 'presencial',label: 'Presencial',        sub: 'Lugar de atención',          icon: <MapPin size={22} />, color: '#c2410c', bg: '#ffedd5', border: '#fed7aa' },
           ] as const).map(opt => (
             <button
               key={opt.value}
@@ -777,7 +777,7 @@ export default function AutomationsPage() {
               <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', margin: '0 0 0.2rem' }}>Confirmación de sesión</p>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
                 {sessionType === 'presencial'
-                  ? 'Al agendar → el paciente recibe fecha, hora y dirección del consultorio'
+                  ? 'Al agendar → el paciente recibe fecha, hora y ubicación de atención'
                   : `Al agendar → el paciente recibe fecha, hora y el link de ${videoPlatform === 'google_meet' ? 'Google Meet' : 'Zoom'}`}
               </p>
             </div>
