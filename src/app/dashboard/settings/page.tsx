@@ -231,12 +231,20 @@ export default function SettingsPage() {
     const { data: patients } = await supabase.from('patients').select('*').eq('psychologist_id', psychologistId);
     const { data: appointments } = await supabase.from('appointments').select('*').eq('psychologist_id', psychologistId);
 
+    let notes: any[] = [];
+    if (appointments && appointments.length > 0) {
+      const apptIds = appointments.map(a => a.id);
+      const { data } = await supabase.from('notes').select('*').in('appointment_id', apptIds);
+      notes = data || [];
+    }
+
     const exportData = {
       exportedAt: new Date().toISOString(),
       user: { email: userEmail, memberSince },
       subscription: { status: subscriptionStatus, trialEndsAt },
       patients: patients || [],
       appointments: appointments || [],
+      notes: notes,
     };
 
     let blob: Blob; let filename: string;
