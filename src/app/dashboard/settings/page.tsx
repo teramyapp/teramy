@@ -74,11 +74,13 @@ function DangerButton({ onClick, icon, label }: { onClick: () => void; icon: Rea
 }
 
 // ── Confirmation Modal ─────────────────────────────────────────────────────
-function Modal({ title, description, confirmLabel, confirmDanger, onConfirm, onCancel, children }: {
+function Modal({ title, description, confirmLabel, confirmDanger, confirmNeutral, icon, onConfirm, onCancel, children }: {
   title: string;
   description: string;
   confirmLabel: string;
   confirmDanger?: boolean;
+  confirmNeutral?: boolean;
+  icon?: React.ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
   children?: React.ReactNode;
@@ -92,8 +94,8 @@ function Modal({ title, description, confirmLabel, confirmDanger, onConfirm, onC
         boxShadow: '0 24px 64px rgba(0,0,0,0.14)', zIndex: 1001,
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: confirmDanger ? '#fef2f2' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {confirmDanger ? <AlertTriangle size={22} style={{ color: '#ef4444' }} /> : <CheckCircle2 size={22} style={{ color: '#0ea5e9' }} />}
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: confirmDanger ? '#fef2f2' : confirmNeutral ? '#f1f5f9' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {icon ? icon : (confirmDanger ? <AlertTriangle size={22} style={{ color: '#ef4444' }} /> : <CheckCircle2 size={22} style={{ color: '#0ea5e9' }} />)}
           </div>
           <button onClick={onCancel} style={{ color: '#94a3b8', cursor: 'pointer', background: 'none', border: 'none', padding: '0.2rem' }}>
             <X size={20} />
@@ -110,9 +112,9 @@ function Modal({ title, description, confirmLabel, confirmDanger, onConfirm, onC
             onClick={onConfirm}
             style={{
               flex: 1, padding: '0.8rem', borderRadius: '10px', border: 'none',
-              background: confirmDanger ? '#ef4444' : 'linear-gradient(135deg,#0369a1,#0ea5e9)',
+              background: confirmDanger ? '#ef4444' : confirmNeutral ? '#1e293b' : 'linear-gradient(135deg,#0369a1,#0ea5e9)',
               color: 'white', fontWeight: 700, cursor: 'pointer',
-              boxShadow: confirmDanger ? '0 4px 12px rgba(239,68,68,0.3)' : '0 4px 12px rgba(14,165,233,0.3)',
+              boxShadow: confirmDanger ? '0 4px 12px rgba(239,68,68,0.3)' : confirmNeutral ? '0 4px 12px rgba(30,41,59,0.3)' : '0 4px 12px rgba(14,165,233,0.3)',
             }}
           >
             {confirmLabel}
@@ -630,6 +632,8 @@ export default function SettingsPage() {
           title="¿Cerrar sesión?"
           description="Saldrás de tu cuenta en este dispositivo. Puedes volver a ingresar en cualquier momento."
           confirmLabel="Sí, cerrar sesión"
+          confirmNeutral
+          icon={<LogOut size={22} style={{ color: '#475569' }} />}
           onConfirm={handleLogout}
           onCancel={() => setModal(null)}
         />

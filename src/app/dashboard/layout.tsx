@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Calendar, User, Clock, FileText, Home, UserCircle, BarChart2, Zap, Settings2, Menu, X, type LucideIcon } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { Calendar, User, Clock, FileText, Home, UserCircle, BarChart2, Zap, Settings2, Menu, X, LogOut, type LucideIcon } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/utils/supabase';
 import {
   DashboardDataProvider, usePsychologist, useDashboardCache,
@@ -12,6 +12,8 @@ import {
 // ── Inner layout: needs the provider in scope, so lives in a child component ──
 function DashboardChrome({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { psychologist, loading } = usePsychologist();
@@ -28,6 +30,21 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
       });
     }
   }, [loading, psychologist, router]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   const userName     = psychologist?.name ?? '';
   const userTitle    = psychologist?.title ?? 'Psicólogo/a';
@@ -277,38 +294,99 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        <Link
-          href="/dashboard/profile"
-          prefetch={true}
-          onClick={() => setIsMobileMenuOpen(false)}
-          style={{
-            marginTop: 'auto',
-            padding: '1.15rem 1rem',
-            background: 'var(--bg-main)',
-            borderRadius: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            textDecoration: 'none',
-            border: '1px solid var(--border-light)',
-            transition: 'all 0.2s ease',
-            cursor: 'pointer',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = 'var(--primary-blue)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--border-light)'; }}
-        >
-          {userPhoto ? (
-            <img src={userPhoto} alt={userName} style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
-          ) : (
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0, border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-              {userInitials || '?'}
+        <div ref={profileMenuRef} style={{ marginTop: 'auto', position: 'relative' }}>
+          <button
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            style={{
+              width: '100%',
+              padding: '1.15rem 1rem',
+              background: 'var(--bg-main)',
+              borderRadius: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              textAlign: 'left',
+              border: '1px solid var(--border-light)',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = 'var(--primary-blue)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--border-light)'; }}
+          >
+            {userPhoto ? (
+              <img src={userPhoto} alt={userName} style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
+            ) : (
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0, border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                {userInitials || '?'}
+              </div>
+            )}
+            <div style={{ overflow: 'hidden' }}>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-dark)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0 }}>{userName || 'Mi perfil'}</p>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0.1rem 0 0', fontWeight: 500 }}>{userTitle || 'Psicólogo/a'}</p>
+            </div>
+          </button>
+
+          {isProfileMenuOpen && (
+            <div style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: 0,
+              width: '100%',
+              marginBottom: '0.75rem',
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+              border: '1px solid var(--border-light)',
+              overflow: 'hidden',
+              zIndex: 50,
+            }}>
+              <Link
+                href="/dashboard/profile"
+                onClick={() => { setIsProfileMenuOpen(false); setIsMobileMenuOpen(false); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.85rem 1rem',
+                  color: 'var(--text-dark)',
+                  textDecoration: 'none',
+                  fontSize: '0.92rem',
+                  fontWeight: 600,
+                  transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
+              >
+                <UserCircle size={18} />
+                Ver perfil
+              </Link>
+              <button
+                onClick={() => { setIsProfileMenuOpen(false); handleLogout(); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.85rem 1rem',
+                  width: '100%',
+                  textAlign: 'left',
+                  border: 'none',
+                  background: 'white',
+                  color: '#ef4444',
+                  fontSize: '0.92rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  borderTop: '1px solid var(--border-light)',
+                  transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fef2f2'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'white'; }}
+              >
+                <LogOut size={18} />
+                Cerrar sesión
+              </button>
             </div>
           )}
-          <div style={{ overflow: 'hidden' }}>
-            <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-dark)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0 }}>{userName || 'Mi perfil'}</p>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0.1rem 0 0', fontWeight: 500 }}>{userTitle || 'Psicólogo/a'}</p>
-          </div>
-        </Link>
+        </div>
       </aside>
 
       <main className="main-content">
