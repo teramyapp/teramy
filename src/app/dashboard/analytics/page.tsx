@@ -37,11 +37,10 @@ export default function AnalyticsPage() {
         .select('id, start_time, status, patient_id, event_types(title, price)')
         .eq('psychologist_id', psychId!);
 
-      const allPatientIds = (appts ?? []).map((a: any) => a.patient_id).filter(Boolean);
-      const patientIds = allPatientIds.filter((id: string, idx: number) => allPatientIds.indexOf(id) === idx);
-      const { data: patients } = patientIds.length > 0
-        ? await supabase.from('patients').select('id, created_at, status').in('id', patientIds)
-        : { data: [] as { id: string; created_at: string; status: string }[] };
+      const { data: patients } = await supabase
+        .from('patients')
+        .select('id, created_at, status')
+        .eq('psychologist_id', psychId!);
 
       if (!appts || !patients) return empty;
 
