@@ -121,9 +121,9 @@ export default function LoginPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>Contraseña</label>
-                <button type="button" style={{ fontSize: '0.8rem', color: '#0ea5e9', fontWeight: 600, cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
+                <Link href="/forgot-password" style={{ fontSize: '0.8rem', color: '#0ea5e9', fontWeight: 600, textDecoration: 'none' }}>
                   ¿Olvidaste tu contraseña?
-                </button>
+                </Link>
               </div>
               <div style={{ position: 'relative' }}>
                 <input
