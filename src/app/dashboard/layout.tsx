@@ -13,6 +13,7 @@ import {
 function DashboardChrome({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -361,7 +362,7 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
                 Ver perfil
               </Link>
               <button
-                onClick={() => { setIsProfileMenuOpen(false); handleLogout(); }}
+                onClick={() => { setIsProfileMenuOpen(false); setShowLogoutModal(true); }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -394,6 +395,46 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+
+      {showLogoutModal && (
+        <>
+          <div onClick={() => setShowLogoutModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)', zIndex: 1000 }} />
+          <div className="animate-slide-up" style={{
+            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+            background: 'white', borderRadius: '20px', padding: '2.5rem', maxWidth: '440px', width: '90%',
+            boxShadow: '0 24px 64px rgba(0,0,0,0.14)', zIndex: 1001,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LogOut size={22} style={{ color: '#0ea5e9', marginLeft: '3px' }} />
+              </div>
+              <button onClick={() => setShowLogoutModal(false)} style={{ color: '#94a3b8', cursor: 'pointer', background: 'none', border: 'none', padding: '0.2rem' }}>
+                <X size={20} />
+              </button>
+            </div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>¿Cerrar sesión?</h3>
+            <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+              Saldrás de tu cuenta en este dispositivo. Puedes volver a ingresar en cualquier momento.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button onClick={() => setShowLogoutModal(false)} style={{ flex: 1, padding: '0.8rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setShowLogoutModal(false); handleLogout(); }}
+                style={{
+                  flex: 1, padding: '0.8rem', borderRadius: '10px', border: 'none',
+                  background: 'linear-gradient(135deg,#0369a1,#0ea5e9)',
+                  color: 'white', fontWeight: 700, cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(14,165,233,0.3)',
+                }}
+              >
+                Sí, cerrar sesión
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
     </>
   );

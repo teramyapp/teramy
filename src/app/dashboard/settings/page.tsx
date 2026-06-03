@@ -640,8 +640,7 @@ export default function SettingsPage() {
           title="¿Cerrar sesión?"
           description="Saldrás de tu cuenta en este dispositivo. Puedes volver a ingresar en cualquier momento."
           confirmLabel="Sí, cerrar sesión"
-          confirmNeutral
-          icon={<LogOut size={22} style={{ color: '#475569' }} />}
+          icon={<LogOut size={22} style={{ color: '#0ea5e9', marginLeft: '3px' }} />}
           onConfirm={handleLogout}
           onCancel={() => setModal(null)}
         />
