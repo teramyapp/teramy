@@ -365,8 +365,38 @@ export default function SettingsPage() {
       </div>
 
       <div className="settings-grid">
+
+        {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('payment') === 'success' && (
+          <div style={{ 
+            background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)', 
+            border: '1px solid #86efac', 
+            borderRadius: '16px', 
+            padding: '1.25rem 1.75rem', 
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.12)'
+          }}>
+            <div style={{ 
+              width: '44px', height: '44px', borderRadius: '12px', background: 'white', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+            }}>
+              <CheckCircle2 size={24} style={{ color: '#16a34a' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: 800, color: '#14532d', fontSize: '1.05rem', margin: '0 0 0.15rem' }}>
+                ¡Pago completado con éxito! 🎉
+              </p>
+              <p style={{ fontSize: '0.88rem', color: '#166534', margin: 0, fontWeight: 500 }}>
+                Tu suscripción a <strong>Teramy Pro</strong> está activa. Tienes acceso completo e ilimitado a todas las funciones.
+              </p>
+            </div>
+          </div>
+        )}
         
-        {subscriptionStatus === 'trialing' && trialEndsAt && (
+        {subscriptionStatus === 'trialing' && trialEndsAt && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('payment') !== 'success' && (
           <div style={{ 
             background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', 
             border: '1px solid #bae6fd', 

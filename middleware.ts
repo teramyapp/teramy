@@ -66,6 +66,20 @@ export async function middleware(request: NextRequest) {
 
   // ── 3. Determine access ──────────────────────────────────────────────────────
   const trialExpired = trial_ends_at ? new Date(trial_ends_at) < new Date() : false;
+  const isPaymentSuccessReturn = request.nextUrl.searchParams.get('payment') === 'success';
+
+  // If user just returned from a successful MercadoPago checkout, activate/unblock immediately
+  if (isPaymentSuccessReturn && subscription_status !== 'active') {
+    await supabase
+      .from('psychologists')
+      .update({
+        subscription_status: 'active',
+        trial_ends_at: '2099-12-31T23:59:59Z',
+      })
+      .eq('user_id', userId);
+
+    return NextResponse.next();
+  }
 
   const isBlocked =
     subscription_status === 'paused' ||

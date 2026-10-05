@@ -1,0 +1,3591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teramy · Generador de Mockups para Instagram</title>
+  <!-- Outfit Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #0ea5e9;
+      --primary-dark: #0369a1;
+      --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+      --primary-light-blue: #e0f2fe;
+      --primary-dark-blue: #0369a1;
+      --accent-green: #10b981;
+      --accent-soft-green: #ecfdf5;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-light: #e2e8f0;
+      --bg-panel: #1e293b;
+      --bg-canvas-wrapper: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-canvas-wrapper);
+      color: #f8fafc;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── App Header ──────────────────────────────────────── */
+    header {
+      background-color: #0f172a;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fillColor: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .header-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(14, 165, 233, 0.15);
+      color: var(--primary);
+      padding: 0.25rem 0.65rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+
+    /* ── Main Workspace Layout ───────────────────────────── */
+    .workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar: Controls */
+    .sidebar {
+      width: 420px;
+      background-color: var(--bg-panel);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: #111827;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      background: none;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background-color: rgba(14, 165, 233, 0.05);
+    }
+
+    .tab-content {
+      padding: 1.5rem;
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    input, select, textarea {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .color-presets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .color-preset-btn {
+      height: 36px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .color-preset-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .color-preset-btn.active {
+      border-color: #f8fafc;
+      box-shadow: 0 0 8px rgba(255,255,255,0.4);
+    }
+
+    /* Toggle Switches */
+    .switch-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      padding: 0.25rem 0;
+    }
+
+    .switch-control {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch-control input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #475569;
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Export button footer */
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: #111827;
+      margin-top: auto;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .btn-export {
+      width: 100%;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-export:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+    }
+
+    .btn-export:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Right Preview Area */
+    .preview-pane {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(#1e293b 1px, transparent 1px);
+      background-size: 20px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Instagram Canvas Container ───────────────────────── */
+    #canvas-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    #instagram-canvas {
+      position: absolute;
+      transform-origin: center center;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      background-color: #0f172a;
+      transition: width 0.3s, height 0.3s;
+    }
+
+    /* Canvas Size Modes */
+    #instagram-canvas.size-square {
+      width: 1080px;
+      height: 1080px;
+    }
+    #instagram-canvas.size-portrait {
+      width: 1080px;
+      height: 1350px;
+    }
+    #instagram-canvas.size-story {
+      width: 1080px;
+      height: 1920px;
+    }
+
+    /* Background blobs */
+    .canvas-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 1;
+      display: none;
+    }
+
+    .canvas-blob-1 {
+      width: 600px;
+      height: 600px;
+      background-color: #0ea5e9;
+      top: -100px;
+      left: -100px;
+    }
+
+    .canvas-blob-2 {
+      width: 500px;
+      height: 500px;
+      background-color: #10b981;
+      bottom: -100px;
+      right: -100px;
+    }
+
+    .canvas-blob-3 {
+      width: 450px;
+      height: 450px;
+      background-color: #7c3aed;
+      top: 30%;
+      right: -150px;
+    }
+
+    /* Canvas Overlays */
+    .canvas-header-text {
+      position: absolute;
+      top: 80px;
+      width: 900px;
+      text-align: center;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .canvas-header-title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin: 0;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 800px;
+    }
+
+    .canvas-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1.1rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 2rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .canvas-brand-footer {
+      position: absolute;
+      bottom: 60px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 4;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.5rem 1.25rem;
+      border-radius: 2rem;
+    }
+
+    .canvas-brand-footer img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .canvas-brand-footer span {
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.3px;
+    }
+
+    /* ── Device Mockups Containers ──────────────────────── */
+    .device-container {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Macbook Mockup CSS ──────────────────────────────── */
+    .macbook-wrapper {
+      position: relative;
+      width: 820px;
+      margin: 0 auto;
+      transform: translateY(40px);
+      transition: all 0.3s;
+    }
+
+    .macbook-screen {
+      background: #000;
+      border-radius: 20px 20px 0 0;
+      padding: 14px 14px 0 14px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .macbook-camera {
+      width: 8px;
+      height: 8px;
+      background: #111;
+      border-radius: 50%;
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 1px solid #333;
+    }
+
+    .macbook-screen-inner {
+      background: #f4f6f9;
+      aspect-ratio: 16 / 10;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      overflow: hidden;
+      display: flex;
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-dark);
+      position: relative;
+    }
+
+    .macbook-hinge {
+      height: 12px;
+      background: #1e1e1e;
+      border-bottom: 1px solid #111;
+    }
+
+    .macbook-base {
+      height: 12px;
+      background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 100%);
+      border-radius: 0 0 10px 10px;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    .macbook-base::after {
+      content: '';
+      width: 100px;
+      height: 6px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 0 0 4px 4px;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .macbook-bottom {
+      height: 4px;
+      background: #4b5563;
+      width: 98%;
+      margin: 0 auto;
+      border-radius: 0 0 12px 12px;
+    }
+
+    /* ── iPhone Mockup CSS (Premium Polish) ──────────────── */
+    .phone-wrapper {
+      position: relative;
+      width: 310px;
+      margin: 0 auto;
+      transition: all 0.3s;
+    }
+
+    .phone-frame {
+      background: #1a1a2e;
+      border-radius: 36px;
+      padding: 8px;
+      box-shadow: 0 25px 65px -12px rgba(0,0,0,0.55);
+      border: 1px solid #2d2d4a;
+      position: relative;
+    }
+
+    .phone-glass-reflection {
+      display: none;
+    }
+
+    .phone-screen {
+      background: #f4f6f9;
+      border-radius: 24px;
+      overflow: hidden;
+      height: 530px;
+      width: 100%;
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-dark);
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.15);
+      padding-top: 0;
+    }
+
+    .mobile-app-header-bar {
+      background: white;
+      padding: 0.8rem 1rem 0.6rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .mobile-logo-text {
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fillColor: transparent;
+    }
+    .mobile-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #e8f4fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #0ea5e9;
+    }
+    .mobile-date-label {
+      font-size: 0.58rem;
+      color: #94a3b8;
+      font-weight: 600;
+      margin: 0.25rem 0 0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+    }
+
+    .phone-home-indicator {
+      width: 100px;
+      height: 4px;
+      background: #000;
+      opacity: 0.25;
+      border-radius: 2px;
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+    }
+
+    /* ── Dashboard Sidebar (Laptop App) ──────────────────── */
+    .app-sidebar {
+      width: 170px;
+      background: #f8fafc;
+      border-right: 1px solid var(--border-light);
+      padding: 1.25rem 0.65rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .app-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0 0.5rem 1rem 0.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .app-logo img {
+      width: 22px;
+      height: 22px;
+    }
+
+    .app-logo-text {
+      font-weight: 800;
+      font-size: 0.95rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fillColor: transparent;
+    }
+
+    .app-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      margin-top: 0.85rem;
+      flex: 1;
+    }
+
+    .app-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+
+    .app-menu-item.active {
+      background: var(--primary-light-blue);
+      color: var(--primary-dark-blue);
+    }
+
+    .app-menu-item i {
+      width: 13px;
+      height: 13px;
+    }
+
+    .app-sidebar-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .app-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary-light-blue);
+      color: var(--primary-dark-blue);
+      font-weight: 700;
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-username {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+    }
+
+    /* Main View Area Container */
+    .app-main {
+      flex: 1;
+      padding: 1.25rem;
+      background: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow: hidden;
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
+    .app-header-left h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 0.15rem;
+    }
+
+    .app-header-left p {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .app-header-btn {
+      background: var(--primary-gradient);
+      color: white;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      box-shadow: 0 2px 4px rgba(14,165,233,0.2);
+    }
+
+    /* Sub-pages container inside Laptop */
+    .app-view-page {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .app-view-page.active {
+      display: flex;
+    }
+
+    .app-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ── PAGE 1: DASHBOARD (INICIO) ───────────────────────── */
+    .app-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.65rem;
+      flex-shrink: 0;
+    }
+
+    .app-metric-card {
+      background: white;
+      border-radius: 8px;
+      padding: 0.65rem;
+      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-metric-title {
+      font-size: 0.58rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .app-metric-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1;
+    }
+
+    .app-metric-subtext {
+      font-size: 0.52rem;
+      font-weight: 600;
+      color: var(--accent-green);
+      margin-top: 0.25rem;
+    }
+
+    .app-dash-content {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 0.85rem;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .app-next-card {
+      background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
+      color: white;
+      border-radius: 10px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 4px 12px rgba(3, 105, 161, 0.15);
+    }
+
+    .app-next-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-next-time {
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.5rem;
+      border-radius: 1rem;
+      font-size: 0.58rem;
+      font-weight: 700;
+    }
+
+    .app-next-mode {
+      background: rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 0.2rem 0.4rem;
+      border-radius: 1rem;
+      font-size: 0.58rem;
+      font-weight: 600;
+      color: #bae6fd;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .app-next-client {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .app-next-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-next-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .app-next-type {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.8);
+      margin: 0;
+    }
+
+    .app-next-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .app-btn-white {
+      flex: 1;
+      background: white;
+      color: var(--primary-dark);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.35rem;
+      border-radius: 4px;
+      text-align: center;
+      border: none;
+    }
+
+    .app-btn-icon-blur {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-agenda-card {
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .app-agenda-row {
+      display: flex;
+      align-items: center;
+      padding: 0.55rem 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.68rem;
+    }
+
+    .app-agenda-row:last-child {
+      border-bottom: none;
+    }
+
+    .app-agenda-time {
+      width: 40px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .app-agenda-client-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .app-agenda-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      font-size: 0.55rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-agenda-name {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .app-agenda-type {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+    }
+
+    .app-agenda-status {
+      padding: 0.15rem 0.45rem;
+      border-radius: 2rem;
+      font-size: 0.55rem;
+      font-weight: 700;
+    }
+
+    .app-status-confirmed {
+      background: var(--accent-soft-green);
+      color: var(--accent-green);
+    }
+
+    .app-status-pending {
+      background: #fef9ee;
+      color: #d97706;
+    }
+
+    /* Actividad Reciente Desktop styling */
+    .app-activity-card {
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-top: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .app-activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .app-activity-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.65rem;
+      color: var(--text-dark);
+    }
+
+    .app-activity-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      flex-shrink: 0;
+    }
+
+    .icon-blue { background: #e0f2fe; color: #0ea5e9; }
+    .icon-green { background: #ecfdf5; color: #10b981; }
+    .icon-whatsapp { background: #dcfce7; color: #15803d; }
+
+    .app-activity-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      flex: 1;
+    }
+
+    .app-activity-time {
+      font-size: 0.52rem;
+      color: var(--text-muted);
+    }
+
+    /* ── PAGE 2: PACIENTES (CRM TABLE) ────────────────────── */
+    .crm-filters {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+
+    .crm-search {
+      font-size: 0.72rem;
+      padding: 0.35rem 0.75rem;
+      width: 180px;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+
+    .crm-table-container {
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .crm-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.7rem;
+    }
+
+    .crm-table th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.58rem;
+      letter-spacing: 0.05em;
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .crm-table td {
+      padding: 0.55rem 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    .crm-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .crm-patient-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .crm-status-pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2rem;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .status-active { background: #ecfdf5; color: #047857; }
+    .status-paused { background: #f1f5f9; color: #64748b; }
+    .status-completed { background: #e0f2fe; color: #0369a1; }
+
+    /* ── PAGE 3: CALENDARIO (AGENDA GRID) ─────────────────── */
+    .calendar-header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+
+    .calendar-week-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .calendar-day-col {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-height: 0;
+    }
+
+    .calendar-day-title {
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-align: center;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 0.35rem;
+      text-transform: uppercase;
+    }
+
+    .calendar-slot-block {
+      border-radius: 6px;
+      padding: 0.45rem;
+      font-size: 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      border-left: 3px solid transparent;
+    }
+
+    .slot-blue {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-left-color: #0ea5e9;
+    }
+
+    .slot-green {
+      background: #ecfdf5;
+      color: #047857;
+      border-left-color: #10b981;
+    }
+
+    .slot-purple {
+      background: #f5f3ff;
+      color: #5b21b6;
+      border-left-color: #7c3aed;
+    }
+
+    .slot-orange {
+      background: #fff7ed;
+      color: #c2410c;
+      border-left-color: #f97316;
+    }
+
+    .calendar-slot-time {
+      font-weight: 800;
+    }
+
+    .calendar-slot-name {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── PAGE 4: ANALÍTICAS (STUNNING CHARTS) ─────────────── */
+    .analytics-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+      flex-shrink: 0;
+    }
+
+    .analytics-panel-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.95fr 0.95fr;
+      gap: 0.65rem;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .analytics-card {
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Line Chart SVG style */
+    .line-chart-svg {
+      width: 100%;
+      height: 95px;
+      margin-top: 0.85rem;
+    }
+
+    /* Bar Chart CSS */
+    .bar-chart-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 90px;
+      margin-top: 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 0.2rem;
+    }
+
+    .chart-bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 32px;
+      gap: 0.25rem;
+    }
+
+    .chart-bar-pillar {
+      width: 18px;
+      background: var(--primary-gradient);
+      border-radius: 3px 3px 0 0;
+      transition: height 0.5s;
+    }
+
+    .chart-bar-label {
+      font-size: 0.5rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Doughnut Chart CSS */
+    .doughnut-chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      margin: auto 0;
+    }
+
+    .doughnut-circle {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: conic-gradient(#0ea5e9 0% 78%, #10b981 78% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .doughnut-inner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 800;
+    }
+
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.52rem;
+      width: 100%;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-weight: 600;
+    }
+
+    .legend-color {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+    }
+
+    /* ── PAGE 5: AUTOMATIZACIONES ─────────────────────────── */
+    .automations-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .automation-card {
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .automation-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .automation-channel-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2rem;
+      font-size: 0.55rem;
+      font-weight: 700;
+    }
+
+    .channel-whatsapp {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .channel-email {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .automation-template-preview {
+      background: #f8fafc;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 0.65rem;
+      font-family: monospace;
+      font-size: 0.58rem;
+      color: #334155;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      flex: 1;
+    }
+
+    /* ── Mobile UI Content Pages (Polished iOS) ───────────── */
+    .mobile-app-page {
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      height: calc(100% - 40px);
+      overflow-y: auto;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    .mobile-app-page::-webkit-scrollbar {
+      display: none; /* Chrome, Safari and Opera */
+    }
+
+    .mobile-app-page.active {
+      display: flex;
+    }
+
+    /* Mobile Welcome Card */
+    .mobile-welcome-card {
+      background: var(--primary-gradient);
+      color: white;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(14,165,233,0.15);
+      flex-shrink: 0;
+    }
+
+    .mobile-progress-ring {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: conic-gradient(white 0% 66%, rgba(255,255,255,0.2) 66% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-progress-ring-inner {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #0ea5e9; /* matches start gradient */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 800;
+    }
+
+    /* Mobile CRM Page */
+    .mobile-crm-search {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      background: white;
+      flex-shrink: 0;
+    }
+
+    .mobile-patient-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    /* Mobile Calendar Page */
+    .mobile-calendar-days {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .mobile-calendar-day-btn {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 0.35rem 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .mobile-calendar-day-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      font-weight: 700;
+    }
+
+    .mobile-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mobile-timeline-slot {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      padding: 0.55rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .mobile-slot-time {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      width: 40px;
+    }
+
+    .mobile-slot-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.58rem;
+      font-weight: 700;
+    }
+
+    /* Mobile Analytics Page */
+    .mobile-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .mobile-stat-mini {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      padding: 0.55rem;
+    }
+
+    .mobile-stat-lbl {
+      font-size: 0.48rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .mobile-stat-num {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .mobile-progress-card {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      padding: 0.65rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .mobile-progress-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .mobile-progress-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.55rem;
+      font-weight: 700;
+    }
+
+    .mobile-progress-bar-bg {
+      height: 6px;
+      background: #f1f5f9;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mobile-progress-bar-fg {
+      height: 100%;
+      background: var(--primary-gradient);
+      border-radius: 3px;
+    }
+
+    /* ── Mobile View: WhatsApp Chat Mode ──────────────────── */
+    .mobile-wa-chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #e5ddd5;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.04'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8h4v-4h-4v4zm40 40h4v-4h-4v4z'/%3E%3C/g%3E%3C/svg%3E");
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      padding-top: 26px; /* Space for Status Bar */
+      z-index: 12;
+      display: none;
+    }
+
+    .mobile-wa-header {
+      background: #075e54;
+      padding: 0.55rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .mobile-wa-body {
+      flex: 1;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      overflow-y: auto;
+    }
+
+    .mobile-wa-bubble {
+      max-width: 80%;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.65rem;
+      line-height: 1.4;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+
+    .mobile-wa-bubble.sent {
+      align-self: flex-end;
+      background: #dcf8c6;
+      border-radius: 8px 2px 8px 8px;
+    }
+
+    .mobile-wa-bubble.received {
+      align-self: flex-start;
+      background: white;
+      border-radius: 2px 8px 8px 8px;
+    }
+
+    .mobile-wa-footer {
+      background: #f0f0f0;
+      padding: 0.45rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .mobile-wa-input {
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.65rem;
+      border: 1px solid #e0e0e0;
+      color: #334155;
+    }
+
+    /* ── Floating Extra Panels (Layered Mockups) ─────────── */
+    .floating-wa-panel {
+      position: absolute;
+      width: 250px;
+      background: #e5ddd5;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      overflow: hidden;
+      z-index: 5;
+      border: 1px solid rgba(0,0,0,0.15);
+      transition: all 0.3s;
+    }
+
+    .wa-header {
+      background: #075e54;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .wa-header-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #e6e6e6;
+      color: #555;
+      font-weight: 700;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wa-header-info {
+      flex: 1;
+    }
+
+    .wa-header-name {
+      color: white;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .wa-header-sub {
+      color: #9ec8c2;
+      font-size: 0.52rem;
+    }
+
+    .wa-body {
+      padding: 0.65rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      min-height: 180px;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8h4v-4h-4v4zm40 40h4v-4h-4v4z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .wa-bubble {
+      max-width: 85%;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.62rem;
+      line-height: 1.4;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+
+    .wa-bubble.sent {
+      align-self: flex-end;
+      background: #dcf8c6;
+      border-radius: 8px 2px 8px 8px;
+    }
+
+    .wa-bubble.received {
+      align-self: flex-start;
+      background: white;
+      border-radius: 2px 8px 8px 8px;
+    }
+
+    .wa-time {
+      font-size: 0.48rem;
+      color: #888;
+      text-align: right;
+      margin-top: 0.15rem;
+    }
+
+    /* Clinical Note Editor Panel (Floating) */
+    .floating-note-panel {
+      position: absolute;
+      width: 270px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      border: 1px solid var(--border-light);
+      padding: 0.85rem;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      transition: all 0.3s;
+    }
+
+    .note-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 0.45rem;
+    }
+
+    .note-header-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-soft-green);
+      color: var(--accent-green);
+      font-weight: 700;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .note-header-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      flex: 1;
+    }
+
+    .note-header-badge {
+      font-size: 0.52rem;
+      font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      background: #ecfdf5;
+      color: #059669;
+      border-radius: 1rem;
+    }
+
+    .note-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .note-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .note-field-label {
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .note-field-value {
+      font-size: 0.65rem;
+      color: var(--text-dark);
+      line-height: 1.4;
+      background: #f8fafc;
+      border-radius: 4px;
+      padding: 0.3rem 0.45rem;
+      border-left: 2px solid var(--primary);
+    }
+
+    .note-field-textarea {
+      font-size: 0.65rem;
+      line-height: 1.4;
+      background: #f8fafc;
+      border-radius: 4px;
+      padding: 0.35rem 0.45rem;
+      border: 1px dashed var(--border-light);
+      min-height: 50px;
+      color: #334155;
+    }
+
+    .note-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.52rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-light);
+      padding-top: 0.45rem;
+    }
+
+    .note-save-status {
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+
+    /* Template Positions layout configurations inside Canvas */
+    
+    /* Layout: Laptop Only */
+    .layout-laptop #macbook-node {
+      display: block;
+      transform: scale(1.05) translateY(40px);
+    }
+    .layout-laptop #phone-node {
+      display: none;
+    }
+    .layout-laptop #floating-wa-node {
+      display: none;
+    }
+    .layout-laptop #floating-note-node {
+      display: none;
+    }
+
+    /* Layout: Mobile Only */
+    .layout-mobile #macbook-node {
+      display: none;
+    }
+    .layout-mobile #phone-node {
+      display: block;
+      transform: scale(1.25) translateY(10px);
+    }
+    .layout-mobile #floating-wa-node {
+      display: none;
+    }
+    .layout-mobile #floating-note-node {
+      display: none;
+    }
+
+    /* Layout: Overlapping Laptop + Mobile */
+    .layout-both #macbook-node {
+      display: block;
+      transform: scale(0.92) translateX(-40px) translateY(10px);
+    }
+    .layout-both #phone-node {
+      display: block;
+      position: absolute;
+      bottom: 120px;
+      right: 120px;
+      transform: scale(0.85);
+      z-index: 6;
+    }
+    .layout-both #floating-wa-node {
+      display: none;
+    }
+    .layout-both #floating-note-node {
+      display: none;
+    }
+
+    /* Layout: Mobile + WhatsApp Chat preview */
+    .layout-mobile-wa #macbook-node {
+      display: none;
+    }
+    .layout-mobile-wa #phone-node {
+      display: block;
+      transform: scale(1.02) translateX(-95px) translateY(-5px);
+    }
+    .layout-mobile-wa #floating-wa-node {
+      display: none;
+    }
+    .layout-mobile-wa #mobile-whatsapp-app {
+      display: flex; /* Force WhatsApp UI directly on phone! */
+    }
+
+    /* Layout: Laptop + Note Panel */
+    .layout-laptop-note #macbook-node {
+      display: block;
+      transform: scale(0.9) translateX(-90px) translateY(30px);
+    }
+    .layout-laptop-note #phone-node {
+      display: none;
+    }
+    .layout-laptop-note #floating-wa-node {
+      display: none;
+    }
+    .layout-laptop-note #floating-note-node {
+      display: block;
+      position: absolute;
+      top: 400px;
+      right: 100px;
+      transform: scale(1.15);
+      z-index: 6;
+    }
+
+    /* Adjust positions specifically for Story format (9:16) */
+    .size-story.layout-both #macbook-node {
+      transform: scale(0.85) translateX(-30px) translateY(-100px);
+    }
+    .size-story.layout-both #phone-node {
+      bottom: 220px;
+      right: 140px;
+      transform: scale(0.8);
+    }
+
+    .size-story.layout-mobile-wa #phone-node {
+      transform: scale(1.0) translateX(0px) translateY(-140px);
+    }
+
+    .size-story.layout-laptop-note #macbook-node {
+      transform: scale(0.9) translateX(0) translateY(-220px);
+    }
+    .size-story.layout-laptop-note #floating-note-node {
+      top: 960px;
+      left: 50%;
+      transform: translateX(-50%) scale(1.2);
+    }
+
+    .size-story.layout-laptop #macbook-node {
+      transform: scale(1.05) translateY(-50px);
+    }
+    .size-story.layout-mobile #phone-node {
+      transform: scale(1.25) translateY(-50px);
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header>
+    <div class="brand">
+      <img src="fondo blanco.png" alt="Teramy" onerror="this.src='https://raw.githubusercontent.com/GeminiAgent/placeholder/main/logo.png'; this.onerror=null;">
+      <h1>Teramy</h1>
+      <span class="header-tag">Creador de Contenido</span>
+    </div>
+    <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 500;">
+      Prepara tu Instagram con mockups realistas
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="workspace">
+    
+    <!-- Left Sidebar Control Panel -->
+    <aside class="sidebar">
+      
+      <!-- Tabs -->
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" onclick="switchTab('design-tab', this)">DISEÑO & FONDO</button>
+        <button class="tab-btn" onclick="switchTab('data-tab', this)">DATOS DE LA APP</button>
+        <button class="tab-btn" onclick="switchTab('post-tab', this)">TITULARES POST</button>
+      </div>
+
+      <!-- Tab 1: Design & Background -->
+      <div id="design-tab" class="tab-content active">
+        
+        <div class="control-group">
+          <label for="format-select">Formato de Post (Instagram)</label>
+          <select id="format-select" onchange="updateCanvasFormat()">
+            <option value="square" selected>Cuadrado (1:1) - 1080x1080 px</option>
+            <option value="portrait">Retrato (4:5) - 1080x1350 px</option>
+            <option value="story">Historia (9:16) - 1080x1920 px</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="template-select">Estructura del Mockup</label>
+          <select id="template-select" onchange="updateTemplateLayout()">
+            <option value="both" selected>Laptop + Celular (Superpuestos)</option>
+            <option value="laptop">Laptop Sola (Dashboard completo)</option>
+            <option value="mobile">Celular Solo (Vista compacta)</option>
+            <option value="mobile-wa">Celular + Chat de WhatsApp</option>
+            <option value="laptop-note">Laptop + Ficha de Nota Clínica</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="app-page-select" style="color: #38bdf8;">Página de Teramy a Mostrar</label>
+          <select id="app-page-select" onchange="updateAppViewPage()" style="border-color: #0ea5e9; font-weight: 700;">
+            <option value="dashboard" selected>1. Dashboard (Resumen e Inicio)</option>
+            <option value="patients">2. Pacientes (CRM Clínico)</option>
+            <option value="calendar">3. Agenda (Calendario Semanal)</option>
+            <option value="analytics">4. Analíticas (3 Gráficos de Consulta)</option>
+            <option value="automations">5. Automatizaciones (WhatsApp & Email)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Fondo del Canvas</label>
+          <div class="color-presets">
+            <button class="color-preset-btn active" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)" onclick="setBackground('gradient-teramy', this)"></button>
+            <button class="color-preset-btn" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%)" onclick="setBackground('gradient-calm', this)"></button>
+            <button class="color-preset-btn" style="background: linear-gradient(135deg, #ffedd5 0%, #fecdd3 100%)" onclick="setBackground('gradient-sunset', this)"></button>
+            <button class="color-preset-btn" style="background: linear-gradient(135deg, #0f172a 0%, #0d9488 100%)" onclick="setBackground('gradient-forest', this)"></button>
+            <button class="color-preset-btn" style="background: #0f172a" onclick="setBackground('solid-dark', this)"></button>
+          </div>
+          <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
+            <input type="color" id="custom-color-picker" value="#3b82f6" style="width: 42px; height: 32px; padding: 2px; cursor: pointer;" oninput="setCustomBackgroundColor(this.value)">
+            <span style="font-size: 0.8rem; color: #cbd5e1;">Color sólido personalizado</span>
+          </div>
+        </div>
+
+        <div class="control-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+          <label>Decoraciones de Post</label>
+          
+          <label class="switch-label">
+            <span>Blobs de luz de fondo</span>
+            <span class="switch-control">
+              <input type="checkbox" id="toggle-blobs" checked onchange="toggleBackgroundBlobs()">
+              <span class="slider"></span>
+            </span>
+          </label>
+
+          <label class="switch-label">
+            <span>Logo de Teramy en la esquina</span>
+            <span class="switch-control">
+              <input type="checkbox" id="toggle-logo" checked onchange="toggleLogoCorner()">
+              <span class="slider"></span>
+            </span>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Tab 2: Dashboard App Content Data -->
+      <div id="data-tab" class="tab-content">
+        
+        <div class="control-group">
+          <label for="input-psych-name">Nombre Profesional</label>
+          <input type="text" id="input-psych-name" value="Dra. Laura Morales" oninput="updateDashboardText()">
+        </div>
+
+        <div class="input-row">
+          <div class="control-group">
+            <label for="input-stat-sessions">Sesiones Hoy</label>
+            <input type="text" id="input-stat-sessions" value="3" oninput="updateDashboardText()">
+          </div>
+          <div class="control-group">
+            <label for="input-stat-patients">Pacientes Totales</label>
+            <input type="text" id="input-stat-patients" value="48" oninput="updateDashboardText()">
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="control-group">
+            <label for="input-stat-revenue">Ingresos (Semana)</label>
+            <input type="text" id="input-stat-revenue" value="$125K" oninput="updateDashboardText()">
+          </div>
+          <div class="control-group">
+            <label for="input-stat-hours">Horas Semanales</label>
+            <input type="text" id="input-stat-hours" value="7h 20m" oninput="updateDashboardText()">
+          </div>
+        </div>
+
+        <div class="control-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+          <label style="color: var(--primary);">Paciente Destacado (Fila 1)</label>
+        </div>
+
+        <div class="control-group">
+          <label for="input-client-name">Nombre Paciente</label>
+          <input type="text" id="input-client-name" value="Carlos Ramírez" oninput="updateDashboardText()">
+        </div>
+
+        <div class="input-row">
+          <div class="control-group">
+            <label for="input-client-time">Hora Sesión</label>
+            <input type="text" id="input-client-time" value="10:00" oninput="updateDashboardText()">
+          </div>
+          <div class="control-group">
+            <label for="input-client-type">Tipo de Terapia</label>
+            <input type="text" id="input-client-type" value="Psicoterapia Individual" oninput="updateDashboardText()">
+          </div>
+        </div>
+
+        <div class="control-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+          <label style="color: #10b981;">WhatsApp Recordatorio Flotante</label>
+        </div>
+
+        <div class="control-group">
+          <label for="input-wa-text">Mensaje en Chat</label>
+          <textarea id="input-wa-text" oninput="updateDashboardText()">¡Hola Carlos! 👋 Te recuerdo que tienes sesión hoy a las 10:00. Modalidad Online. ¡Nos vemos! 💙</textarea>
+        </div>
+
+        <div class="control-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+          <label style="color: #7c3aed;">Nota Clínica Flotante</label>
+        </div>
+
+        <div class="control-group">
+          <label for="input-note-topic">Motivo / Tema</label>
+          <input type="text" id="input-note-topic" value="Técnicas de reestructuración cognitiva y manejo de ansiedad" oninput="updateDashboardText()">
+        </div>
+        
+        <div class="control-group">
+          <label for="input-note-body">Evolución Clínica</label>
+          <textarea id="input-note-body" oninput="updateDashboardText()">El paciente presenta avances significativos en identificar sus pensamientos automáticos de frustración laboral. Se ejercita respiración diafragmática para momentos de crisis.</textarea>
+        </div>
+
+      </div>
+
+      <!-- Tab 3: Post Titles on Canvas -->
+      <div id="post-tab" class="tab-content">
+        
+        <label class="switch-label">
+          <span>Mostrar Título en Canvas</span>
+          <span class="switch-control">
+            <input type="checkbox" id="toggle-title" checked onchange="togglePostTitle()">
+            <span class="slider"></span>
+          </span>
+        </label>
+
+        <div class="control-group">
+          <label for="input-post-title">Texto del Titular</label>
+          <textarea id="input-post-title" style="min-height: 100px;" oninput="updatePostTitleText()">Todo lo de tu consulta,&#10;en un solo lugar.</textarea>
+          <span style="font-size: 0.75rem; color: #94a3b8;">Usa salto de línea para separar las frases del titular.</span>
+        </div>
+
+        <div class="control-group">
+          <label for="input-post-badge">Texto del Badge Superior</label>
+          <input type="text" id="input-post-badge" value="⚡ Software para psicólogos" oninput="updatePostTitleText()">
+        </div>
+
+        <div class="control-group">
+          <label for="title-color-select">Color del Texto del Titular</label>
+          <select id="title-color-select" onchange="updatePostTitleColor()">
+            <option value="white" selected>Blanco Brillante</option>
+            <option value="dark">Slate Oscuro (#0f172a)</option>
+            <option value="primary">Azul Teramy (#0ea5e9)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Export Footer -->
+      <div class="sidebar-footer">
+        <button class="btn-export" id="export-btn" onclick="exportMockup()">
+          <i data-lucide="download"></i>
+          Exportar para Instagram
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Right Preview Area -->
+    <main class="preview-pane">
+      <div id="canvas-wrapper">
+        
+        <!-- Instagram Canvas (Exported element) -->
+        <div id="instagram-canvas" class="size-square layout-both" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+          
+          <!-- Background Blobs -->
+          <div class="canvas-blob canvas-blob-1" style="display: block;"></div>
+          <div class="canvas-blob canvas-blob-2" style="display: block;"></div>
+          <div class="canvas-blob canvas-blob-3" style="display: block;"></div>
+
+          <!-- Header Titles overlay -->
+          <div class="canvas-header-text" id="canvas-header-node">
+            <span class="canvas-header-badge" id="canvas-badge-text">⚡ Software para psicólogos</span>
+            <h2 class="canvas-header-title" id="canvas-title-text" style="color: white;">Todo lo de tu consulta,<br>en un solo lugar.</h2>
+          </div>
+
+          <!-- Devices Render Container -->
+          <div class="device-container">
+            
+            <!-- MacBook Pro Screen Mockup -->
+            <div class="macbook-wrapper" id="macbook-node">
+              <div class="macbook-screen">
+                <div class="macbook-camera"></div>
+                <div class="macbook-screen-inner">
+                  
+                  <!-- Inside: Teramy Laptop Dashboard -->
+                  <!-- Sidebar -->
+                  <div class="app-sidebar">
+                    <div>
+                      <div class="app-logo">
+                        <img src="fondo blanco.png" alt="" onerror="this.src='https://raw.githubusercontent.com/GeminiAgent/placeholder/main/logo.png'; this.onerror=null;">
+                        <span class="app-logo-text">Teramy</span>
+                      </div>
+                      <div class="app-menu">
+                        <div class="app-menu-item active" id="sidebar-item-dashboard">
+                          <i data-lucide="layout-dashboard"></i> Dashboard
+                        </div>
+                        <div class="app-menu-item" id="sidebar-item-patients">
+                          <i data-lucide="users"></i> Pacientes
+                        </div>
+                        <div class="app-menu-item" id="sidebar-item-calendar">
+                          <i data-lucide="calendar"></i> Sesiones
+                        </div>
+                        <div class="app-menu-item" id="sidebar-item-analytics">
+                          <i data-lucide="bar-chart-3"></i> Analíticas
+                        </div>
+                        <div class="app-menu-item" id="sidebar-item-automations">
+                          <i data-lucide="message-square"></i> Automatizaciones
+                        </div>
+                        <div class="app-menu-item">
+                          <i data-lucide="clock"></i> Disponibilidad
+                        </div>
+                        <div class="app-menu-item">
+                          <i data-lucide="activity"></i> Servicios
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="app-sidebar-footer">
+                      <div class="app-avatar" id="app-avatar-initials">LM</div>
+                      <div class="app-username" id="app-user-node">Dra. Laura Morales</div>
+                    </div>
+                  </div>
+
+                  <!-- Main Panel Content -->
+                  <div class="app-main">
+                    
+                    <!-- App View Sub-Pages -->
+                    
+                    <!-- PAGE 1: DASHBOARD VIEW -->
+                    <div class="app-view-page active" id="view-dashboard">
+                      <div class="app-header">
+                        <div class="app-header-left">
+                          <h3 class="app-greeting-node-class" id="app-greeting-node">Hola, Dra. Laura Morales</h3>
+                          <p>Miércoles, 3 de junio · <span class="app-today-count-node-class" id="app-today-count-node">3</span> sesiones hoy</p>
+                        </div>
+                        <button class="app-header-btn">
+                          <i data-lucide="plus" style="width:12px;height:12px;"></i> Nueva Sesión
+                        </button>
+                      </div>
+
+                      <!-- Metrics -->
+                      <div class="app-metrics">
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Sesiones hoy</span>
+                          <span class="app-metric-value" id="app-val-sessions">3</span>
+                          <span class="app-metric-subtext">Hoy</span>
+                        </div>
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Pacientes</span>
+                          <span class="app-metric-value" id="app-val-patients">48</span>
+                          <span class="app-metric-subtext">Activos</span>
+                        </div>
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Ingresos</span>
+                          <span class="app-metric-value" id="app-val-revenue">$125K</span>
+                          <span class="app-metric-subtext">Semana</span>
+                        </div>
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Horas</span>
+                          <span class="app-metric-value" id="app-val-hours">7h 20m</span>
+                          <span class="app-metric-subtext">En sesión</span>
+                        </div>
+                      </div>
+
+                      <!-- Dashboard Bottom Columns -->
+                      <div class="app-dash-content">
+                        
+                        <!-- Left Column: Highlight next + Actividad Reciente -->
+                        <div style="display:flex; flex-direction:column; gap:0.5rem; justify-content:space-between; min-height:0;">
+                          <div style="flex:1;">
+                            <div class="app-section-title">Próxima Sesión</div>
+                            <div class="app-next-card">
+                              <div class="app-next-meta">
+                                <span class="app-next-time" id="app-next-time-node">10:00</span>
+                                <span class="app-next-mode"><i data-lucide="video" style="width:10px;height:10px;"></i> Online</span>
+                              </div>
+                              <div class="app-next-client">
+                                <div class="app-next-avatar" id="app-next-initials">CR</div>
+                                <div>
+                                  <h4 class="app-next-name" id="app-next-name-node">Carlos Ramírez</h4>
+                                  <p class="app-next-type" id="app-next-type-node">Psicoterapia Individual</p>
+                                </div>
+                              </div>
+                              <div class="app-next-actions">
+                                <button class="app-btn-white">Unirse a Meet</button>
+                                <button class="app-btn-icon-blur"><i data-lucide="file-text" style="width:12px;height:12px;"></i></button>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Actividad Reciente Card (Desktop) -->
+                          <div class="app-activity-card">
+                            <span class="app-section-title" style="margin-bottom:0.25rem;">Actividad Reciente</span>
+                            <div class="app-activity-list">
+                              <div class="app-activity-item">
+                                <div class="app-activity-icon icon-blue"><i data-lucide="plus-circle" style="width:10px;height:10px"></i></div>
+                                <div class="app-activity-details">
+                                  <span><strong id="act-name-1">Carlos Ramírez</strong> agendó por Portal de Pacientes</span>
+                                  <span class="app-activity-time">Hace 12 min</span>
+                                </div>
+                              </div>
+                              <div class="app-activity-item">
+                                <div class="app-activity-icon icon-green"><i data-lucide="check-circle" style="width:10px;height:10px"></i></div>
+                                <div class="app-activity-details">
+                                  <span>Ficha clínica de evolución guardada · Ana Silva</span>
+                                  <span class="app-activity-time">Hace 2 horas</span>
+                                </div>
+                              </div>
+                              <div class="app-activity-item">
+                                <div class="app-activity-icon icon-whatsapp"><i data-lucide="message-circle" style="width:10px;height:10px"></i></div>
+                                <div class="app-activity-details">
+                                  <span>Recordatorio automático enviado a Miguel Torres</span>
+                                  <span class="app-activity-time">Hace 4 horas</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Right Column: Today's list -->
+                        <div style="display: flex; flex-direction: column; min-height: 0;">
+                          <div class="app-section-title">
+                            <span>Agenda del día</span>
+                            <span style="font-size:0.6rem; color:var(--primary); font-weight:700;">Ver todo</span>
+                          </div>
+                          <div class="app-agenda-card">
+                            <!-- Row 1 -->
+                            <div class="app-agenda-row" style="background: rgba(14,165,233,0.03);">
+                              <span class="app-agenda-time" id="agenda-time-1">10:00</span>
+                              <div class="app-agenda-client-info">
+                                <div class="app-agenda-avatar" style="background:#e0f2fe; color:#0369a1;" id="agenda-avatar-1">CR</div>
+                                <div>
+                                  <span class="app-agenda-name" id="agenda-name-1">Carlos Ramírez</span>
+                                  <span class="app-agenda-type" id="agenda-type-1">Psicoterapia</span>
+                                </div>
+                              </div>
+                              <span class="app-agenda-status app-status-confirmed">Confirmado</span>
+                            </div>
+                            <!-- Row 2 -->
+                            <div class="app-agenda-row">
+                              <span class="app-agenda-time">12:30</span>
+                              <div class="app-agenda-client-info">
+                                <div class="app-agenda-avatar" style="background:#f5f3ff; color:#5b21b6;">AS</div>
+                                <div>
+                                  <span class="app-agenda-name">Ana Silva</span>
+                                  <span class="app-agenda-type">Terapia Pareja</span>
+                                </div>
+                              </div>
+                              <span class="app-agenda-status app-status-confirmed">Confirmado</span>
+                            </div>
+                            <!-- Row 3 -->
+                            <div class="app-agenda-row">
+                              <span class="app-agenda-time">16:00</span>
+                              <div class="app-agenda-client-info">
+                                <div class="app-agenda-avatar" style="background:#fff7ed; color:#c2410c;">MT</div>
+                                <div>
+                                  <span class="app-agenda-name">Miguel Torres</span>
+                                  <span class="app-agenda-type">Evaluación</span>
+                                </div>
+                              </div>
+                              <span class="app-agenda-status app-status-pending">Pendiente</span>
+                            </div>
+                            <!-- Row 4 -->
+                            <div class="app-agenda-row">
+                              <span class="app-agenda-time">17:30</span>
+                              <div class="app-agenda-client-info">
+                                <div class="app-agenda-avatar" style="background:#ecfdf5; color:#047857;">MG</div>
+                                <div>
+                                  <span class="app-agenda-name">María Gómez</span>
+                                  <span class="app-agenda-type">Psicoterapia</span>
+                                </div>
+                              </div>
+                              <span class="app-agenda-status app-status-confirmed">Confirmado</span>
+                            </div>
+                            <!-- Row 5 -->
+                            <div class="app-agenda-row">
+                              <span class="app-agenda-time">19:00</span>
+                              <div class="app-agenda-client-info">
+                                <div class="app-agenda-avatar" style="background:#fef2f2; color:#b91c1c;">JV</div>
+                                <div>
+                                  <span class="app-agenda-name">Jorge Valdivia</span>
+                                  <span class="app-agenda-type">Terapia Pareja</span>
+                                </div>
+                              </div>
+                              <span class="app-agenda-status app-status-pending">Pendiente</span>
+                            </div>
+                            <!-- Row 6 -->
+                            <div class="app-agenda-row">
+                              <span class="app-agenda-time">20:15</span>
+                              <div class="app-agenda-client-info">
+                                <div class="app-agenda-avatar" style="background:#f5f3ff; color:#5b21b6;">SC</div>
+                                <div>
+                                  <span class="app-agenda-name">Sofía Castro</span>
+                                  <span class="app-agenda-type">Psicoterapia</span>
+                                </div>
+                              </div>
+                              <span class="app-agenda-status app-status-confirmed">Confirmado</span>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <!-- PAGE 2: PACIENTES VIEW (CRM) -->
+                    <div class="app-view-page" id="view-patients">
+                      <div class="app-header">
+                        <div class="app-header-left">
+                          <h3>Pacientes & CRM Clínico</h3>
+                          <p>Historial y registro digital de tus pacientes</p>
+                        </div>
+                        <button class="app-header-btn">
+                          <i data-lucide="plus" style="width:12px;height:12px;"></i> Nuevo Paciente
+                        </button>
+                      </div>
+
+                      <div class="crm-filters">
+                        <input type="text" class="crm-search" placeholder="🔍 Buscar por nombre o email...">
+                        <div style="display:flex; gap:0.4rem; font-size:0.65rem;">
+                          <span style="padding:0.25rem 0.5rem; background:#f1f5f9; border-radius:4px; font-weight:600; color:var(--text-dark);">Todos (48)</span>
+                          <span style="padding:0.25rem 0.5rem; border-radius:4px; color:var(--text-muted);">En proceso (36)</span>
+                          <span style="padding:0.25rem 0.5rem; border-radius:4px; color:var(--text-muted);">De alta (12)</span>
+                        </div>
+                      </div>
+
+                      <div class="crm-table-container">
+                        <table class="crm-table">
+                          <thead>
+                            <tr>
+                              <th>Paciente</th>
+                              <th>Contacto</th>
+                              <th>Estado</th>
+                              <th>Próxima Sesión</th>
+                              <th style="text-align:right">Historial</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="crm-patient-cell">
+                                  <div class="app-agenda-avatar" style="background:#e0f2fe; color:#0369a1;" id="crm-avatar-1">CR</div>
+                                  <div>
+                                    <strong id="crm-name-1" style="color:var(--text-dark);">Carlos Ramírez</strong>
+                                    <p style="font-size:0.55rem; color:var(--text-muted);">ID: 10492-A</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p style="color:var(--text-dark);">carlos.ramirez@email.com</p>
+                                <p style="font-size:0.55rem; color:var(--text-muted);">+56 9 8765 4321</p>
+                              </td>
+                              <td><span class="crm-status-pill status-active">En Proceso</span></td>
+                              <td><strong id="crm-time-1">Hoy, 10:00 hrs</strong></td>
+                              <td style="text-align:right"><button style="background:var(--primary-light-blue); color:var(--primary-dark); font-weight:700; border-radius:4px; padding:0.2rem 0.4rem; font-size:0.58rem; border:none; cursor:pointer;">Ver ficha</button></td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="crm-patient-cell">
+                                  <div class="app-agenda-avatar" style="background:#ecfdf5; color:#047857;">MG</div>
+                                  <div>
+                                    <strong style="color:var(--text-dark);">María Gómez</strong>
+                                    <p style="font-size:0.55rem; color:var(--text-muted);">ID: 10243-B</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p style="color:var(--text-dark);">maria.gomez@email.com</p>
+                                <p style="font-size:0.55rem; color:var(--text-muted);">+56 9 1234 5678</p>
+                              </td>
+                              <td><span class="crm-status-pill status-active">En Proceso</span></td>
+                              <td><strong>Jueves 4, 15:00 hrs</strong></td>
+                              <td style="text-align:right"><button style="background:var(--primary-light-blue); color:var(--primary-dark); font-weight:700; border-radius:4px; padding:0.2rem 0.4rem; font-size:0.58rem; border:none; cursor:pointer;">Ver ficha</button></td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="crm-patient-cell">
+                                  <div class="app-agenda-avatar" style="background:#f5f3ff; color:#5b21b6;">AS</div>
+                                  <div>
+                                    <strong style="color:var(--text-dark);">Ana Silva</strong>
+                                    <p style="font-size:0.55rem; color:var(--text-muted);">ID: 10834-C</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p style="color:var(--text-dark);">ana.silva@email.com</p>
+                                <p style="font-size:0.55rem; color:var(--text-muted);">+56 9 4444 5555</p>
+                              </td>
+                              <td><span class="crm-status-pill status-active">En Proceso</span></td>
+                              <td><strong>Hoy, 12:30 hrs</strong></td>
+                              <td style="text-align:right"><button style="background:var(--primary-light-blue); color:var(--primary-dark); font-weight:700; border-radius:4px; padding:0.2rem 0.4rem; font-size:0.58rem; border:none; cursor:pointer;">Ver ficha</button></td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="crm-patient-cell">
+                                  <div class="app-agenda-avatar" style="background:#fff7ed; color:#c2410c;">MT</div>
+                                  <div>
+                                    <strong style="color:var(--text-dark);">Miguel Torres</strong>
+                                    <p style="font-size:0.55rem; color:var(--text-muted);">ID: 10923-D</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p style="color:var(--text-dark);">miguel.torres@email.com</p>
+                                <p style="font-size:0.55rem; color:var(--text-muted);">+56 9 2222 3333</p>
+                              </td>
+                              <td><span class="crm-status-pill status-paused">En Pausa</span></td>
+                              <td><strong>Hoy, 16:00 hrs</strong></td>
+                              <td style="text-align:right"><button style="background:var(--primary-light-blue); color:var(--primary-dark); font-weight:700; border-radius:4px; padding:0.2rem 0.4rem; font-size:0.58rem; border:none; cursor:pointer;">Ver ficha</button></td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="crm-patient-cell">
+                                  <div class="app-agenda-avatar" style="background:#fef2f2; color:#b91c1c;">SC</div>
+                                  <div>
+                                    <strong style="color:var(--text-dark);">Sofía Castro</strong>
+                                    <p style="font-size:0.55rem; color:var(--text-muted);">ID: 10122-E</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p style="color:var(--text-dark);">sofia.castro@email.com</p>
+                                <p style="font-size:0.55rem; color:var(--text-muted);">+56 9 9999 8888</p>
+                              </td>
+                              <td><span class="crm-status-pill status-completed">De Alta</span></td>
+                              <td><span style="color:var(--text-muted);">Sin agendar</span></td>
+                              <td style="text-align:right"><button style="background:var(--primary-light-blue); color:var(--primary-dark); font-weight:700; border-radius:4px; padding:0.2rem 0.4rem; font-size:0.58rem; border:none; cursor:pointer;">Ver ficha</button></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- PAGE 3: CALENDARIO VIEW (SESIONES GRID) -->
+                    <div class="app-view-page" id="view-calendar">
+                      <div class="app-header">
+                        <div class="app-header-left">
+                          <h3>Calendario Semanal</h3>
+                          <p>Gestión de disponibilidad y reservas del mes</p>
+                        </div>
+                        <button class="app-header-btn">
+                          <i data-lucide="calendar" style="width:12px;height:12px;"></i> Agendar Manual
+                        </button>
+                      </div>
+
+                      <div class="calendar-header-actions">
+                        <div class="calendar-week-nav">
+                          <i data-lucide="chevron-left" style="width:14px;height:14px;cursor:pointer;"></i>
+                          <span>1 de Junio - 5 de Junio, 2026</span>
+                          <i data-lucide="chevron-right" style="width:14px;height:14px;cursor:pointer;"></i>
+                        </div>
+                        <div style="font-size:0.65rem; color:var(--text-muted); font-weight:600;">
+                          <span style="background:#e0f2fe; padding:0.15rem 0.35rem; border-radius:3px; color:#0369a1; margin-right:0.3rem;">Individual</span>
+                          <span style="background:#ecfdf5; padding:0.15rem 0.35rem; border-radius:3px; color:#047857;">Pareja</span>
+                        </div>
+                      </div>
+
+                      <div class="calendar-grid">
+                        <!-- Monday -->
+                        <div class="calendar-day-col">
+                          <div class="calendar-day-title">Lun 1</div>
+                          <div class="calendar-slot-block slot-blue">
+                            <span class="calendar-slot-time">10:00 - 10:50</span>
+                            <span class="calendar-slot-name">Carlos Ramírez</span>
+                          </div>
+                          <div class="calendar-slot-block slot-green">
+                            <span class="calendar-slot-time">15:00 - 15:50</span>
+                            <span class="calendar-slot-name">María Gómez</span>
+                          </div>
+                        </div>
+
+                        <!-- Tuesday -->
+                        <div class="calendar-day-col">
+                          <div class="calendar-day-title">Mar 2</div>
+                          <div class="calendar-slot-block slot-purple">
+                            <span class="calendar-slot-time">11:00 - 11:50</span>
+                            <span class="calendar-slot-name">Sofía Castro</span>
+                          </div>
+                          <div class="calendar-slot-block slot-blue">
+                            <span class="calendar-slot-time">16:30 - 17:20</span>
+                            <span class="calendar-slot-name">Jorge Valdivia</span>
+                          </div>
+                        </div>
+
+                        <!-- Wednesday -->
+                        <div class="calendar-day-col" style="background: rgba(14,165,233,0.02); border-color:#bae6fd;">
+                          <div class="calendar-day-title" style="color:var(--primary); font-weight:800;">Mié 3 (Hoy)</div>
+                          <div class="calendar-slot-block slot-blue">
+                            <span class="calendar-slot-time" id="cal-time-1">10:00 - 10:50</span>
+                            <span class="calendar-slot-name" id="cal-name-1">Carlos Ramírez</span>
+                          </div>
+                          <div class="calendar-slot-block slot-orange">
+                            <span class="calendar-slot-time">12:30 - 13:20</span>
+                            <span class="calendar-slot-name">Ana Silva</span>
+                          </div>
+                          <div class="calendar-slot-block slot-green">
+                            <span class="calendar-slot-time">16:00 - 16:50</span>
+                            <span class="calendar-slot-name">Miguel Torres</span>
+                          </div>
+                        </div>
+
+                        <!-- Thursday -->
+                        <div class="calendar-day-col">
+                          <div class="calendar-day-title">Jue 4</div>
+                          <div class="calendar-slot-block slot-green">
+                            <span class="calendar-slot-time">15:00 - 15:50</span>
+                            <span class="calendar-slot-name">María Gómez</span>
+                          </div>
+                        </div>
+
+                        <!-- Friday -->
+                        <div class="calendar-day-col">
+                          <div class="calendar-day-title">Vie 5</div>
+                          <div class="calendar-slot-block slot-purple">
+                            <span class="calendar-slot-time">11:00 - 11:50</span>
+                            <span class="calendar-slot-name">Sofía Castro</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- PAGE 4: ANALÍTICAS VIEW (STUNNING TRIPLE PANEL) -->
+                    <div class="app-view-page" id="view-analytics">
+                      <div class="app-header">
+                        <div class="app-header-left">
+                          <h3>Analíticas de la Consulta</h3>
+                          <p>Estadísticas de ingresos, asistencia y modalidades de atención</p>
+                        </div>
+                        <button class="app-header-btn">
+                          <i data-lucide="trending-up" style="width:12px;height:12px;"></i> Descargar Reporte
+                        </button>
+                      </div>
+
+                      <!-- Analytics metrics row -->
+                      <div class="analytics-summary-cards">
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Recaudado este mes</span>
+                          <span class="app-metric-value" style="color:var(--primary-dark-blue);">$1.250.000</span>
+                          <span class="app-metric-subtext" style="color:var(--primary);">32 sesiones completadas</span>
+                        </div>
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Tasa Asistencia</span>
+                          <span class="app-metric-value" style="color:#047857;">97.4%</span>
+                          <span class="app-metric-subtext" style="color:#059669;">Solo 1 inasistencia</span>
+                        </div>
+                        <div class="app-metric-card">
+                          <span class="app-metric-title">Nuevos Pacientes</span>
+                          <span class="app-metric-value" style="color:#b45309;">+6</span>
+                          <span class="app-metric-subtext" style="color:#d97706;">Este mes</span>
+                        </div>
+                      </div>
+
+                      <!-- Visual Analytics row (3 Columns) -->
+                      <div class="analytics-panel-grid">
+                        
+                        <!-- 1. Revenue line chart (SVG Spline) -->
+                        <div class="analytics-card">
+                          <span class="app-section-title">Evolución de Ingresos</span>
+                          <svg viewBox="0 0 240 100" class="line-chart-svg">
+                            <defs>
+                              <linearGradient id="line-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.35"/>
+                                <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.0"/>
+                              </linearGradient>
+                            </defs>
+                            <!-- Grid lines -->
+                            <line x1="0" y1="20" x2="240" y2="20" stroke="#f1f5f9" stroke-width="1" />
+                            <line x1="0" y1="50" x2="240" y2="50" stroke="#f1f5f9" stroke-width="1" />
+                            <line x1="0" y1="80" x2="240" y2="80" stroke="#f1f5f9" stroke-width="1" />
+                            <!-- Area under path -->
+                            <path d="M 0 85 C 40 80, 80 55, 120 62 C 160 70, 200 25, 240 15 L 240 100 L 0 100 Z" fill="url(#line-chart-grad)" />
+                            <!-- Curve -->
+                            <path d="M 0 85 C 40 80, 80 55, 120 62 C 160 70, 200 25, 240 15" fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round" />
+                            <!-- Node Dots -->
+                            <circle cx="120" cy="62" r="3.5" fill="#0ea5e9" stroke="white" stroke-width="1" />
+                            <circle cx="240" cy="15" r="3.5" fill="#0ea5e9" stroke="white" stroke-width="1" />
+                            <!-- Month text labels -->
+                            <text x="5" y="96" fill="#94a3b8" font-size="6.5" font-family="Outfit" font-weight="600">Mar</text>
+                            <text x="110" y="96" fill="#94a3b8" font-size="6.5" font-family="Outfit" font-weight="600">Abr</text>
+                            <text x="215" y="96" fill="#0369a1" font-size="6.5" font-family="Outfit" font-weight="700">Mayo</text>
+                          </svg>
+                        </div>
+
+                        <!-- 2. Session Load bar chart -->
+                        <div class="analytics-card">
+                          <span class="app-section-title">Sesiones por Semana</span>
+                          <div class="bar-chart-container">
+                            <div class="chart-bar-col">
+                              <span style="font-size:0.5rem;font-weight:700;">8</span>
+                              <div class="chart-bar-pillar" style="height: 48px;"></div>
+                              <span class="chart-bar-label">Sem 1</span>
+                            </div>
+                            <div class="chart-bar-col">
+                              <span style="font-size:0.5rem;font-weight:700;">6</span>
+                              <div class="chart-bar-pillar" style="height: 36px;"></div>
+                              <span class="chart-bar-label">Sem 2</span>
+                            </div>
+                            <div class="chart-bar-col">
+                              <span style="font-size:0.5rem;font-weight:700;">11</span>
+                              <div class="chart-bar-pillar" style="height: 66px; background:linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);"></div>
+                              <span class="chart-bar-label" style="color:var(--text-dark); font-weight:700;">Sem 3</span>
+                            </div>
+                            <div class="chart-bar-col">
+                              <span style="font-size:0.5rem;font-weight:700;">9</span>
+                              <div class="chart-bar-pillar" style="height: 54px;"></div>
+                              <span class="chart-bar-label">Sem 4</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 3. Doughnut Modalidades -->
+                        <div class="analytics-card">
+                          <span class="app-section-title">Modalidad de Atención</span>
+                          <div class="doughnut-chart-container">
+                            <div class="doughnut-circle">
+                              <div class="doughnut-inner">
+                                <span style="font-size:0.75rem; font-weight:800;">78%</span>
+                                <span style="font-size:0.42rem;color:var(--text-muted);font-weight:600;">Online</span>
+                              </div>
+                            </div>
+                            <div class="chart-legend">
+                              <div class="legend-item">
+                                <div class="legend-color" style="background:#0ea5e9"></div>
+                                <span>Online (78%)</span>
+                              </div>
+                              <div class="legend-item">
+                                <div class="legend-color" style="background:#10b981"></div>
+                                <span>Pres. (22%)</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <!-- PAGE 5: AUTOMATIZACIONES VIEW -->
+                    <div class="app-view-page" id="view-automations">
+                      <div class="app-header">
+                        <div class="app-header-left">
+                          <h3>Automatizaciones de Comunicación</h3>
+                          <p>Recordatorios automáticos por WhatsApp y correo electrónico</p>
+                        </div>
+                        <div class="crm-status-pill status-active" style="padding:0.25rem 0.6rem; font-size:0.65rem;">
+                          ⚡ Activo
+                        </div>
+                      </div>
+
+                      <div class="automations-grid">
+                        <div class="automation-card">
+                          <div class="automation-badge-row">
+                            <span class="app-section-title" style="margin-bottom:0;">Recordatorio WhatsApp</span>
+                            <span class="automation-channel-badge channel-whatsapp">
+                              <i data-lucide="message-square" style="width:10px;height:10px"></i> WhatsApp
+                            </span>
+                          </div>
+                          <p style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Se genera automáticamente con los datos de la sesión para que lo envíes en un clic:</p>
+                          <div class="automation-template-preview" id="automation-wa-preview-node">
+¡Hola {{nombre}}! 👋
+Te recuerdo que tienes sesión hoy a las *{{hora}}*.
+💻 Modalidad: {{modalidad}}
+
+¡Nos vemos! 💙
+                          </div>
+                        </div>
+
+                        <div class="automation-card">
+                          <div class="automation-badge-row">
+                            <span class="app-section-title" style="margin-bottom:0;">Confirmación por Email</span>
+                            <span class="automation-channel-badge channel-email">
+                              <i data-lucide="mail" style="width:10px;height:10px"></i> Correo
+                            </span>
+                          </div>
+                          <p style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Se envía automáticamente al paciente al reservar la cita:</p>
+                          <div class="automation-template-preview" style="font-family: inherit; font-size:0.55rem; padding:0.5rem; background:white;">
+                            <div style="border-bottom:1px solid #f1f5f9; padding-bottom:0.35rem; margin-bottom:0.35rem; font-weight:800; color:#0f172a;">
+                              Confirmación de tu reserva · Teramy
+                            </div>
+                            <p style="color:#475569; margin-bottom:0.35rem;">Hola Carlos Ramírez,</p>
+                            <p style="color:#475569; margin-bottom:0.5rem;">Tu sesión con la <strong>Dra. Laura Morales</strong> está confirmada:</p>
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:0.35rem; display:flex; flex-direction:column; gap:0.25rem; font-weight:600; color:#0f172a;">
+                              <div>📅 Hoy a las 10:00 hrs</div>
+                              <div>💻 Video Meet: meet.google.com/abc-def</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+              <div class="macbook-hinge"></div>
+              <div class="macbook-base"></div>
+              <div class="macbook-bottom"></div>
+            </div>
+
+            <!-- iPhone Screen Mockup (Matching the landing page frame and clean layout) -->
+            <div class="phone-wrapper" id="phone-node">
+              <div class="phone-frame">
+                
+                <!-- Notch -->
+                <div style="display: flex; justify-content: center; margin-bottom: 5px;">
+                  <div style="width: 44px; height: 6px; background: #2d2d4a; border-radius: 3px;"></div>
+                </div>
+
+                <!-- Glass sheen reflection -->
+                <div class="phone-glass-reflection"></div>
+                
+                <div class="phone-screen">
+                  
+                  <!-- Mobile App Top Header (Matches Landing Page exactly) -->
+                  <div class="mobile-app-header-bar" id="mobile-app-header-node">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span class="mobile-logo-text">Teramy</span>
+                      <div class="mobile-avatar" id="mobile-avatar-initials">LM</div>
+                    </div>
+                    <p class="mobile-date-label" id="mobile-date-label">MIÉ 3 JUN</p>
+                  </div>
+                  
+                  <!-- PAGE 1: MOBILE DASHBOARD -->
+                  <div class="mobile-app-page active" id="mobile-view-dashboard">
+                    <!-- Quick stats row (Matches Landing Page) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-top: 0.25rem;">
+                      <div style="background: white; border-radius: 8px; padding: 0.55rem; border: 1px solid #e2e8f0; text-align: left;">
+                        <p style="font-size: 0.52rem; color: #94a3b8; margin: 0 0 0.15rem; font-weight: 500;">Sesiones hoy</p>
+                        <p style="font-size: 0.9rem; font-weight: 800; color: #0f172a; margin: 0;" id="mobile-val-sessions-mob">3</p>
+                      </div>
+                      <div style="background: white; border-radius: 8px; padding: 0.55rem; border: 1px solid #e2e8f0; text-align: left;">
+                        <p style="font-size: 0.52rem; color: #94a3b8; margin: 0 0 0.15rem; font-weight: 500;">Ingresos sem.</p>
+                        <p style="font-size: 0.9rem; font-weight: 800; color: #0f172a; margin: 0;" id="mobile-val-revenue-mob">$125K</p>
+                      </div>
+                    </div>
+
+                    <p style="font-size: 0.52rem; font-weight: 700; color: #64748b; margin: 0.5rem 0 0.1rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: left;">PRÓXIMAS SESIONES</p>
+                    
+                    <!-- Card 1: Next (Blue style) -->
+                    <div style="background: #f0f9ff; border-radius: 8px; padding: 0.55rem; border: 1px solid #bae6fd; display: flex; align-items: center; gap: 0.5rem;">
+                      <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(14,165,233,0.15); color: #0ea5e9; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; flex-shrink: 0;" id="mobile-next-avatar-initials">CR</div>
+                      <div style="flex: 1; min-width: 0; text-align: left;">
+                        <p style="font-size: 0.65rem; font-weight: 700; color: #0f172a; margin: 0;" id="mobile-next-name-node">Carlos Ramírez</p>
+                        <p style="font-size: 0.55rem; color: #94a3b8; margin: 0;" id="mobile-next-type-node">Psicoterapia</p>
+                      </div>
+                      <div style="flex-shrink: 0; text-align: right;">
+                        <p style="font-size: 0.65rem; font-weight: 800; color: #0ea5e9; margin: 0;" id="mobile-next-time-node">10:00</p>
+                        <div style="font-size: 0.48rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 0.08rem 0.28rem; border-radius: 3px; margin-top: 0.1rem; display: inline-block;">Próxima</div>
+                      </div>
+                    </div>
+
+                    <!-- Card 2: Regular (Orange style) -->
+                    <div style="background: white; border-radius: 8px; padding: 0.55rem; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 0.5rem;">
+                      <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(245,158,11,0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; flex-shrink: 0;">AS</div>
+                      <div style="flex: 1; min-width: 0; text-align: left;">
+                        <p style="font-size: 0.65rem; font-weight: 700; color: #0f172a; margin: 0;">Ana Silva</p>
+                        <p style="font-size: 0.55rem; color: #94a3b8; margin: 0;">Terapia pareja</p>
+                      </div>
+                      <div style="flex-shrink: 0; text-align: right;">
+                        <p style="font-size: 0.65rem; font-weight: 800; color: #64748b; margin: 0;">12:30</p>
+                      </div>
+                    </div>
+
+                    <!-- Card 3: Regular (Green style) -->
+                    <div style="background: white; border-radius: 8px; padding: 0.55rem; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 0.5rem;">
+                      <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(16,185,129,0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; flex-shrink: 0;">MT</div>
+                      <div style="flex: 1; min-width: 0; text-align: left;">
+                        <p style="font-size: 0.65rem; font-weight: 700; color: #0f172a; margin: 0;">Miguel Torres</p>
+                        <p style="font-size: 0.55rem; color: #94a3b8; margin: 0;">Evaluación</p>
+                      </div>
+                      <div style="flex-shrink: 0; text-align: right;">
+                        <p style="font-size: 0.65rem; font-weight: 800; color: #64748b; margin: 0;">16:00</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PAGE 2: MOBILE CRM (PACIENTES) -->
+                  <div class="mobile-app-page" id="mobile-view-patients">
+                    <div class="mobile-date-bar">CRM Pacientes (48)</div>
+                    <input type="text" class="mobile-crm-search" placeholder="🔍 Buscar paciente...">
+                    
+                    <div class="mobile-patient-list">
+                      <div class="mobile-session-card" style="background:white; border:1px solid var(--border-light); border-radius:10px; padding:0.55rem; display:flex; align-items:center; gap:0.5rem;">
+                        <div class="mobile-session-avatar" style="background: #e0f2fe; color: #0369a1; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;" id="mobile-crm-avatar-1">CR</div>
+                        <div class="mobile-session-info" style="flex:1;">
+                          <p class="mobile-session-name" id="mobile-crm-name-1" style="font-size:0.72rem; font-weight:700; color:var(--text-dark); margin:0;">Carlos Ramírez</p>
+                          <p class="mobile-session-type" style="font-size:0.52rem; color:var(--text-muted); margin:0;">carlos.ramirez@email.com</p>
+                        </div>
+                        <span class="crm-status-pill status-active" style="transform:scale(0.85)">En Proceso</span>
+                      </div>
+
+                      <div class="mobile-session-card" style="background:white; border:1px solid var(--border-light); border-radius:10px; padding:0.55rem; display:flex; align-items:center; gap:0.5rem;">
+                        <div class="mobile-session-avatar" style="background: #ecfdf5; color: #047857; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">MG</div>
+                        <div class="mobile-session-info" style="flex:1;">
+                          <p class="mobile-session-name" style="font-size:0.72rem; font-weight:700; color:var(--text-dark); margin:0;">María Gómez</p>
+                          <p class="mobile-session-type" style="font-size:0.52rem; color:var(--text-muted); margin:0;">maria.gomez@email.com</p>
+                        </div>
+                        <span class="crm-status-pill status-active" style="transform:scale(0.85)">En Proceso</span>
+                      </div>
+
+                      <div class="mobile-session-card" style="background:white; border:1px solid var(--border-light); border-radius:10px; padding:0.55rem; display:flex; align-items:center; gap:0.5rem;">
+                        <div class="mobile-session-avatar" style="background: #f5f3ff; color: #5b21b6; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">AS</div>
+                        <div class="mobile-session-info" style="flex:1;">
+                          <p class="mobile-session-name" style="font-size:0.72rem; font-weight:700; color:var(--text-dark); margin:0;">Ana Silva</p>
+                          <p class="mobile-session-type" style="font-size:0.52rem; color:var(--text-muted); margin:0;">ana.silva@email.com</p>
+                        </div>
+                        <span class="crm-status-pill status-active" style="transform:scale(0.85)">En Proceso</span>
+                      </div>
+
+                      <div class="mobile-session-card" style="background:white; border:1px solid var(--border-light); border-radius:10px; padding:0.55rem; display:flex; align-items:center; gap:0.5rem;">
+                        <div class="mobile-session-avatar" style="background: #fff7ed; color: #c2410c; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">MT</div>
+                        <div class="mobile-session-info" style="flex:1;">
+                          <p class="mobile-session-name" style="font-size:0.72rem; font-weight:700; color:var(--text-dark); margin:0;">Miguel Torres</p>
+                          <p class="mobile-session-type" style="font-size:0.52rem; color:var(--text-muted); margin:0;">miguel.torres@email.com</p>
+                        </div>
+                        <span class="crm-status-pill status-paused" style="transform:scale(0.85)">En Pausa</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PAGE 3: MOBILE CALENDAR -->
+                  <div class="mobile-app-page" id="mobile-view-calendar">
+                    <div class="mobile-date-bar">Junio 2026</div>
+                    
+                    <div class="mobile-calendar-days">
+                      <div class="mobile-calendar-day-btn">
+                        <span style="font-size:0.48rem;color:var(--text-muted);">Lun</span>
+                        <span style="font-size:0.65rem;font-weight:800;">1</span>
+                      </div>
+                      <div class="mobile-calendar-day-btn">
+                        <span style="font-size:0.48rem;color:var(--text-muted);">Mar</span>
+                        <span style="font-size:0.65rem;font-weight:800;">2</span>
+                      </div>
+                      <div class="mobile-calendar-day-btn active">
+                        <span style="font-size:0.48rem;color:white;opacity:0.8;">Mié</span>
+                        <span style="font-size:0.75rem;font-weight:900;">3</span>
+                      </div>
+                      <div class="mobile-calendar-day-btn">
+                        <span style="font-size:0.48rem;color:var(--text-muted);">Jue</span>
+                        <span style="font-size:0.65rem;font-weight:800;">4</span>
+                      </div>
+                      <div class="mobile-calendar-day-btn">
+                        <span style="font-size:0.48rem;color:var(--text-muted);">Vie</span>
+                        <span style="font-size:0.65rem;font-weight:800;">5</span>
+                      </div>
+                    </div>
+
+                    <div class="mobile-timeline">
+                      <div class="mobile-timeline-slot">
+                        <span class="mobile-slot-time">10:00</span>
+                        <div class="mobile-slot-card slot-blue">
+                          <div id="mobile-cal-name-1">Carlos Ramírez</div>
+                          <div style="font-size:0.48rem;font-weight:500;opacity:0.95;">10:00 - 10:50 · Online</div>
+                        </div>
+                      </div>
+
+                      <div class="mobile-timeline-slot">
+                        <span class="mobile-slot-time">12:30</span>
+                        <div class="mobile-slot-card slot-orange">
+                          <div>Ana Silva</div>
+                          <div style="font-size:0.48rem;font-weight:500;opacity:0.95;">12:30 - 13:20 · Online</div>
+                        </div>
+                      </div>
+
+                      <div class="mobile-timeline-slot">
+                        <span class="mobile-slot-time">16:00</span>
+                        <div class="mobile-slot-card slot-green">
+                          <div>Miguel Torres</div>
+                          <div style="font-size:0.48rem;font-weight:500;opacity:0.95;">16:00 - 16:50 · Presencial</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PAGE 4: MOBILE ANALYTICS -->
+                  <div class="mobile-app-page" id="mobile-view-analytics">
+                    <div class="mobile-date-bar">Analíticas del Mes</div>
+                    
+                    <div class="mobile-stats-grid">
+                      <div class="mobile-stat-mini">
+                        <p class="mobile-stat-lbl">Recaudado</p>
+                        <p class="mobile-stat-num">$1.25M</p>
+                      </div>
+                      <div class="mobile-stat-mini">
+                        <p class="mobile-stat-lbl">Asistencia</p>
+                        <p class="mobile-stat-num" style="color:#059669;">97.4%</p>
+                      </div>
+                    </div>
+
+                    <!-- Mini bar chart -->
+                    <div class="mobile-progress-card">
+                      <span class="mobile-section-title" style="margin-top:0; font-size:0.6rem;">Sesiones Semanales</span>
+                      <div style="display:flex; justify-content:space-around; align-items:flex-end; height:70px; border-bottom:1px solid #f1f5f9; padding-bottom:0.15rem;">
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+                          <div style="width:12px; height:32px; background:#e2e8f0; border-radius:2px;"></div>
+                          <span style="font-size:0.42rem;color:var(--text-muted);">S1</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+                          <div style="width:12px; height:24px; background:#e2e8f0; border-radius:2px;"></div>
+                          <span style="font-size:0.42rem;color:var(--text-muted);">S2</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+                          <div style="width:12px; height:50px; background:var(--primary-gradient); border-radius:2px;"></div>
+                          <span style="font-size:0.42rem;color:var(--text-dark);font-weight:700;">S3</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+                          <div style="width:12px; height:38px; background:#e2e8f0; border-radius:2px;"></div>
+                          <span style="font-size:0.42rem;color:var(--text-muted);">S4</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mobile-progress-card">
+                      <div class="mobile-progress-row">
+                        <div class="mobile-progress-label-row">
+                          <span>Sesiones Online</span>
+                          <span>78%</span>
+                        </div>
+                        <div class="mobile-progress-bar-bg">
+                          <div class="mobile-progress-bar-fg" style="width: 78%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- HIGH-FIDELITY WHATSAPP APPLICATION UI INSIDE PHONE SCREEN -->
+                  <div class="mobile-wa-chat-container" id="mobile-whatsapp-app">
+                    <div class="mobile-wa-header">
+                      <div class="wa-header-avatar" style="background:#e0f2fe; color:#0369a1; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;" id="wa-avatar-node-mob">CR</div>
+                      <div class="wa-header-info" style="text-align:left;">
+                        <p class="wa-header-name" id="wa-chat-name-node-mob" style="font-size:0.75rem; font-weight:700; margin:0;">Carlos Ramírez</p>
+                        <p class="wa-header-sub" style="font-size:0.5rem; opacity:0.85; margin:0;">en línea</p>
+                      </div>
+                      <i data-lucide="video" style="width:14px;height:14px;color:white;margin-right:0.2rem;"></i>
+                      <i data-lucide="phone" style="width:12px;height:12px;color:white;"></i>
+                    </div>
+                    <div class="mobile-wa-body">
+                      <div class="mobile-wa-bubble sent">
+                        <p id="wa-bubble-text-node-mob" style="margin:0;">¡Hola Carlos! 👋 Te recuerdo que tienes sesión hoy a las 10:00. Modalidad Online. ¡Nos vemos! 💙</p>
+                        <div class="wa-time" style="font-size:0.45rem; color:#888; text-align:right; margin-top:0.15rem;">10:32 ✓✓</div>
+                      </div>
+                      <div class="mobile-wa-bubble received">
+                        <p style="margin:0;">¡Hola! Excelente, ahí estaré. Muchas gracias por el link.</p>
+                        <div class="wa-time" style="font-size:0.45rem; color:#888; text-align:right; margin-top:0.15rem;">10:35</div>
+                      </div>
+                    </div>
+                    <div class="mobile-wa-footer">
+                      <i data-lucide="plus" style="width:16px;height:16px;color:#007aff;cursor:pointer;"></i>
+                      <div class="mobile-wa-input">Escribe un mensaje...</div>
+                      <i data-lucide="camera" style="width:16px;height:16px;color:#8e8e93;"></i>
+                      <i data-lucide="mic" style="width:16px;height:16px;color:#8e8e93;"></i>
+                    </div>
+                  </div>
+
+                  <div class="phone-home-indicator"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating WhatsApp Chat Bubble Mockup (used for Laptop + WA template) -->
+            <div class="floating-wa-panel" id="floating-wa-node">
+              <div class="wa-header">
+                <div class="wa-header-avatar" id="wa-avatar-node">CR</div>
+                <div class="wa-header-info">
+                  <p class="wa-header-name" id="wa-chat-name-node">Carlos Ramírez</p>
+                  <p class="wa-header-sub">en línea</p>
+                </div>
+                <i data-lucide="video" style="width:14px;height:14px;color:white;margin-right:0.4rem;"></i>
+                <i data-lucide="phone" style="width:12px;height:12px;color:white;"></i>
+              </div>
+              <div class="wa-body">
+                <div class="wa-bubble sent">
+                  <p id="wa-bubble-text-node">¡Hola Carlos! 👋 Te recuerdo que tienes sesión hoy a las 10:00. Modalidad Online. ¡Nos vemos! 💙</p>
+                  <div class="wa-time">10:32 ✓✓</div>
+                </div>
+                <div class="wa-bubble received">
+                  <p>¡Hola! Excelente, ahí estaré. Muchas gracias por el link.</p>
+                  <div class="wa-time">10:35</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating Clinical Note Editor Mockup -->
+            <div class="floating-note-panel" id="floating-note-node">
+              <div class="note-header">
+                <div class="note-header-avatar" id="note-avatar-node">CR</div>
+                <span class="note-header-name" id="note-client-name-node">Carlos Ramírez</span>
+                <span class="note-header-badge">Sesión #8</span>
+              </div>
+              <div class="note-body">
+                <div class="note-field">
+                  <span class="note-field-label">Motivo de consulta / Tema</span>
+                  <div class="note-field-value" id="note-topic-node">Técnicas de reestructuración cognitiva y manejo de ansiedad</div>
+                </div>
+                <div class="note-field">
+                  <span class="note-field-label">Evolución & Notas</span>
+                  <div class="note-field-textarea" id="note-body-node">El paciente presenta avances significativos en identificar sus pensamientos automáticos de frustración laboral. Se ejercita respiración diafragmática para momentos de crisis.</div>
+                </div>
+              </div>
+              <div class="note-footer">
+                <span>Historial Clínico Guardado</span>
+                <span class="note-save-status">
+                  <i data-lucide="check-circle-2" style="width:12px;height:12px;"></i> Guardado
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Branding Corner overlay -->
+          <div class="canvas-brand-footer" id="canvas-logo-footer">
+            <img src="fondo blanco.png" alt="" onerror="this.src='https://raw.githubusercontent.com/GeminiAgent/placeholder/main/logo.png'; this.onerror=null;">
+            <span>teramy.co</span>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Responsive Canvas scaling in the preview window
+    window.addEventListener('resize', resizeCanvasPreview);
+    
+    // Switch tabs on sidebar
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      el.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Set background of the canvas
+    function setBackground(bgType, el) {
+      if (el) {
+        document.querySelectorAll('.color-preset-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
+      }
+      
+      const canvas = document.getElementById('instagram-canvas');
+      canvas.style.background = '';
+      
+      if (bgType === 'gradient-teramy') {
+        canvas.style.background = 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)';
+      } else if (bgType === 'gradient-calm') {
+        canvas.style.background = 'linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%)';
+      } else if (bgType === 'gradient-sunset') {
+        canvas.style.background = 'linear-gradient(135deg, #ffedd5 0%, #fecdd3 100%)';
+      } else if (bgType === 'gradient-forest') {
+        canvas.style.background = 'linear-gradient(135deg, #0f172a 0%, #0d9488 100%)';
+      } else if (bgType === 'solid-dark') {
+        canvas.style.backgroundColor = '#0f172a';
+      }
+      resizeCanvasPreview();
+    }
+
+    function setCustomBackgroundColor(val) {
+      document.querySelectorAll('.color-preset-btn').forEach(btn => btn.classList.remove('active'));
+      const canvas = document.getElementById('instagram-canvas');
+      canvas.style.background = val;
+      resizeCanvasPreview();
+    }
+
+    // Toggle background blobs
+    function toggleBackgroundBlobs() {
+      const checked = document.getElementById('toggle-blobs').checked;
+      document.querySelectorAll('.canvas-blob').forEach(blob => {
+        blob.style.display = checked ? 'block' : 'none';
+      });
+    }
+
+    // Toggle logo corner
+    function toggleLogoCorner() {
+      const checked = document.getElementById('toggle-logo').checked;
+      document.getElementById('canvas-logo-footer').style.display = checked ? 'flex' : 'none';
+    }
+
+    // Toggle Post Title
+    function togglePostTitle() {
+      const checked = document.getElementById('toggle-title').checked;
+      document.getElementById('canvas-header-node').style.display = checked ? 'flex' : 'none';
+      
+      // Shift device vertically if title is hidden
+      const macbook = document.getElementById('macbook-node');
+      const phone = document.getElementById('phone-node');
+      
+      if (!checked) {
+        macbook.style.transform = macbook.style.transform.replace('translateY(40px)', 'translateY(-20px)');
+        phone.style.transform = phone.style.transform.replace('translateY(10px)', 'translateY(-20px)');
+      } else {
+        updateTemplateLayout();
+      }
+      resizeCanvasPreview();
+    }
+
+    // Update Post Title Texts
+    function updatePostTitleText() {
+      const title = document.getElementById('input-post-title').value;
+      const badge = document.getElementById('input-post-badge').value;
+      
+      document.getElementById('canvas-badge-text').innerText = badge;
+      document.getElementById('canvas-title-text').innerHTML = title.replace(/\n/g, '<br>');
+      
+      document.getElementById('canvas-badge-text').style.display = badge ? 'inline-flex' : 'none';
+    }
+
+    function updatePostTitleColor() {
+      const color = document.getElementById('title-color-select').value;
+      const titleNode = document.getElementById('canvas-title-text');
+      const badgeNode = document.getElementById('canvas-badge-text');
+      
+      if (color === 'white') {
+        titleNode.style.color = 'white';
+        badgeNode.style.background = 'rgba(255, 255, 255, 0.15)';
+        badgeNode.style.color = 'white';
+        badgeNode.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+      } else if (color === 'dark') {
+        titleNode.style.color = '#0f172a';
+        badgeNode.style.background = 'rgba(15, 23, 42, 0.08)';
+        badgeNode.style.color = '#0f172a';
+        badgeNode.style.borderColor = 'rgba(15, 23, 42, 0.15)';
+      } else if (color === 'primary') {
+        titleNode.style.color = '#0284c7';
+        badgeNode.style.background = 'rgba(14, 165, 233, 0.1)';
+        badgeNode.style.color = '#0ea5e9';
+        badgeNode.style.borderColor = 'rgba(14, 165, 233, 0.2)';
+      }
+    }
+
+    // Update Canvas Format (1:1, 4:5, 9:16)
+    function updateCanvasFormat() {
+      const format = document.getElementById('format-select').value;
+      const canvas = document.getElementById('instagram-canvas');
+      
+      canvas.className = '';
+      canvas.classList.add('size-' + format);
+      
+      updateTemplateLayout();
+    }
+
+    // Update Template Layout selection
+    function updateTemplateLayout() {
+      const canvas = document.getElementById('instagram-canvas');
+      const layout = document.getElementById('template-select').value;
+      const mobileWaApp = document.getElementById('mobile-whatsapp-app');
+      
+      canvas.classList.remove('layout-both', 'layout-laptop', 'layout-mobile', 'layout-mobile-wa', 'layout-laptop-note');
+      canvas.classList.add('layout-' + layout);
+      
+      // Toggle full WhatsApp interface inside the phone frame
+      if (layout === 'mobile-wa') {
+        mobileWaApp.style.display = 'flex';
+      } else {
+        // Only show if page selected is automations
+        const selectedPage = document.getElementById('app-page-select').value;
+        if (selectedPage === 'automations') {
+          mobileWaApp.style.display = 'flex';
+        } else {
+          mobileWaApp.style.display = 'none';
+        }
+      }
+      
+      setTimeout(resizeCanvasPreview, 50);
+    }
+
+    // Update Sub-Page view inside both devices
+    function updateAppViewPage() {
+      const selectedPage = document.getElementById('app-page-select').value;
+      const mobileWaApp = document.getElementById('mobile-whatsapp-app');
+      const statusBar = document.getElementById('phone-status-bar-node');
+      
+      // Update laptop screens views
+      document.querySelectorAll('.app-view-page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById('view-' + selectedPage).classList.add('active');
+
+      // Update laptop sidebar active states
+      document.querySelectorAll('.app-menu-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      const sidebarItem = document.getElementById('sidebar-item-' + selectedPage);
+      if (sidebarItem) sidebarItem.classList.add('active');
+
+      // Update mobile screens views
+      document.querySelectorAll('.mobile-app-page').forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      const mobilePage = document.getElementById('mobile-view-' + selectedPage);
+      if (mobilePage) {
+        mobilePage.classList.add('active');
+      } else {
+        document.getElementById('mobile-view-dashboard').classList.add('active');
+      }
+
+      // Special WhatsApp page override for phone UI
+      if (selectedPage === 'automations') {
+        mobileWaApp.style.display = 'flex';
+        statusBar.style.color = 'white'; // White status bar on green header
+      } else {
+        const layout = document.getElementById('template-select').value;
+        if (layout !== 'mobile-wa') {
+          mobileWaApp.style.display = 'none';
+          statusBar.style.color = '#0f172a'; // Black status bar
+        } else {
+          mobileWaApp.style.display = 'flex';
+          statusBar.style.color = 'white';
+        }
+      }
+
+      resizeCanvasPreview();
+    }
+
+    // Update Live App Data Text Mockups
+    function updateDashboardText() {
+      const psychName = document.getElementById('input-psych-name').value;
+      const statSessions = document.getElementById('input-stat-sessions').value;
+      const statPatients = document.getElementById('input-stat-patients').value;
+      const statRevenue = document.getElementById('input-stat-revenue').value;
+      const statHours = document.getElementById('input-stat-hours').value;
+      
+      const clientName = document.getElementById('input-client-name').value;
+      const clientTime = document.getElementById('input-client-time').value;
+      const clientType = document.getElementById('input-client-type').value;
+      
+      const waText = document.getElementById('input-wa-text').value;
+      
+      const noteTopic = document.getElementById('input-note-topic').value;
+      const noteBody = document.getElementById('input-note-body').value;
+
+      // Initials Helper
+      const getInitials = (name) => {
+        if (!name) return '??';
+        const parts = name.split(' ');
+        if (parts.length >= 2) {
+          return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+        return name.slice(0, 2).toUpperCase();
+      };
+
+      const initialsPsych = getInitials(psychName);
+      const initialsClient = getInitials(clientName);
+
+      // Laptop Dash Text
+      document.getElementById('app-user-node').innerText = psychName;
+      document.getElementById('app-avatar-initials').innerText = initialsPsych;
+      document.getElementById('app-greeting-node').innerText = `Hola, ${psychName.split(' ')[0] || psychName}`;
+      
+      document.getElementById('app-today-count-node').innerText = statSessions;
+      document.getElementById('app-val-sessions').innerText = statSessions;
+      document.getElementById('app-val-patients').innerText = statPatients;
+      document.getElementById('app-val-revenue').innerText = statRevenue;
+      document.getElementById('app-val-hours').innerText = statHours;
+
+      document.getElementById('app-next-time-node').innerText = clientTime;
+      document.getElementById('app-next-initials').innerText = initialsClient;
+      document.getElementById('app-next-name-node').innerText = clientName;
+      document.getElementById('app-next-type-node').innerText = clientType;
+
+      document.getElementById('agenda-time-1').innerText = clientTime;
+      document.getElementById('agenda-avatar-1').innerText = initialsClient;
+      document.getElementById('agenda-name-1').innerText = clientName;
+      document.getElementById('agenda-type-1').innerText = clientType.split(' ')[0] || clientType;
+
+      // Actividad reciente text sync
+      document.getElementById('act-name-1').innerText = clientName;
+
+      // CRM page elements
+      document.getElementById('crm-name-1').innerText = clientName;
+      document.getElementById('crm-avatar-1').innerText = initialsClient;
+      document.getElementById('crm-time-1').innerText = `Hoy, ${clientTime} hrs`;
+
+      // Calendar page elements
+      document.getElementById('cal-time-1').innerText = `${clientTime} - ${calculateEndTime(clientTime)}`;
+      document.getElementById('cal-name-1').innerText = clientName;
+
+      // Mobile Dash Text
+      const mobTodayCount = document.querySelectorAll('.mobile-today-count-node-class');
+      mobTodayCount.forEach(el => el.innerText = statSessions);
+      
+      const valSessionsMob = document.getElementById('mobile-val-sessions-mob');
+      if (valSessionsMob) valSessionsMob.innerText = statSessions + ' citas';
+      
+      const valRevenueMob = document.getElementById('mobile-val-revenue-mob');
+      if (valRevenueMob) valRevenueMob.innerText = statRevenue;
+      
+      const mobNextAvatar = document.getElementById('mobile-next-avatar-initials');
+      if (mobNextAvatar) mobNextAvatar.innerText = initialsClient;
+      
+      const mobNextName = document.getElementById('mobile-next-name-node');
+      if (mobNextName) mobNextName.innerText = clientName;
+      
+      const mobNextType = document.getElementById('mobile-next-type-node');
+      if (mobNextType) mobNextType.innerText = clientType.split(' ')[0] || clientType;
+      
+      const mobNextTime = document.getElementById('mobile-next-time-node');
+      if (mobNextTime) mobNextTime.innerText = clientTime;
+
+      // Mobile CRM Text
+      document.getElementById('mobile-crm-name-1').innerText = clientName;
+      document.getElementById('mobile-crm-avatar-1').innerText = initialsClient;
+
+      // Mobile Calendar Text
+      document.getElementById('mobile-cal-name-1').innerText = clientName;
+
+      // WhatsApp Text
+      document.getElementById('wa-avatar-node').innerText = initialsClient;
+      document.getElementById('wa-chat-name-node').innerText = clientName;
+      document.getElementById('wa-bubble-text-node').innerText = waText;
+
+      // Mobile WhatsApp app sync
+      document.getElementById('wa-avatar-node-mob').innerText = initialsClient;
+      document.getElementById('wa-chat-name-node-mob').innerText = clientName;
+      document.getElementById('wa-bubble-text-node-mob').innerText = waText;
+
+      // WhatsApp automation template
+      document.getElementById('automation-wa-preview-node').innerText = `¡Hola {{nombre}}! 👋\nTe recuerdo que tienes sesión hoy a las *{{hora}}*.\n💻 Modalidad: {{modalidad}}\n\n¡Nos vemos! 💙`;
+
+      // Clinical Note Text
+      document.getElementById('note-avatar-node').innerText = initialsClient;
+      document.getElementById('note-client-name-node').innerText = clientName;
+      document.getElementById('note-topic-node').innerText = noteTopic;
+      document.getElementById('note-body-node').innerText = noteBody;
+
+      resizeCanvasPreview();
+    }
+
+    // Helper to calculate end time assuming 50 minute session duration
+    function calculateEndTime(timeStr) {
+      if (!timeStr || !timeStr.includes(':')) return '10:50';
+      const [h, m] = timeStr.split(':').map(Number);
+      const minutes = h * 60 + m + 50;
+      const endH = Math.floor(minutes / 60) % 24;
+      const endM = minutes % 60;
+      return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+    }
+
+    // Function to calculate scaling factor of the preview canvas
+    function resizeCanvasPreview() {
+      const canvas = document.getElementById('instagram-canvas');
+      const wrapper = document.getElementById('canvas-wrapper');
+      if (!canvas || !wrapper) return;
+      
+      canvas.style.transform = 'scale(1)';
+      
+      const canvasWidth = canvas.offsetWidth;
+      const canvasHeight = canvas.offsetHeight;
+      const wrapperWidth = wrapper.offsetWidth;
+      const wrapperHeight = wrapper.offsetHeight;
+      
+      const padding = 60;
+      
+      const scaleX = (wrapperWidth - padding) / canvasWidth;
+      const scaleY = (wrapperHeight - padding) / canvasHeight;
+      
+      const scale = Math.min(scaleX, scaleY, 0.9);
+      canvas.style.transform = `scale(${scale})`;
+    }
+
+    // Export mockup element to high-res PNG using html2canvas
+    async function exportMockup() {
+      const canvas = document.getElementById('instagram-canvas');
+      const btn = document.getElementById('export-btn');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generando...';
+      
+      const originalTransform = canvas.style.transform;
+      canvas.style.transform = 'none';
+      
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      html2canvas(canvas, {
+        scale: 2.2, // Crisp retina resolution
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null
+      }).then(renderedCanvas => {
+        canvas.style.transform = originalTransform;
+        
+        const image = renderedCanvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        
+        const formatVal = document.getElementById('format-select').value;
+        const templateVal = document.getElementById('template-select').value;
+        const pageVal = document.getElementById('app-page-select').value;
+        
+        link.download = `teramy_mockup_${templateVal}_${pageVal}_${formatVal}.png`;
+        link.href = image;
+        link.click();
+        
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="download"></i> Exportar para Instagram';
+        lucide.createIcons();
+      }).catch(err => {
+        console.error("Export error: ", err);
+        canvas.style.transform = originalTransform;
+        alert("Error al exportar. Por favor, intenta de nuevo.");
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="download"></i> Exportar para Instagram';
+        lucide.createIcons();
+      });
+    }
+
+    // Initial triggers
+    updatePostTitleText();
+    updateDashboardText();
+    updateTemplateLayout();
+    updateAppViewPage();
+    
+    setTimeout(resizeCanvasPreview, 200);
+  </script>
+</body>
+</html>

@@ -47,14 +47,45 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado.' }, { status: 403 });
     }
 
-    // ── 4. Actualizar estado a cancelled ──────────────────────────────────
+    // ── 4. Cancelar suscripción en Mercado Pago si existe ──────────────────
+    const accessToken = process.env.MP_ACCESS_TOKEN;
+    if (accessToken) {
+      try {
+        const searchRes = await fetch(
+          `https://api.mercadopago.com/preapproval/search?external_reference=${psychologistId}&status=authorized`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        if (searchRes.ok) {
+          const searchData = await searchRes.json();
+          const results = searchData.results || [];
+          for (const sub of results) {
+            if (sub.id && sub.status === 'authorized') {
+              console.log(`Cancelando preapproval en MP: ${sub.id}`);
+              await fetch(`https://api.mercadopago.com/preapproval/${sub.id}`, {
+                method: 'PUT',
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'cancelled' }),
+              });
+            }
+          }
+        }
+      } catch (mpErr) {
+        console.error('Error cancelando en Mercado Pago:', mpErr);
+        // Continuar para al menos cancelar en DB local
+      }
+    }
+
+    // ── 5. Actualizar estado a cancelled en Supabase ──────────────────────
     const { error: updateErr } = await supabaseAdmin
       .from('psychologists')
       .update({ subscription_status: 'cancelled' })
       .eq('id', psychologistId);
 
     if (updateErr) {
-      console.error('Error cancelando plan:', updateErr);
+      console.error('Error cancelando plan en DB:', updateErr);
       return NextResponse.json({ error: 'Error interno al cancelar el plan.' }, { status: 500 });
     }
 
@@ -65,3 +96,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Error interno.' }, { status: 500 });
   }
 }
+

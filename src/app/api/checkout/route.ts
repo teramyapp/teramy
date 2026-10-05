@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import { MercadoPagoConfig, PreApproval } from 'mercadopago';
+import { createClient } from '@supabase/supabase-js';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { isValidUuid } from '@/lib/sanitize';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);
 
 export async function POST(request: Request) {
   // ── 1. Rate limiting: máx 5 intentos de checkout por IP por hora ─────────
   const ip = getClientIp(request);
-  const { success: allowed } = rateLimit(ip, { windowMs: 60 * 60_000, max: 5 });
+  const { success: allowed } = rateLimit(ip, { windowMs: 60 * 60_000, max: 10 });
   if (!allowed) {
     return NextResponse.json(
       { error: 'Demasiados intentos. Por favor espera un momento.' },
@@ -34,18 +40,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ID de psicólogo inválido' }, { status: 400 });
     }
 
+    // ── 3. Verificar existencia del psicólogo en DB ────────────────────────
+    const { data: psych, error: psychErr } = await supabaseAdmin
+      .from('psychologists')
+      .select('id, name')
+      .eq('id', psychologistId)
+      .single();
+
+    if (psychErr || !psych) {
+      return NextResponse.json({ error: 'Perfil de profesional no encontrado' }, { status: 404 });
+    }
+
     const accessToken = process.env.MP_ACCESS_TOKEN;
     const appUrl      = process.env.NEXT_PUBLIC_APP_URL || 'https://teramy.cl';
 
     if (!accessToken) {
       console.error('MP_ACCESS_TOKEN no configurado');
       return NextResponse.json(
-        { error: 'El administrador aún no ha configurado Mercado Pago.' },
+        { error: 'El servicio de cobro de Mercado Pago aún no está configurado.' },
         { status: 500 }
       );
     }
 
-    // ── 3. Crear la suscripción en MercadoPago ────────────────────────────
+    // ── 4. Crear la suscripción en MercadoPago ────────────────────────────
     const client      = new MercadoPagoConfig({ accessToken });
     const preApproval = new PreApproval(client);
 
@@ -58,7 +75,7 @@ export async function POST(request: Request) {
           transaction_amount: 19990,
           currency_id:        'CLP',
         },
-        payer_email:        email || 'test_user_123@testuser.com',
+        payer_email:        email || undefined,
         back_url:           `${appUrl}/dashboard/settings?payment=success`,
         external_reference: psychologistId,
         status:             'pending',
@@ -66,13 +83,14 @@ export async function POST(request: Request) {
     });
 
     if (!response.init_point) {
-      console.error('Error MP:', response);
+      console.error('Error al generar init_point MercadoPago:', response);
       throw new Error('No se pudo generar el enlace de suscripción.');
     }
 
     return NextResponse.json({ url: response.init_point });
   } catch (error: any) {
     console.error('Checkout error:', error);
-    return NextResponse.json({ error: 'Error interno al procesar el pago' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || 'Error interno al procesar el pago' }, { status: 500 });
   }
 }
+
