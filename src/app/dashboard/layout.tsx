@@ -20,17 +20,28 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
   const { psychologist, loading } = usePsychologist();
   const { prefetch } = useDashboardCache();
 
-  // Redirect to /login if no auth (handled here so the provider above us has run).
+  const isPaymentSuccess = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('payment') === 'success';
+  const isTrialExpired = psychologist?.trial_ends_at ? new Date(psychologist.trial_ends_at) < new Date() : false;
+  const isBlocked = !loading && !!psychologist && psychologist.subscription_status !== 'active' && (
+    psychologist.subscription_status === 'paused' ||
+    psychologist.subscription_status === 'cancelled' ||
+    (psychologist.subscription_status === 'trialing' && isTrialExpired)
+  );
+
+  // Redirect to /login if no auth, or /subscribe if trial expired
   useEffect(() => {
     if (loading) return;
     if (!psychologist) {
-      // double-check session before bouncing — psychologist could be missing yet
-      // but session valid (e.g. profile not created yet)
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session?.user) router.replace('/login');
       });
+      return;
     }
-  }, [loading, psychologist, router]);
+
+    if (isBlocked && !isPaymentSuccess) {
+      router.replace('/subscribe');
+    }
+  }, [loading, psychologist, isBlocked, isPaymentSuccess, router]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -167,6 +178,57 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
       </Link>
     );
   };
+
+  if (!loading && isBlocked && !isPaymentSuccess) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)',
+        padding: '2rem',
+        textAlign: 'center',
+        fontFamily: 'Outfit, sans-serif',
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '24px',
+          padding: '3rem 2.5rem',
+          maxWidth: '480px',
+          width: '100%',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0',
+        }}>
+          <div style={{
+            width: '64px', height: '64px', borderRadius: '50%', background: '#fef2f2',
+            color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 1.25rem', border: '2px solid #fecaca'
+          }}>
+            <Clock size={32} />
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+            Tu período de prueba ha finalizado
+          </h2>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+            Para seguir utilizando Teramy y acceder a tu agenda, pacientes y notas de sesión, activa tu suscripción.
+          </p>
+          <button
+            onClick={() => router.push('/subscribe')}
+            style={{
+              width: '100%', padding: '0.95rem', borderRadius: '14px',
+              background: 'linear-gradient(135deg, #0369a1, #0ea5e9)', color: 'white',
+              fontWeight: 800, fontSize: '1.05rem', border: 'none', cursor: 'pointer',
+              boxShadow: '0 8px 24px rgba(14,165,233,0.3)', transition: 'all 0.2s',
+            }}
+          >
+            Activar mi suscripción
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
