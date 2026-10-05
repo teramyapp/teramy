@@ -135,6 +135,8 @@ export default function SubscribePage() {
     { icon: <Shield size={18} />, text: 'Cancela cuando quieras, sin penalidades' },
   ];
 
+  const isTrialActive = psychologist?.subscription_status === 'trialing' && psychologist?.trial_ends_at && new Date(psychologist.trial_ends_at) > new Date();
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -153,7 +155,7 @@ export default function SubscribePage() {
             <img src="/fondo%20blanco.png" alt="Teramy Logo" style={{ width: '48px', height: '48px', mixBlendMode: 'multiply', objectFit: 'contain' }} />
             <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.03em' }}>teramy</span>
           </Link>
-          {psychologist?.subscription_status === 'trialing' && (
+          {isTrialActive && (
             <Link href="/dashboard" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textDecoration: 'none', background: 'white', padding: '0.5rem 1rem', borderRadius: '2rem', border: '1.5px solid #e2e8f0' }}>
               Volver
             </Link>
@@ -183,17 +185,17 @@ export default function SubscribePage() {
               margin: '0 auto 1.25rem',
               border: '2px solid rgba(255,255,255,0.3)',
             }}>
-              {psychologist?.subscription_status === 'trialing' 
+              {isTrialActive 
                 ? <Zap size={30} style={{ color: 'white' }} />
                 : <Clock size={30} style={{ color: 'white' }} />}
             </div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 0.5rem', lineHeight: 1.2 }}>
-              {psychologist?.subscription_status === 'trialing' 
+              {isTrialActive 
                 ? 'Asegura tu lugar en Teramy Pro' 
                 : 'Tu período de prueba terminó'}
             </h1>
             <p style={{ fontSize: '1rem', opacity: 0.9, margin: 0, lineHeight: 1.5 }}>
-              {psychologist?.subscription_status === 'trialing'
+              {isTrialActive
                 ? 'Suscríbete ahora para seguir usando todas las herramientas sin interrupciones cuando finalice tu prueba.'
                 : 'Para seguir usando Teramy, activa tu suscripción y continúa sin perder ningún dato.'}
             </p>

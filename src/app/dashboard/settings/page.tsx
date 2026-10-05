@@ -366,105 +366,161 @@ export default function SettingsPage() {
 
       <div className="settings-grid">
 
-        {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('payment') === 'success' && (
-          <div style={{ 
-            background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)', 
-            border: '1px solid #86efac', 
-            borderRadius: '16px', 
-            padding: '1.25rem 1.75rem', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.12)'
-          }}>
-            <div style={{ 
-              width: '44px', height: '44px', borderRadius: '12px', background: 'white', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-            }}>
-              <CheckCircle2 size={24} style={{ color: '#16a34a' }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 800, color: '#14532d', fontSize: '1.05rem', margin: '0 0 0.15rem' }}>
-                ¡Pago completado con éxito! 🎉
-              </p>
-              <p style={{ fontSize: '0.88rem', color: '#166534', margin: 0, fontWeight: 500 }}>
-                Tu suscripción a <strong>Teramy Pro</strong> está activa. Tienes acceso completo e ilimitado a todas las funciones.
-              </p>
-            </div>
-          </div>
-        )}
-        
-        {subscriptionStatus === 'trialing' && trialEndsAt && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('payment') !== 'success' && (
-          <div style={{ 
-            background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', 
-            border: '1px solid #bae6fd', 
-            borderRadius: '16px', 
-            padding: '1.25rem 1.75rem', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            boxShadow: '0 4px 12px rgba(2, 132, 199, 0.08)'
-          }}>
-            <div style={{ 
-              width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-            }}>
-              <Zap size={20} style={{ color: '#0284c7' }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 800, color: '#0c4a6e', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
-                Aprovecha al máximo tu periodo de prueba
-              </p>
-              <p style={{ fontSize: '0.85rem', color: '#0369a1', fontWeight: 500 }}>
-                Tu acceso de prueba gratuita finalizará el {new Date(trialEndsAt).toLocaleDateString('es-CL')}. ¡Suscríbete para asegurar tu lugar en Teramy Pro!
-              </p>
-            </div>
-            <button 
-              onClick={() => router.push('/subscribe')}
-              style={{ 
-                padding: '0.6rem 1.25rem', borderRadius: '10px', background: '#0284c7', color: 'white', 
-                fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.2)'
-              }}
-            >
-              Suscribirme ahora
-            </button>
-          </div>
-        )}
+        {(() => {
+          const isTrialExpired = trialEndsAt ? new Date(trialEndsAt) < new Date() : false;
+          const isTrialActive = subscriptionStatus === 'trialing' && !isTrialExpired;
+          const isPaymentSuccess = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('payment') === 'success';
 
-        {subscriptionStatus === 'active' && (
-          <div style={{ 
-            background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', 
-            border: '1px solid #bbf7d0', 
-            borderRadius: '16px', 
-            padding: '1.25rem 1.75rem', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.08)'
-          }}>
-            <div style={{ 
-              width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-            }}>
-              <CheckCircle2 size={20} style={{ color: '#16a34a' }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 800, color: '#14532d', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
-                ¡Eres Miembro Pro!
-              </p>
-              <p style={{ fontSize: '0.85rem', color: '#166534', fontWeight: 500 }}>
-                Gracias por ser parte de Teramy. Tienes acceso ilimitado a todas las funcionalidades profesionales.
-              </p>
-            </div>
-          </div>
-        )}
+          if (isPaymentSuccess) {
+            return (
+              <div style={{ 
+                background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)', 
+                border: '1px solid #86efac', 
+                borderRadius: '16px', 
+                padding: '1.25rem 1.75rem', 
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                boxShadow: '0 4px 12px rgba(22, 163, 74, 0.12)'
+              }}>
+                <div style={{ 
+                  width: '44px', height: '44px', borderRadius: '12px', background: 'white', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                }}>
+                  <CheckCircle2 size={24} style={{ color: '#16a34a' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 800, color: '#14532d', fontSize: '1.05rem', margin: '0 0 0.15rem' }}>
+                    ¡Pago completado con éxito! 🎉
+                  </p>
+                  <p style={{ fontSize: '0.88rem', color: '#166534', margin: 0, fontWeight: 500 }}>
+                    Tu suscripción a <strong>Teramy Pro</strong> está activa. Tienes acceso completo e ilimitado a todas las funciones.
+                  </p>
+                </div>
+              </div>
+            );
+          }
+
+          if (subscriptionStatus !== 'active' && isTrialExpired) {
+            return (
+              <div style={{ 
+                background: 'linear-gradient(135deg, #fff5f5, #fef2f2)', 
+                border: '1px solid #fecaca', 
+                borderRadius: '16px', 
+                padding: '1.25rem 1.75rem', 
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.08)'
+              }}>
+                <div style={{ 
+                  width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                }}>
+                  <AlertTriangle size={20} style={{ color: '#ef4444' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 800, color: '#991b1b', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
+                    Tu período de prueba ha finalizado
+                  </p>
+                  <p style={{ fontSize: '0.85rem', color: '#b91c1c', fontWeight: 500, margin: 0 }}>
+                    Tu acceso de prueba gratuita finalizó el {trialEndsAt ? new Date(trialEndsAt).toLocaleDateString('es-CL') : 'recientemente'}. Activa tu suscripción para seguir usando Teramy.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => router.push('/subscribe')}
+                  style={{ 
+                    padding: '0.6rem 1.25rem', borderRadius: '10px', background: '#ef4444', color: 'white', 
+                    fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)', whiteSpace: 'nowrap'
+                  }}
+                >
+                  Suscribirme ahora
+                </button>
+              </div>
+            );
+          }
+
+          if (isTrialActive) {
+            return (
+              <div style={{ 
+                background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', 
+                border: '1px solid #bae6fd', 
+                borderRadius: '16px', 
+                padding: '1.25rem 1.75rem', 
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.08)'
+              }}>
+                <div style={{ 
+                  width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                }}>
+                  <Zap size={20} style={{ color: '#0284c7' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 800, color: '#0c4a6e', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
+                    Aprovecha al máximo tu periodo de prueba
+                  </p>
+                  <p style={{ fontSize: '0.85rem', color: '#0369a1', fontWeight: 500 }}>
+                    Tu acceso de prueba gratuita finalizará el {new Date(trialEndsAt!).toLocaleDateString('es-CL')}. ¡Suscríbete para asegurar tu lugar en Teramy Pro!
+                  </p>
+                </div>
+                <button 
+                  onClick={() => router.push('/subscribe')}
+                  style={{ 
+                    padding: '0.6rem 1.25rem', borderRadius: '10px', background: '#0284c7', color: 'white', 
+                    fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(2, 132, 199, 0.2)', whiteSpace: 'nowrap'
+                  }}
+                >
+                  Suscribirme ahora
+                </button>
+              </div>
+            );
+          }
+
+          if (subscriptionStatus === 'active') {
+            return (
+              <div style={{ 
+                background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', 
+                border: '1px solid #bbf7d0', 
+                borderRadius: '16px', 
+                padding: '1.25rem 1.75rem', 
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                boxShadow: '0 4px 12px rgba(22, 163, 74, 0.08)'
+              }}>
+                <div style={{ 
+                  width: '40px', height: '40px', borderRadius: '12px', background: 'white', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                }}>
+                  <CheckCircle2 size={20} style={{ color: '#16a34a' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 800, color: '#14532d', fontSize: '0.95rem', marginBottom: '0.1rem' }}>
+                    ¡Eres Miembro Pro!
+                  </p>
+                  <p style={{ fontSize: '0.85rem', color: '#166534', fontWeight: 500 }}>
+                    Gracias por ser parte de Teramy. Tienes acceso ilimitado a todas las funcionalidades profesionales.
+                  </p>
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })()}
 
         <SectionCard 
           title="Plan y suscripción" 
@@ -472,38 +528,53 @@ export default function SettingsPage() {
         >
 
           {/* Plan badge */}
-          <div className="plan-badge-container">
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary-dark-blue)' }}>
-                  {subscriptionStatus === 'trialing' ? 'Teramy Trial' : 'Teramy Pro'}
-                </span>
-                <span style={{ 
-                  padding: '0.15rem 0.65rem', 
-                  borderRadius: '2rem', 
-                  background: subscriptionStatus === 'active' ? 'linear-gradient(135deg, #dcfce7, #bbf7d0)' : subscriptionStatus === 'trialing' ? '#eff6ff' : '#fee2e2', 
-                  color: subscriptionStatus === 'active' ? '#15803d' : subscriptionStatus === 'trialing' ? '#0ea5e9' : '#ef4444', 
-                  fontSize: '0.72rem', 
-                  fontWeight: 800, 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '0.05em',
-                  border: subscriptionStatus === 'active' ? '1px solid #86efac' : 'none'
-                }}>
-                  ● {
-                    subscriptionStatus === 'active' ? 'Activo' : 
-                    subscriptionStatus === 'trialing' ? 'En Prueba' : 
-                    subscriptionStatus === 'cancelled' ? 'Cancelado' : 'Pausado'
-                  }
-                </span>
+          {(() => {
+            const isTrialExpired = trialEndsAt ? new Date(trialEndsAt) < new Date() : false;
+            const isTrialActive = subscriptionStatus === 'trialing' && !isTrialExpired;
+            const statusLabel =
+              subscriptionStatus === 'active' ? 'Activo' :
+              isTrialActive ? 'En Prueba' :
+              subscriptionStatus === 'cancelled' ? 'Cancelado' : 'Prueba Finalizada';
+
+            const statusBg =
+              subscriptionStatus === 'active' ? 'linear-gradient(135deg, #dcfce7, #bbf7d0)' :
+              isTrialActive ? '#eff6ff' : '#fee2e2';
+
+            const statusColor =
+              subscriptionStatus === 'active' ? '#15803d' :
+              isTrialActive ? '#0ea5e9' : '#ef4444';
+
+            return (
+              <div className="plan-badge-container">
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary-dark-blue)' }}>
+                      {subscriptionStatus === 'active' ? 'Teramy Pro' : 'Teramy Trial'}
+                    </span>
+                    <span style={{ 
+                      padding: '0.15rem 0.65rem', 
+                      borderRadius: '2rem', 
+                      background: statusBg, 
+                      color: statusColor, 
+                      fontSize: '0.72rem', 
+                      fontWeight: 800, 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.05em',
+                      border: subscriptionStatus === 'active' ? '1px solid #86efac' : 'none'
+                    }}>
+                      ● {statusLabel}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    {subscriptionStatus === 'active' ? '$19.990 CLP / mensual' : isTrialActive ? 'Sin cobros actuales (Periodo de prueba gratuito)' : 'Prueba finalizada · Requiere suscripción'} · Miembro desde {memberSince || '—'}
+                  </p>
+                </div>
+                <div className="plan-badge-price" style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary-dark-blue)', lineHeight: 1 }}>
+                  {subscriptionStatus === 'active' ? '$19.990' : isTrialActive ? 'Prueba' : '$19.990'}
+                </div>
               </div>
-              <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                {subscriptionStatus === 'trialing' ? 'Sin cobros actuales (Periodo de prueba gratuito)' : '$19.990 CLP / mensual'} · Miembro desde {memberSince || '—'}
-              </p>
-            </div>
-            <div className="plan-badge-price" style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary-dark-blue)', lineHeight: 1 }}>
-              {subscriptionStatus === 'trialing' ? 'Prueba' : '$19.990'}
-            </div>
-          </div>
+            );
+          })()}
 
           <InfoRow 
             label={subscriptionStatus === 'trialing' ? "Fin del trial" : "Próximo cobro"} 

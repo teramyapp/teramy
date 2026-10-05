@@ -132,6 +132,11 @@ function RegisterForm() {
     const userId = newUserId || (await supabase.auth.getUser()).data.user?.id;
     if (!userId) { setAuthError('Sesión expirada. Vuelve al paso anterior.'); setRegisterLoading(false); return; }
     const finalSlug = slug || autoSlug(name);
+    
+    // Explicit 30-day trial calculation
+    const trialEnds = new Date();
+    trialEnds.setDate(trialEnds.getDate() + 30);
+
     const { error } = await supabase.from('psychologists').insert({
       user_id: userId,
       slug: finalSlug,
@@ -143,6 +148,8 @@ function RegisterForm() {
       languages,
       years_experience: yearsExp ? parseInt(yearsExp) : null,
       phone: phone ? `+56${phone}` : null,
+      subscription_status: 'trialing',
+      trial_ends_at: trialEnds.toISOString(),
     });
     setRegisterLoading(false);
     if (error) {
